@@ -7,7 +7,7 @@ function mgc2b(mgc::Vector{Float64}, α::Float64, γ::Float64)
         return b
     end
 
-    b = gnorm(b, γ) # TODO replace with inplace version
+    gnorm!(b, γ)
     
     # scale by gamma
     b[1] = log(b[1])

@@ -50,6 +50,9 @@ function test_gnorm(γ::Float64)
     g = SPTK.gnorm(mc, γ)
     ĝ = gnorm(mc, γ)
     @test_approx_eq g ĝ
+    ĝ = copy(mc)
+    gnorm!(ĝ, γ)
+    @test_approx_eq g ĝ
 
     mc = MelGeneralizedCepstrum(0.0, γ, mc)
     ĝ = gnorm(mc)
@@ -63,6 +66,9 @@ function test_ignorm(γ::Float64)
 
     g = SPTK.ignorm(mc, γ)
     ĝ = ignorm(mc, γ)
+    @test_approx_eq g ĝ
+    ĝ = copy(mc)
+    ignorm!(ĝ, γ)
     @test_approx_eq g ĝ
 
     mc = MelGeneralizedCepstrum(0.0, γ, mc)
