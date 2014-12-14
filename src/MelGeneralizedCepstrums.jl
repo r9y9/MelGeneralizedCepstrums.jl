@@ -31,7 +31,8 @@ export
 
   # Conversions
   mc2b,
-  gnorm
+  gnorm,
+  c2ir
 
 for fname in [
               "common",
@@ -39,6 +40,7 @@ for fname in [
               "mcep",
               "gcep",
               "mc2b",
+              "c2ir",
               "gnorm"
     ]
     include(string(fname, ".jl"))
