@@ -7,7 +7,7 @@ immutable MelGeneralizedCepstrum{FS<:FrequencyScale, L<:LogFunc} <: AbstractMelG
     
     function MelGeneralizedCepstrum(α::Float64, γ::Float64, 
                                     data::Vector{Float64})
-        abs(α) < 1 || error("α < 1 is supported")
+        abs(α) < 1 || error("|α| < 1 is supported")
         (-1 <= γ <= 0) || error("-1 <= γ <= 0 is supported")
         @assert length(data) > 1
         new(α, γ, data)

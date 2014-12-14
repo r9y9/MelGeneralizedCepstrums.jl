@@ -18,3 +18,9 @@ function freqt(c::Vector{Float64}, order::Int, α::Float64)
 
     wc
 end
+
+function freqt{FS,L}(c::MelGeneralizedCepstrum{FS,L}, order::Int, α::Float64)
+    raw = rawdata(c)
+    cc = freqt(raw, order, α)
+    MelGeneralizedCepstrum{FS,L}(alpha(c)+α, gamma(c), cc)
+end
