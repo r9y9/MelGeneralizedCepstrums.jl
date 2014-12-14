@@ -50,6 +50,10 @@ function test_gnorm(γ::Float64)
     g = SPTK.gnorm(mc, γ)
     ĝ = gnorm(mc, γ)
     @test_approx_eq g ĝ
+
+    mc = MelGeneralizedCepstrum(0.0, γ, mc)
+    ĝ = gnorm(mc)
+    @test_approx_eq g rawdata(ĝ)
 end
 
 function test_mc2b(α::Float64)
@@ -80,6 +84,10 @@ function test_freqt(order::Int, α::Float64)
     m = SPTK.freqt(mc, order, α)
     m̂ = freqt(mc, order, α)
     @test_approx_eq m m̂
+
+    mc = MelGeneralizedCepstrum(0.0, 0.0, mc)
+    m̂ = freqt(mc, order, α)
+    @test_approx_eq m rawdata(m̂)
 end
 
 function test_gc2gc(order::Int, γ::Float64)
@@ -91,9 +99,9 @@ function test_gc2gc(order::Int, γ::Float64)
     gc2̂ = gc2gc(gc, 0.0, order, γ)
     @test_approx_eq gc2 gc2̂
 
-    gc = GeneralizedCepstrum(0.0, gc)
-    gc2 = gc2gc(gc, order, γ)
-    @test_approx_eq rawdata(gc2) gc2̂
+    gc = MelGeneralizedCepstrum(0.0, 0.0, gc)
+    gc2̂ = gc2gc(gc, order, γ)
+    @test_approx_eq gc2 rawdata(gc2̂)
 end
 
 test_mgc_basics()
