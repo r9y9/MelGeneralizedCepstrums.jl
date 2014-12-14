@@ -56,6 +56,20 @@ function test_gnorm(γ::Float64)
     @test_approx_eq g rawdata(ĝ)
 end
 
+function test_ignorm(γ::Float64)
+    srand(98765)
+    x = rand(100)
+    mc = rand(21)
+
+    g = SPTK.ignorm(mc, γ)
+    ĝ = ignorm(mc, γ)
+    @test_approx_eq g ĝ
+
+    mc = MelGeneralizedCepstrum(0.0, γ, mc)
+    ĝ = ignorm(mc)
+    @test_approx_eq g rawdata(ĝ)
+end
+
 function test_mc2b(α::Float64)
     srand(98765)
     x = rand(100)
@@ -109,9 +123,15 @@ test_mc_basics()
 test_gc_basics()
 
 for ns in 1:15
-    γ=-1.0/ns
+    γ = -1.0/ns
     println("gnorm: testing with γ=$γ")
     test_gnorm(γ)
+end
+
+for ns in 1:15
+    γ = -1.0/ns
+    println("ignorm: testing with γ=$γ")
+    test_ignorm(γ)
 end
 
 for α in [0.35, 0.41, 0.544]
