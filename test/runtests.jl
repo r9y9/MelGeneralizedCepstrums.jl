@@ -118,6 +118,22 @@ function test_gc2gc(order::Int, γ::Float64)
     @test_approx_eq gc2 rawdata(gc2̂)
 end
 
+function test_gc2gc(order::Int, α::Float64, γ::Float64)
+    srand(98765)
+    x = rand(100)
+    mgc = rand(21)
+
+    mgc2 = SPTK.mgc2gc(gc, 0.0, 0.0, order, α, γ)
+    mgc2̂ = mgc2gc(gc, 0.0, 0.0, order, α, γ)
+    @test_approx_eq mgc2 mgc2̂
+
+    mgc = MelGeneralizedCepstrum(0.0, 0.0, gc)
+    mgc2̂ = mgc2gc(gc, order, α, γ)
+    @test_approx_eq mgc2 rawdata(mgc2̂)
+    @test alpha(mgc2²) == α
+    @test gamma(mgc2²) == γ
+end
+
 test_mgc_basics()
 test_mc_basics()
 test_gc_basics()
@@ -155,5 +171,14 @@ for order in 15:5:35
     for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
         println("gc2gc: testing with order=$order, γ=$γ")
         test_gc2gc(order, γ)
+    end
+end
+
+for order in 15:5:35
+    for α in [0.35, 0.41, 0.544]
+        for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
+            println("mgc2mgc: testing with order=$order, α=$α, γ=$γ")
+            test_gc2gc(order, γ)
+        end
     end
 end
