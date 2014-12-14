@@ -33,7 +33,8 @@ export
   mc2b,
   gnorm,
   c2ir,
-  freqt
+  freqt,
+  gc2gc
 
 for fname in [
               "common",
@@ -43,7 +44,8 @@ for fname in [
               "mc2b",
               "gnorm",
               "c2ir",
-              "freqt"
+              "freqt",
+              "gc2gc"
     ]
     include(string(fname, ".jl"))
 end

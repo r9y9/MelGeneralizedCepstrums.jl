@@ -1,7 +1,7 @@
 using MelGeneralizedCepstrums
 using Base.Test
 
-import MelGeneralizedCepstrums: frequency_scale, log_func
+import MelGeneralizedCepstrums: frequency_scale, log_func, rawdata
 
 srand(98765)
 c = rand(Float64, 21)
@@ -82,6 +82,20 @@ function test_freqt(order::Int, α::Float64)
     @test_approx_eq m m̂
 end
 
+function test_gc2gc(order::Int, γ::Float64)
+    srand(98765)
+    x = rand(100)
+    gc = rand(21)
+
+    gc2 = SPTK.gc2gc(gc, 0.0, order, γ)
+    gc2̂ = gc2gc(gc, 0.0, order, γ)
+    @test_approx_eq gc2 gc2̂
+
+    gc = GeneralizedCepstrum(0.0, gc)
+    gc2 = gc2gc(gc, order, γ)
+    @test_approx_eq rawdata(gc2) gc2̂
+end
+
 test_mgc_basics()
 test_mc_basics()
 test_gc_basics()
@@ -106,5 +120,12 @@ for order in 20:2:30
     for α in [0.35, 0.41, 0.544]
         println("freqt: testing with order=$order, α=$α")
         test_freqt(order, α)
+    end
+end
+
+for order in 15:5:35
+    for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
+        println("gc2gc: testing with order=$order, γ=$γ")
+        test_gc2gc(order, γ)
     end
 end
