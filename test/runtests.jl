@@ -72,6 +72,16 @@ function test_c2ir(len::Int=512)
     @test_approx_eq ir ir̂
 end
 
+function test_freqt(order::Int, α::Float64)
+    srand(98765)
+    x = rand(100)
+    mc = rand(21)
+
+    m = SPTK.freqt(mc, order, α)
+    m̂ = freqt(mc, order, α)
+    @test_approx_eq m m̂
+end
+
 test_mgc_basics()
 test_mc_basics()
 test_gc_basics()
@@ -90,4 +100,11 @@ end
 for len in [128, 256, 512, 1024]
     println("c2ir: testing with len=$len")
     test_c2ir(len)
+end
+
+for order in 20:2:30
+    for α in [0.35, 0.41, 0.544]
+        println("freqt: testing with order=$order, α=$α")
+        test_freqt(order, α)
+    end
 end
