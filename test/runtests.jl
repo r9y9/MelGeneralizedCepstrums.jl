@@ -75,9 +75,19 @@ function test_mc2b(α::Float64)
     x = rand(100)
     mc = rand(21)
 
-    g = SPTK.mc2b(mc, α)
-    ĝ = mc2b(mc, α)
-    @test_approx_eq g ĝ
+    b = SPTK.mc2b(mc, α)
+    b̂ = mc2b(mc, α)
+    @test_approx_eq b b̂
+end
+
+function test_b2mc(α::Float64)
+    srand(98765)
+    x = rand(100)
+    b = rand(21)
+
+    mc = SPTK.b2mc(b, α)
+    mĉ = b2mc(b, α)
+    @test_approx_eq mc mĉ
 end
 
 function test_c2ir(len::Int=512)
@@ -153,6 +163,11 @@ end
 for α in [0.35, 0.41, 0.544]
     println("mc2b: testing with α=$α")
     test_mc2b(α)
+end
+
+for α in [0.35, 0.41, 0.544]
+    println("mc2b: testing with α=$α")
+    test_b2mc(α)
 end
 
 for len in [128, 256, 512, 1024]

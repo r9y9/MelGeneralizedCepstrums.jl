@@ -31,6 +31,7 @@ export
 
   # Conversions
   mc2b,
+  b2mc,
   gnorm,
   ignorm,
   c2ir,
@@ -44,6 +45,7 @@ for fname in [
               "mcep",
               "gcep",
               "mc2b",
+              "b2mc",
               "gnorm",
               "ignorm",
               "c2ir",
