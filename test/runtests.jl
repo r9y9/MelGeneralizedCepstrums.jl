@@ -1,7 +1,8 @@
 using MelGeneralizedCepstrums
 using Base.Test
 
-import MelGeneralizedCepstrums: frequency_scale, log_func, rawdata
+import MelGeneralizedCepstrums: frequency_scale, log_func, rawdata, Mel, Linear,
+  StandardLog, GeneralizedLog
 
 srand(98765)
 c = rand(Float64, 21)

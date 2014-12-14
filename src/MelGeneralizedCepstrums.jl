@@ -10,14 +10,6 @@ export
   MelCepstrum,
   GeneralizedCepstrum,
 
-  # Frequency scales
-  Mel,
-  Linear,
-
-  # Log type
-  StandardLog,
-  GeneralizedLog,
-
   # Basic property of Mel-generalized cepstrum
   order,
   alpha,
