@@ -12,7 +12,7 @@ function freqt(c::Vector{Float64}, order::Int, α::Float64)
             wc[2] = (1.0-α*α)*prev[1] + α*prev[2]
         end
         for m=3:order+1
-            wc[m] = prev[m-1] + α*(prev[m] - wc[m-1])
+            @inbounds wc[m] = prev[m-1] + α*(prev[m] - wc[m-1])
         end
     end
 

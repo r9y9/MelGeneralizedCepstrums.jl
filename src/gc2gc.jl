@@ -12,13 +12,13 @@ function gc2gc(c1::Vector{Float64}, γ¹::Float64, m2::Int, γ²::Float64)
         end
 
         for k=2:min
-            cc = c1[k] * c2[m-k+1]
+            @inbounds cc = c1[k] * c2[m-k+1]
             ss2 += (k-1) * cc
             ss1 += (m-k) * cc
         end
 
         if m <= m1
-            c2[m] = c1[m] + (γ²*ss2 - γ¹*ss1)/(m-1)
+            @inbounds c2[m] = c1[m] + (γ²*ss2 - γ¹*ss1)/(m-1)
         else
             c2[m] = (γ²*ss2 - γ¹*ss1)/(m-1)
         end

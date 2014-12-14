@@ -2,7 +2,7 @@ function mc2b!(coef::Vector{Float64}, mc::Vector{Float64}, α::Float64)
     @assert length(coef) == length(mc)
     coef[end] = mc[end]
     for i=length(mc)-1:-1:1
-        coef[i] = mc[i] - α*coef[i+1]
+        @inbounds coef[i] = mc[i] - α*coef[i+1]
     end    
     coef
 end
