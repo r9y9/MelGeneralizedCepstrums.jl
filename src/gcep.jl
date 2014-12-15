@@ -5,5 +5,5 @@ function GeneralizedCepstrum(γ::Float64, data::Vector{Float64})
 end
 
 function gcep(x::Vector{Float64}, order::Int, γ::Float64)
-    error("not implemented")
+    SPTK.gcep(x, order, γ)
 end
