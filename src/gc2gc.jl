@@ -6,7 +6,7 @@ function gc2gc(c1::Vector{Float64}, γ¹::Float64, m2::Int, γ²::Float64)
     for m=2:m2+1
         ss1, ss2 = 0.0, 0.0
         min = m1
-
+        
         if m1 >= m-1 
             min = m-1
         end
@@ -28,7 +28,7 @@ function gc2gc(c1::Vector{Float64}, γ¹::Float64, m2::Int, γ²::Float64)
 end
 
 function gc2gc{FS,L}(c::MelGeneralizedCepstrum{FS,L}, m2::Int, γ²::Float64)
-    γ¹ = gamma(c)
+    γ¹ = glog_gamma(c)
     raw = gc2gc(rawdata(c), γ¹, m2, γ²)
-    MelGeneralizedCepstrum{FS,L}(alpha(c), γ², raw)
+    MelGeneralizedCepstrum{FS,L}(allpass_alpha(c), γ², raw)
 end

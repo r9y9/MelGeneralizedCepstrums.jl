@@ -13,6 +13,8 @@ function mc2b(mc::Vector{Float64}, α::Float64)
 end
 
 function mc2b{FS,L}(c::MelGeneralizedCepstrum{FS,L})
-    raw = mc2b(rawdata(c), alpha(c))
-    MelGeneralizedCepstrum{FS,L}(alpha(c), gamma(c), raw)
+    α = allpass_alpha(c)
+    γ = glog_gamma(c)
+    raw = mc2b(rawdata(c), α)
+    MelGeneralizedCepstrum{FS,L}(α, γ, raw)
 end

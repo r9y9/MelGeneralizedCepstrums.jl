@@ -22,5 +22,5 @@ end
 function freqt{FS,L}(c::MelGeneralizedCepstrum{FS,L}, order::Int, α::Float64)
     raw = rawdata(c)
     cc = freqt(raw, order, α)
-    MelGeneralizedCepstrum{FS,L}(alpha(c)+α, gamma(c), cc)
+    MelGeneralizedCepstrum{FS,L}(allpass_alpha(c)+α, glog_gamma(c), cc)
 end

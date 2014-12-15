@@ -17,6 +17,7 @@ function gnorm(c::Vector{Float64}, γ::Float64)
 end
 
 function gnorm{FS,L}(c::MelGeneralizedCepstrum{FS,L})
-    raw = gnorm(rawdata(c), gamma(c))
-    MelGeneralizedCepstrum{FS,L}(alpha(c), gamma(c), raw)
+    γ = glog_gamma(c)
+    raw = gnorm(rawdata(c), γ)
+    MelGeneralizedCepstrum{FS,L}(allpass_alpha(c), γ, raw)
 end

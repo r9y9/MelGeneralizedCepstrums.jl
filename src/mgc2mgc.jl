@@ -19,8 +19,8 @@ end
 
 function mgc2mgc{FS,L}(c::MelGeneralizedCepstrum{FS,L}, m2::Int, α²::Float64, 
                        γ²::Float64)
-    α¹ = alpha(c)
-    γ¹ = gamma(c)
+    α¹ = allpass_alpha(c)
+    γ¹ = glog_gamma(c)
     raw = mgc2mgc(rawdata(c), α¹, γ¹, m2, α², γ²)
     MelGeneralizedCepstrum{FS,L}(α², γ², raw)
 end

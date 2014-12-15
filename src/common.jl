@@ -25,9 +25,9 @@ end
 order(c::AbstractMelGeneralizedCepstrum) = length(rawdata(c))-1
 
 # all-pass constant for mel-cepstrum analysis
-alpha(c::AbstractMelGeneralizedCepstrum) = c.α
+allpass_alpha(c::AbstractMelGeneralizedCepstrum) = c.α
 
 # paramter of generalized log function
-gamma(c::AbstractMelGeneralizedCepstrum) = c.γ
+glog_gamma(c::AbstractMelGeneralizedCepstrum) = c.γ
 
 powercoef(c::AbstractMelGeneralizedCepstrum) = first(rawdata(c))

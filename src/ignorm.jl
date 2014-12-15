@@ -17,6 +17,7 @@ function ignorm(normalizedc::Vector{Float64}, γ::Float64)
 end
 
 function ignorm{FS,L}(c::MelGeneralizedCepstrum{FS,L})
-    raw = ignorm(rawdata(c), gamma(c))
-    MelGeneralizedCepstrum{FS,L}(alpha(c), gamma(c), raw)
+    γ = glog_gamma(c)
+    raw = ignorm(rawdata(c), γ)
+    MelGeneralizedCepstrum{FS,L}(allpass_alpha(c), γ, raw)
 end

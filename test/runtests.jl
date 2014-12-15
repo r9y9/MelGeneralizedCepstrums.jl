@@ -9,8 +9,8 @@ c = rand(Float64, 21)
 
 function test_mgc_basics()
     mgc = MelGeneralizedCepstrum(0.41, -0.01, c)
-    @test alpha(mgc) == 0.41
-    @test gamma(mgc) == -0.01
+    @test allpass_alpha(mgc) == 0.41
+    @test glog_gamma(mgc) == -0.01
     @test order(mgc) == 20
     @test powercoef(mgc) == mgc[1]
     @test size(mgc) == size(c)
@@ -21,8 +21,8 @@ end
 
 function test_mc_basics()
     mc = MelCepstrum(0.41, c)
-    @test alpha(mc) == 0.41
-    @test gamma(mc) == zero(Float64)
+    @test allpass_alpha(mc) == 0.41
+    @test glog_gamma(mc) == zero(Float64)
     @test order(mc) == 20
     @test powercoef(mc) == mc[1]
     @test size(mc) == size(c)
@@ -33,8 +33,8 @@ end
 
 function test_gc_basics()
     gc = GeneralizedCepstrum(-0.01, c)
-    @test alpha(gc) == 0.0
-    @test gamma(gc) == -0.01
+    @test allpass_alpha(gc) == 0.0
+    @test glog_gamma(gc) == -0.01
     @test order(gc) == 20
     @test powercoef(gc) == gc[1]
     @test size(gc) == size(c)
@@ -56,6 +56,7 @@ function test_gnorm(γ::Float64)
     @test_approx_eq g ĝ
 
     mc = MelGeneralizedCepstrum(0.0, γ, mc)
+    dump(mc)
     ĝ = gnorm(mc)
     @test_approx_eq g rawdata(ĝ)
 end
@@ -147,8 +148,8 @@ function test_gc2gc(order::Int, α::Float64, γ::Float64)
     mgc = MelGeneralizedCepstrum(0.0, 0.0, gc)
     mgc2̂ = mgc2gc(gc, order, α, γ)
     @test_approx_eq mgc2 rawdata(mgc2̂)
-    @test alpha(mgc2²) == α
-    @test gamma(mgc2²) == γ
+    @test allpass_alpha(mgc2²) == α
+    @test glog_gamma(mgc2²) == γ
 end
 
 test_mgc_basics()

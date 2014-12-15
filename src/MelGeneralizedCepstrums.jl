@@ -12,8 +12,8 @@ export
 
   # Basic property of Mel-generalized cepstrum
   order,
-  alpha,
-  gamma,
+  allpass_alpha,   # all-pass constant (alpha)
+  glog_gamma,      # parameter of generalized log function
   powercoef,
 
   # Feature extraction
