@@ -24,10 +24,10 @@ Base.size(c::MelGeneralizedCepstrum) = size(c.data)
 Base.getindex(c::MelGeneralizedCepstrum, i::Real) = getindex(c.data)
 rawdata(c::MelGeneralizedCepstrum) = c.data
 
-order(c::AbstractMelGeneralizedCepstrum) = length(c)-1
-allpass_alpha(c::AbstractMelGeneralizedCepstrum) = c.α
-glog_gamma(c::AbstractMelGeneralizedCepstrum) = c.γ
-powercoef(c::AbstractMelGeneralizedCepstrum) = first(rawdata(c))
+order(c::MelGeneralizedCepstrum) = length(c)-1
+allpass_alpha(c::MelGeneralizedCepstrum) = c.α
+glog_gamma(c::MelGeneralizedCepstrum) = c.γ
+powercoef(c::MelGeneralizedCepstrum) = first(rawdata(c))
 
 function mgcep(x::Vector{Float64}, order::Int, α::Float64, γ::Float64)
     raw = SPTK.mgcep(x, order, α, γ)
