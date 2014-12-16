@@ -23,7 +23,9 @@ export
 
   # Conversions
   mc2b,
+  mc2b!,
   mgc2b,
+  mgc2b!,
   b2mc,
   gnorm!,
   gnorm,
