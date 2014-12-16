@@ -56,7 +56,6 @@ function test_gnorm(γ::Float64)
     @test_approx_eq g ĝ
 
     mc = MelGeneralizedCepstrum(0.0, γ, mc)
-    dump(mc)
     ĝ = gnorm(mc)
     @test_approx_eq g rawdata(ĝ)
 end
@@ -100,6 +99,9 @@ function test_mgc2b(α::Float64, γ::Float64)
     b̂ = copy(mgc)
     mgc2b!(b̂, α, γ)
     @test_approx_eq b b̂
+    mgc = MelGeneralizedCepstrum(α, γ, mgc)
+    b̂ = mgc2b(mgc)
+    @test_approx_eq b rawdata(b̂)
 end
 
 function test_b2mc(α::Float64)

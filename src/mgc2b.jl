@@ -21,3 +21,10 @@ function mgc2b(mgc::Vector{Float64}, α::Float64, γ::Float64)
     b = copy(mgc)
     mgc2b!(b, α, γ)
 end
+
+function mgc2b{FS,L}(c::MelGeneralizedCepstrum{FS,L})
+    α = allpass_alpha(c)
+    γ = glog_gamma(c)
+    raw = mgc2b(rawdata(c), α, γ)
+    MelGeneralizedCepstrum{FS,L}(α, γ, raw)
+end
