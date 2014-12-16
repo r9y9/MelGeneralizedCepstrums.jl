@@ -17,17 +17,15 @@ frequency_scale{T<:AbstractMelGeneralizedCepstrum}(::Type{T}) = frequency_scale(
 log_func{FS<:FrequencyScale,L<:LogFunc}(::Type{AbstractMelGeneralizedCepstrum{FS,L}}) = L
 log_func{T<:AbstractMelGeneralizedCepstrum}(::Type{T}) = log_func(super(T))
 
-function rawdata(c::AbstractMelGeneralizedCepstrum)
-    error("All concrete types must implement rawdata for accessing raw data.")
-end
+rawdata(c::AbstractMelGeneralizedCepstrum) = error("not implemented")
 
 # order of mel-generalized cepstrum
-order(c::AbstractMelGeneralizedCepstrum) = length(rawdata(c))-1
+order(c::AbstractMelGeneralizedCepstrum) = error("not implemented")
 
 # all-pass constant for mel-cepstrum analysis
-allpass_alpha(c::AbstractMelGeneralizedCepstrum) = c.α
+allpass_alpha(c::AbstractMelGeneralizedCepstrum) = 0.0
 
 # paramter of generalized log function
-glog_gamma(c::AbstractMelGeneralizedCepstrum) = c.γ
+glog_gamma(c::AbstractMelGeneralizedCepstrum) = 0.0
 
-powercoef(c::AbstractMelGeneralizedCepstrum) = first(rawdata(c))
+powercoef(c::AbstractMelGeneralizedCepstrum) = error("not implemented")
