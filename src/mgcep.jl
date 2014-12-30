@@ -4,8 +4,8 @@ immutable MelGeneralizedCepstrum{FS<:FrequencyScale, L<:LogFunc} <: AbstractMelG
     α::Float64
     γ::Float64
     data::Vector{Float64}
-    
-    function MelGeneralizedCepstrum(α::Float64, γ::Float64, 
+
+    function MelGeneralizedCepstrum(α::Float64, γ::Float64,
                                     data::Vector{Float64})
         abs(α) < 1 || error("|α| < 1 is supported")
         (-1 <= γ <= 0) || error("-1 <= γ <= 0 is supported")
@@ -29,7 +29,7 @@ allpass_alpha(c::MelGeneralizedCepstrum) = c.α
 glog_gamma(c::MelGeneralizedCepstrum) = c.γ
 powercoef(c::MelGeneralizedCepstrum) = first(rawdata(c))
 
-function mgcep(x::Vector{Float64}, order::Int, α::Float64, γ::Float64)
-    raw = SPTK.mgcep(x, order, α, γ)
+function mgcep(x::Vector{Float64}, order::Int, α::Float64, γ::Float64; kargs...)
+    raw = SPTK.mgcep(x, order, α, γ; kargs...)
     MelGeneralizedCepstrum(α, γ, raw)
 end
