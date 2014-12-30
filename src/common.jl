@@ -1,12 +1,20 @@
 # Common types and functions
 
 abstract FrequencyScale
-type Mel <: FrequencyScale end
-type Linear <: FrequencyScale end
+
+type Mel <: FrequencyScale
+end
+
+type Linear <: FrequencyScale
+end
 
 abstract LogFunc
-type GeneralizedLog <: LogFunc end
-type StandardLog <: LogFunc end
+
+type GeneralizedLog <: LogFunc
+end
+
+type StandardLog <: LogFunc
+end
 
 # Generic type
 abstract AbstractMelGeneralizedCepstrum{FS<:FrequencyScale,L<:LogFunc} <: AbstractVector{Float64}
