@@ -1,5 +1,5 @@
-function c2ir(c::Vector{Float64}, len::Int)
-    h = Array(Float64, len)
+function c2ir{T<:FloatingPoint}(c::Vector{T}, len::Int)
+    h = Array(T, len)
     m = length(c) - 1
 
     h[1] = exp(c[1])

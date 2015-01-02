@@ -1,10 +1,10 @@
 # mgc2b converts mel generalized cesptrum to MGLSADF filter coefficients.
-function mgc2b!(mgc::Vector{Float64}, α::Float64, γ::Float64)
+function mgc2b!{T<:FloatingPoint}(mgc::Vector{T}, α::Float64, γ::Float64)
     b = mgc
     mc2b!(b, α)
 
     # when gamma = 0, mel-generalized cespstrum corresponds to mel cepstrum
-    if γ == 0.0
+    if γ == zero(T)
         return b
     end
 
@@ -17,7 +17,7 @@ function mgc2b!(mgc::Vector{Float64}, α::Float64, γ::Float64)
     b
 end
 
-function mgc2b(mgc::Vector{Float64}, α::Float64, γ::Float64)
+function mgc2b{T<:FloatingPoint}(mgc::Vector{T}, α::Float64, γ::Float64)
     b = copy(mgc)
     mgc2b!(b, α, γ)
 end

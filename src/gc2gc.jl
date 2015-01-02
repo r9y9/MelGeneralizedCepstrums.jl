@@ -1,6 +1,7 @@
-function gc2gc(c1::Vector{Float64}, γ¹::Float64, m2::Int, γ²::Float64)
+function gc2gc{T<:FloatingPoint}(c1::Vector{T}, γ¹::Float64, m2::Int,
+                                 γ²::Float64)
     m1 = length(c1)
-    c2 = zeros(Float64, m2+1)
+    c2 = zeros(T, m2+1)
     c2[1] = c1[1]
 
     for m=2:m2+1

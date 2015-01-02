@@ -1,5 +1,5 @@
 # mc2e computes energy from mel-cepstrum.
-function mc2e(mc::Vector{Float64}, alpha::Float64, len::Int)
+function mc2e{T<:FLoatingPoint}(mc::Vector{T}, alpha::Float64, len::Int)
     # back to linear frequency domain
     c = freqt(mc, len-1, -alpha)
 
@@ -7,4 +7,9 @@ function mc2e(mc::Vector{Float64}, alpha::Float64, len::Int)
     ir = c2ir(c, len)
 
     sumabs2(ir)
+end
+
+function mc2e(c::MelGeneralizedCepstrum, len::Int)
+    α = allpass_alpha(c)
+    mc2e(rawdata(c), α, len)
 end

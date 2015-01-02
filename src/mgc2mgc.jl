@@ -1,10 +1,10 @@
-function mgc2mgc(c1::Vector{Float64}, α¹::Float64, γ¹::Float64,
-                 m2::Int, α²::Float64, γ²::Float64)
-    c2 = zeros(Float64, m2+1)
+function mgc2mgc{T<:FloatingPoint}(c1::Vector{T}, α¹::Float64, γ¹::Float64,
+                                   m2::Int, α²::Float64, γ²::Float64)
+    c2 = zeros(T, m2+1)
 
     α = (α²-α¹) / (1.0-α²*α¹)
 
-    if α == 0.0
+    if α == zero(T)
         c2 = gnorm(c1, γ¹)
         c2 = gc2gc(c2, γ¹, m2, γ²)
     else

@@ -1,6 +1,6 @@
-function freqt(c::Vector{Float64}, order::Int, α::Float64)
-    wc = zeros(Float64, order+1)
-    prev = zeros(Float64, order+1)
+function freqt{T<:FloatingPoint}(c::Vector{T}, order::Int, α::Float64)
+    wc = zeros(T, order+1)
+    prev = zeros(T, order+1)
 
     m1 = length(c)-1
     for i=-m1:0

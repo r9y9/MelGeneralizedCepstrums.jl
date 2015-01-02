@@ -1,17 +1,17 @@
-function gnorm!(c::Vector{Float64}, γ::Float64)
-    if γ == 0.0
+function gnorm!{T<:FloatingPoint}(c::Vector{T}, γ::Float64)
+    if γ == zeros(T)
         c[1] = exp(c[1])
         return normalizedc
     end
 
-    gain = 1.0 + γ*c[1]
+    gain = one(T) + γ*c[1]
     c[2:end] = c[2:end]/gain
-    c[1] = gain^(1.0/γ)
+    c[1] = gain^(one(T)/γ)
 
     c
 end
 
-function gnorm(c::Vector{Float64}, γ::Float64)
+function gnorm{T<:FloatingPoint}(c::Vector{T}, γ::Float64)
     normalizedc = copy(c)
     gnorm!(normalizedc, γ)
 end

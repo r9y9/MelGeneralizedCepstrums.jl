@@ -1,7 +1,7 @@
-function b2mc(b::Vector{Float64}, α::Float64)
-    mc = Array(Float64, length(b))
+function b2mc{T<:FloatingPoint}(b::Vector{T}, α::Float64)
+    mc = Array(T, length(b))
     m = length(b)
-    
+
     mc[m] = b[m]
     d = mc[m]
 

@@ -30,6 +30,7 @@ export
     # Conversions
     mc2b,
     mc2b!,
+    mc2e,
     mgc2b,
     mgc2b!,
     b2mc,
@@ -53,7 +54,8 @@ for fname in [
               "c2ir",
               "freqt",
               "gc2gc",
-              "mgc2mgc"
+              "mgc2mgc",
+              "extend"
     ]
     include(string(fname, ".jl"))
 end
