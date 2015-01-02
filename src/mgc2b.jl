@@ -9,11 +9,11 @@ function mgc2b!(mgc::Vector{Float64}, α::Float64, γ::Float64)
     end
 
     gnorm!(b, γ)
-    
+
     # scale by gamma
     b[1] = log(b[1])
     b[2:end] *= γ
-    
+
     b
 end
 
@@ -22,9 +22,9 @@ function mgc2b(mgc::Vector{Float64}, α::Float64, γ::Float64)
     mgc2b!(b, α, γ)
 end
 
-function mgc2b{FS,L}(c::MelGeneralizedCepstrum{FS,L})
+function mgc2b(c::MelGeneralizedCepstrum)
     α = allpass_alpha(c)
     γ = glog_gamma(c)
     raw = mgc2b(rawdata(c), α, γ)
-    MelGeneralizedCepstrum{FS,L}(α, γ, raw)
+    MelGeneralizedCepstrum(α, γ, raw)
 end

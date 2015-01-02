@@ -4,43 +4,46 @@ module MelGeneralizedCepstrums
 import SPTK
 
 export
-  # Types
-  AbstractMelGeneralizedCepstrum,
-  MelGeneralizedCepstrum,
-  MelCepstrum,
-  GeneralizedCepstrum,
+    # Types
+    MelGeneralizedCepstrum,
 
-  # Basic property of Mel-generalized cepstrum
-  order,
-  allpass_alpha,   # all-pass constant (alpha)
-  glog_gamma,      # parameter of generalized log function
-  powercoef,
+    MelFrequencyCepstrum,
+    LinearFrequencyCepstrum,
+    LogGeneralizedCepstrum,
+    StandardLogCepstrum,
+    AllPoleCepstrum,
+    AllZeroCepstrum,
+    MelCepstrum,
+    GeneralizedCepstrum,
 
-  # Feature extraction
-  mgcep,
-  mcep,
-  gcep,
+    # Basic property of Mel-generalized cepstrum
+    order,
+    allpass_alpha,   # all-pass constant (alpha)
+    glog_gamma,      # parameter of generalized log function
+    powercoef,
 
-  # Conversions
-  mc2b,
-  mc2b!,
-  mgc2b,
-  mgc2b!,
-  b2mc,
-  gnorm!,
-  gnorm,
-  ignorm!,
-  ignorm,
-  c2ir,
-  freqt,
-  gc2gc,
-  mgc2mgc
+    # Feature extraction
+    mgcep,
+    mcep,
+    gcep,
+
+    # Conversions
+    mc2b,
+    mc2b!,
+    mgc2b,
+    mgc2b!,
+    b2mc,
+    gnorm!,
+    gnorm,
+    ignorm!,
+    ignorm,
+    c2ir,
+    freqt,
+    gc2gc,
+    mgc2mgc
 
 for fname in [
-              "common",
               "mgcep",
-              "mcep",
-              "gcep",
               "mc2b",
               "mgc2b",
               "b2mc",

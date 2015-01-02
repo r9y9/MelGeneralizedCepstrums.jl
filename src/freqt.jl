@@ -1,7 +1,7 @@
 function freqt(c::Vector{Float64}, order::Int, α::Float64)
     wc = zeros(Float64, order+1)
     prev = zeros(Float64, order+1)
-    
+
     m1 = length(c)-1
     for i=-m1:0
         copy!(prev, wc)
@@ -19,8 +19,8 @@ function freqt(c::Vector{Float64}, order::Int, α::Float64)
     wc
 end
 
-function freqt{FS,L}(c::MelGeneralizedCepstrum{FS,L}, order::Int, α::Float64)
+function freqt(c::MelGeneralizedCepstrum, order::Int, α::Float64)
     raw = rawdata(c)
     cc = freqt(raw, order, α)
-    MelGeneralizedCepstrum{FS,L}(allpass_alpha(c)+α, glog_gamma(c), cc)
+    MelGeneralizedCepstrum(allpass_alpha(c)+α, glog_gamma(c), cc)
 end

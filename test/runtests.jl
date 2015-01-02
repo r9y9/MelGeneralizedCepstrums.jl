@@ -9,6 +9,8 @@ c = rand(Float64, 21)
 
 function test_mgc_basics()
     mgc = MelGeneralizedCepstrum(0.41, -0.01, c)
+    @test typeof(mgc) <: MelFrequencyCepstrum
+    @test typeof(mgc) <: LogGeneralizedCepstrum
     @test allpass_alpha(mgc) == 0.41
     @test glog_gamma(mgc) == -0.01
     @test order(mgc) == 20
@@ -20,7 +22,9 @@ function test_mgc_basics()
 end
 
 function test_mc_basics()
-    mc = MelCepstrum(0.41, c)
+    mc = MelGeneralizedCepstrum(0.41, 0.0, c)
+    @test typeof(mc) <: MelCepstrum
+    @test typeof(mc) <: StandardLogCepstrum
     @test allpass_alpha(mc) == 0.41
     @test glog_gamma(mc) == zero(Float64)
     @test order(mc) == 20
@@ -32,7 +36,9 @@ function test_mc_basics()
 end
 
 function test_gc_basics()
-    gc = GeneralizedCepstrum(-0.01, c)
+    gc = MelGeneralizedCepstrum(0.0, -0.01, c)
+    @test typeof(gc) <: GeneralizedCepstrum
+    @test typeof(gc) <: LinearFrequencyCepstrum
     @test allpass_alpha(gc) == 0.0
     @test glog_gamma(gc) == -0.01
     @test order(gc) == 20

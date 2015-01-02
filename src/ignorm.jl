@@ -7,7 +7,7 @@ function ignorm!(c::Vector{Float64}, γ::Float64)
     gain = c[1]^γ
     c[1:end] = c[1:end]*gain
     c[1] = (gain - 1.0)/γ
-    
+
     c
 end
 
@@ -16,8 +16,8 @@ function ignorm(normalizedc::Vector{Float64}, γ::Float64)
     ignorm!(c, γ)
 end
 
-function ignorm{FS,L}(c::MelGeneralizedCepstrum{FS,L})
+function ignorm(c::MelGeneralizedCepstrum)
     γ = glog_gamma(c)
     raw = ignorm(rawdata(c), γ)
-    MelGeneralizedCepstrum{FS,L}(allpass_alpha(c), γ, raw)
+    MelGeneralizedCepstrum(allpass_alpha(c), γ, raw)
 end

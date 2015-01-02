@@ -7,7 +7,7 @@ function gnorm!(c::Vector{Float64}, γ::Float64)
     gain = 1.0 + γ*c[1]
     c[2:end] = c[2:end]/gain
     c[1] = gain^(1.0/γ)
-    
+
     c
 end
 
@@ -16,8 +16,8 @@ function gnorm(c::Vector{Float64}, γ::Float64)
     gnorm!(normalizedc, γ)
 end
 
-function gnorm{FS,L}(c::MelGeneralizedCepstrum{FS,L})
+function gnorm(c::MelGeneralizedCepstrum)
     γ = glog_gamma(c)
     raw = gnorm(rawdata(c), γ)
-    MelGeneralizedCepstrum{FS,L}(allpass_alpha(c), γ, raw)
+    MelGeneralizedCepstrum(allpass_alpha(c), γ, raw)
 end
