@@ -43,6 +43,7 @@ export
     mgc2mgc
 
 for fname in [
+              "common",
               "mgcep",
               "mc2b",
               "mgc2b",
