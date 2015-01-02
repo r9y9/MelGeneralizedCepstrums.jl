@@ -56,7 +56,7 @@ end
 
 typealias MelFrequencyCepstrum{L,T,N} MelGeneralizedCepstrum{Mel,L,T,N}
 typealias LinearFrequencyCepstrum{L,T,N} MelGeneralizedCepstrum{Linear,L,T,N}
-typealias LogGeneralizedCepstrum{F,T,N} MelGeneralizedCepstrum{F,GeneralizedLog,T,N}
+typealias GeneralizedLogCepstrum{F,T,N} MelGeneralizedCepstrum{F,GeneralizedLog,T,N}
 typealias StandardLogCepstrum{F,T,N} MelGeneralizedCepstrum{F,StandardLog,T,N}
 typealias AllPoleCepstrum{F,T,N} MelGeneralizedCepstrum{F,AllPoleLog,T,N}
 typealias AllZeroCepstrum{F,T,N} MelGeneralizedCepstrum{F,AllZeroLog,T,N}

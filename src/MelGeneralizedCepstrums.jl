@@ -9,7 +9,7 @@ export
 
     MelFrequencyCepstrum,
     LinearFrequencyCepstrum,
-    LogGeneralizedCepstrum,
+    GeneralizedLogCepstrum,
     StandardLogCepstrum,
     AllPoleCepstrum,
     AllZeroCepstrum,

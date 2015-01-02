@@ -10,7 +10,7 @@ c = rand(Float64, 21)
 function test_mgc_basics()
     mgc = MelGeneralizedCepstrum(0.41, -0.01, c)
     @test typeof(mgc) <: MelFrequencyCepstrum
-    @test typeof(mgc) <: LogGeneralizedCepstrum
+    @test typeof(mgc) <: GeneralizedLogCepstrum
     @test allpass_alpha(mgc) == 0.41
     @test glog_gamma(mgc) == -0.01
     @test order(mgc) == 20
