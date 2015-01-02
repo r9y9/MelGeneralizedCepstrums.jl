@@ -75,13 +75,6 @@ Base.getindex(c::MelGeneralizedCepstrum, i::Range,j::Real) = getindex(c.data, i,
 Base.getindex(c::MelGeneralizedCepstrum, i::Real, j::Range) = getindex(c.data, i, j)
 Base.eltype(c::MelGeneralizedCepstrum) = Base.eltype(g.data)
 
-function Base.similar(c::MelGeneralizedCepstrum)
-    α = allpass_alpha(c)
-    γ = glog_gamma(c)
-    raw = rawdata(c)
-    MelGeneralizedCepstrum(α, γ, similar(raw))
-end
-
 ## Mel-generalized cepstrum related functions ##
 
 rawdata(c::MelGeneralizedCepstrum) = c.data
