@@ -41,6 +41,8 @@ export
     c2ir,
     freqt,
     freqt!,
+    frqtr,
+    frqtr!,
     gc2gc,
     mgc2mgc
 

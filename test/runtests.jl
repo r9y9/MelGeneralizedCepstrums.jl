@@ -144,6 +144,20 @@ function test_freqt(order::Int, α::Float64)
     @test_approx_eq m rawdata(m̂)
 end
 
+function test_frqtr(order::Int, α::Float64)
+    srand(98765)
+    x = rand(100)
+    mc = rand(21)
+
+    m = SPTK.frqtr(mc, order, α)
+    m̂ = frqtr(mc, order, α)
+    @test_approx_eq m m̂
+
+    mc = MelGeneralizedCepstrum(0.0, 0.0, mc)
+    m̂ = frqtr(mc, order, α)
+    @test_approx_eq m rawdata(m̂)
+end
+
 function test_gc2gc(order::Int, γ::Float64)
     srand(98765)
     x = rand(100)
@@ -217,6 +231,13 @@ for order in 20:2:30
     for α in [0.35, 0.41, 0.544]
         println("freqt: testing with order=$order, α=$α")
         test_freqt(order, α)
+    end
+end
+
+for order in 20:2:30
+    for α in [0.35, 0.41, 0.544]
+        println("frqtr: testing with order=$order, α=$α")
+        test_frqtr(order, α)
     end
 end
 
