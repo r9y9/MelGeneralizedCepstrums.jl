@@ -1,6 +1,5 @@
-function freqt{T<:FloatingPoint}(c::Vector{T}, order::Int, α::Float64)
-    wc = zeros(T, order+1)
-    prev = zeros(T, order+1)
+function freqt!{T<:FloatingPoint}(wc::Vector{T}, c::Vector{T}, order::Int, α::Float64)
+    prev = Array(T, order+1)
 
     m1 = length(c)-1
     for i=-m1:0
@@ -17,6 +16,11 @@ function freqt{T<:FloatingPoint}(c::Vector{T}, order::Int, α::Float64)
     end
 
     wc
+end
+
+function freqt{T<:FloatingPoint}(c::Vector{T}, order::Int, α::Float64)
+    wc = zeros(T, order+1)
+    freqt!(wc, c, order, α)
 end
 
 function freqt(c::MelGeneralizedCepstrum, order::Int, α::Float64)

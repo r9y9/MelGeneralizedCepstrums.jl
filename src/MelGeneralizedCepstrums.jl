@@ -40,6 +40,7 @@ export
     ignorm,
     c2ir,
     freqt,
+    freqt!,
     gc2gc,
     mgc2mgc
 
