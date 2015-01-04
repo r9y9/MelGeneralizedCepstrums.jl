@@ -83,7 +83,7 @@ function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
 
     # Initial value of mel-cesptrum
     mc = freqt(sub(c, 1:xh+1), order, α)
-    s = c[1]
+    czero = c[1]
 
     # Allocate memory for solving linear equation (Tm + Hm)d = b
     Tm = Array(T, order+1, order+1)
@@ -110,12 +110,11 @@ function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
         frqtr!(sub(c, 1:2order+1), c[1:xh+1], α)
 
         # check convergence
-        t = c[1]
         if i >= miniter
-            if abs((t-s)/t) < threshold
+            if abs((c[1]-czero)/c[1]) < threshold
                 break
             end
-            s = t
+            czero = c[1]
         end
 
         copy!(te, 1, c, 1, order+1)
