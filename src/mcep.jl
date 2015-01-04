@@ -69,13 +69,13 @@ function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
     fplan = FFTW.Plan(c, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
     iplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
 
-    # Periodgram
+    # Periodogram
     FFTW.execute(fplan.plan, x, y)
-    periodgram = abs2(y)
-    logperiodgram = log(periodgram + e)
+    periodogram = abs2(y)
+    logperiodogram = log(periodogram + e)
 
     # Initial value of cepstrum
-    fill_only_real_part!(y, logperiodgram)
+    fill_only_real_part!(y, logperiodogram)
     FFTW.execute(iplan.plan, y, c)
     scale!(c, FFTW.normalization(c))
     c[1] /= 2.0
@@ -102,7 +102,7 @@ function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
 
         FFTW.execute(fplan.plan, c, y)
         for i=1:length(y)
-            @inbounds y[i] = Complex(periodgram[i] / exp(2real(y[i])), zero(T))
+            @inbounds y[i] = Complex(periodogram[i] / exp(2real(y[i])), zero(T))
         end
         FFTW.execute(iplan.plan, y, c)
         scale!(c, FFTW.normalization(c))
