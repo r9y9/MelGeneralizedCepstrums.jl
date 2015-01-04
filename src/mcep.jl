@@ -6,7 +6,7 @@ function fill_al!{T<:FloatingPoint}(al::Vector{T}, α::Float64)
     al
 end
 
-function fill_toeplitz!{T}(A::Matrix{T}, t::Vector{T})
+function fill_toeplitz!{T}(A::AbstractMatrix{T}, t::AbstractVector{T})
     n = length(t)
     for i=1:n, j=1:n
         if i-j+1 >= 1
@@ -18,7 +18,7 @@ function fill_toeplitz!{T}(A::Matrix{T}, t::Vector{T})
     A
 end
 
-function fill_hankel!{T}(A::Matrix{T}, h::Vector{T})
+function fill_hankel!{T}(A::AbstractMatrix{T}, h::AbstractVector{T})
     n = div(length(h),2) + 1
     for i=1:n, j=1:n
         @inbounds A[i,j] = h[i+j-1]
@@ -26,10 +26,12 @@ function fill_hankel!{T}(A::Matrix{T}, h::Vector{T})
     A
 end
 
-function fill_real_part!{T}(y::AbstractVector{Complex{T}}, v::AbstractVector{T})
+function fill_only_real_part!{T}(y::AbstractVector{Complex{T}},
+                                 v::AbstractVector{T})
     for i=1:length(v)
         @inbounds y[i] = Complex(v[i], 0.0)
     end
+    y
 end
 
 function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
@@ -43,7 +45,7 @@ function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
     c = Array(T, length(x))
 
     # create FFT plan
-    fplan = FFTW.Plan(x, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+    fplan = FFTW.Plan(c, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
     iplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
 
     # Periodgram
@@ -52,7 +54,7 @@ function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
     logperiodgram = log(periodgram + e)
 
     # Initial value of cepstrum
-    fill_real_part!(y, logperiodgram)
+    fill_only_real_part!(y, logperiodgram)
     FFTW.execute(iplan.plan, y, c)
     scale!(c, FFTW.normalization(c))
     c[1] /= 2.0
@@ -109,7 +111,7 @@ function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
         c[1] += c[1]
 
         fill_hankel!(Hm, h)
-        fill_toeplitz!(Tm, c[1:order+1])
+        fill_toeplitz!(Tm, sub(c, 1:order+1))
 
         # solve!
         mc += (Tm + Hm) \ b
