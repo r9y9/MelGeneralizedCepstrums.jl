@@ -1,7 +1,8 @@
+# Npte that wc must be initialized.
 function freqt!{T<:FloatingPoint}(wc::AbstractVector{T}, c::AbstractVector{T},
-                                  α::Float64)
+                                  α::Float64;
+                                  prev::Vector{T}=Array(T,length(wc)))
     desired_order = length(wc) - 1
-    prev = Array(T, desired_order+1)
 
     m1 = length(c)-1
     for i=-m1:0
@@ -31,11 +32,12 @@ function freqt(c::MelGeneralizedCepstrum, order::Int, α::Float64)
     MelGeneralizedCepstrum(allpass_alpha(c)+α, glog_gamma(c), cc)
 end
 
+# Npte that wc must be initialized.
 function frqtr!{T<:FloatingPoint}(wc::AbstractVector{T},
                                   c::AbstractVector{T},
-                                  α::Float64)
+                                  α::Float64;
+                                  prev::Vector{T}=Array(T,length(wc)))
     desired_order = length(wc) - 1
-    prev = zeros(T, desired_order+1)
 
     m1 = length(c)-1
     for i=-m1:0
