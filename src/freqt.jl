@@ -1,4 +1,4 @@
-# Npte that wc must be initialized.
+# Note that wc must be initialized.
 function freqt!{T<:FloatingPoint}(wc::AbstractVector{T}, c::AbstractVector{T},
                                   α::Float64;
                                   prev::Vector{T}=Array(T,length(wc)))
@@ -32,7 +32,7 @@ function freqt(c::MelGeneralizedCepstrum, order::Int, α::Float64)
     MelGeneralizedCepstrum(allpass_alpha(c)+α, glog_gamma(c), cc)
 end
 
-# Npte that wc must be initialized.
+# Note that wc must be initialized.
 function frqtr!{T<:FloatingPoint}(wc::AbstractVector{T},
                                   c::AbstractVector{T},
                                   α::Float64;
