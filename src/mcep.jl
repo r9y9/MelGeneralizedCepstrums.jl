@@ -26,6 +26,12 @@ function fill_hankel!{T}(A::Matrix{T}, h::Vector{T})
     A
 end
 
+function fill_real_part!{T}(y::AbstractVector{Complex{T}}, v::AbstractVector{T})
+    for i=1:length(v)
+        @inbounds y[i] = Complex(v[i], 0.0)
+    end
+end
+
 function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
                                  miniter::Int=2,
                                  maxiter::Int=30,
@@ -33,13 +39,22 @@ function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
                                  e::Float64=0.0)
     const xh = div(length(x),2)
 
+    y = Array(Complex{T}, xh+1)
+    c = Array(T, length(x))
+
+    # create FFT plan
+    fplan = FFTW.Plan(x, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+    iplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+
     # Periodgram
-    y = fft(x)
+    FFTW.execute(fplan.plan, x, y)
     periodgram = abs2(y)
     logperiodgram = log(periodgram + e)
 
     # Initial value of cepstrum
-    c = real(ifft(complex(logperiodgram)))
+    fill_real_part!(y, logperiodgram)
+    FFTW.execute(iplan.plan, y, c)
+    scale!(c, FFTW.normalization(c))
     c[1] /= 2.0
     c[xh+1] /= 2.0
 
@@ -61,9 +76,12 @@ function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
         fill!(c, zero(T))
         freqt!(sub(c, 1:xh+1), mc, -α)
 
-        y = fft(c)
-        c2 = periodgram ./ exp(2real(y))
-        c = real(ifft(complex(c2)))
+        FFTW.execute(fplan.plan, c, y)
+        for i=1:length(y)
+            @inbounds y[i] = Complex(periodgram[i] / exp(2y[i].re), 0.0)
+        end
+        FFTW.execute(iplan.plan, y, c)
+        scale!(c, FFTW.normalization(c))
 
         frqtr!(sub(c, 1:2order+1), c[1:xh+1], α)
 
