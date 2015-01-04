@@ -1,3 +1,6 @@
+# Mel-cepstrum analysis
+# re-coded from SPTK
+
 function fill_al!{T<:FloatingPoint}(al::Vector{T}, α::Float64)
     al[1] = one(T)
     for i=2:length(al)
@@ -26,19 +29,38 @@ function fill_hankel!{T}(A::AbstractMatrix{T}, h::AbstractVector{T})
     A
 end
 
+
 function fill_only_real_part!{T}(y::AbstractVector{Complex{T}},
                                  v::AbstractVector{T})
     for i=1:length(v)
-        @inbounds y[i] = Complex(v[i], 0.0)
+        @inbounds y[i] = Complex(v[i], zero(T))
     end
     y
 end
 
-function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
-                                 miniter::Int=2,
-                                 maxiter::Int=30,
-                                 threshold::Float64=0.001,
-                                 e::Float64=0.0)
+function update_hankel_elements!(he::AbstractVector, c::AbstractVector)
+    for j=1:length(he)
+        @inbounds he[j] = c[j]
+    end
+    for j=1:2:length(he)
+        @inbounds he[j] -= c[1]
+    end
+    he
+end
+
+function update_toeplitz_elements!(te::AbstractVector, c::AbstractVector)
+    for j=3:2:length(te)
+        @inbounds te[j] += c[1]
+    end
+    te[1] += c[1]
+    te
+end
+
+function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
+                                miniter::Int=2,
+                                maxiter::Int=30,
+                                threshold::T=0.001,
+                                e::T=zero(T))
     const xh = div(length(x),2)
 
     y = Array(Complex{T}, xh+1)
@@ -67,8 +89,9 @@ function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
     # Allocate memory for solving linear equation (Tm + Hm)d = b
     Tm = Array(T, order+1, order+1)
     Hm = Array(T, order+1, order+1)
-    b = Array(T, order+1)  # elements of toeplitz matrix
-    h = Array(T, 2order+1) # elements of hankel matrix
+    he = Array(T, 2order+1) # elements of hankel matrix
+    te = Array(T, order+1)  # elements of toeplitz matrix
+    b = Array(T, order+1)   # right side of linear equation
 
     al = Array(T, order+1)
     fill_al!(al, α)
@@ -80,7 +103,7 @@ function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
 
         FFTW.execute(fplan.plan, c, y)
         for i=1:length(y)
-            @inbounds y[i] = Complex(periodgram[i] / exp(2y[i].re), 0.0)
+            @inbounds y[i] = Complex(periodgram[i] / exp(2real(y[i])), zero(T))
         end
         FFTW.execute(iplan.plan, y, c)
         scale!(c, FFTW.normalization(c))
@@ -96,22 +119,17 @@ function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
             s = t
         end
 
+        copy!(te, 1, c, 1, order+1)
+
         for j=1:order+1
             @inbounds b[j] = c[j] - al[j]
         end
-        for j=1:2order+1
-            @inbounds h[j] = c[j]
-        end
-        for j=1:2:2order+1
-            @inbounds h[j] -= c[1]
-        end
-        for j=3:2:order+1
-            @inbounds c[j] += c[1]
-        end
-        c[1] += c[1]
 
-        fill_hankel!(Hm, h)
-        fill_toeplitz!(Tm, sub(c, 1:order+1))
+        update_hankel_elements!(he, c)
+        update_toeplitz_elements!(te, c)
+
+        fill_hankel!(Hm, he)
+        fill_toeplitz!(Tm, te)
 
         # solve linear equation and add derivative
         mc += (Tm + Hm) \ b
