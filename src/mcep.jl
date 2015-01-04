@@ -63,10 +63,9 @@ function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
                                 verbose::Bool=false)
     const xh = div(length(x),2)
 
+    # create FFT workspace and plan
     y = Array(Complex{T}, xh+1)
     c = Array(T, length(x))
-
-    # create FFT plan
     fplan = FFTW.Plan(c, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
     iplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
 
