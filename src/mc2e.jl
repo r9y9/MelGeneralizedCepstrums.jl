@@ -1,5 +1,6 @@
 # mc2e computes energy from mel-cepstrum.
-function mc2e{T<:FLoatingPoint}(mc::Vector{T}, alpha::Float64, len::Int)
+function mc2e{T<:FLoatingPoint}(mc::AbstractVector{T}, alpha::FloatingPoint,
+                                len::Int)
     # back to linear frequency domain
     c = freqt(mc, len-1, -alpha)
 

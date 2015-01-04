@@ -1,4 +1,4 @@
-function gnorm!{T<:FloatingPoint}(c::Vector{T}, γ::Float64)
+function gnorm!{T<:FloatingPoint}(c::AbstractVector{T}, γ::FloatingPoint)
     if γ == zeros(T)
         c[1] = exp(c[1])
         return normalizedc
@@ -11,7 +11,7 @@ function gnorm!{T<:FloatingPoint}(c::Vector{T}, γ::Float64)
     c
 end
 
-function gnorm{T<:FloatingPoint}(c::Vector{T}, γ::Float64)
+function gnorm{T<:FloatingPoint}(c::AbstractVector{T}, γ::FloatingPoint)
     normalizedc = copy(c)
     gnorm!(normalizedc, γ)
 end

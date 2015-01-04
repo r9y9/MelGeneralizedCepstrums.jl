@@ -1,5 +1,5 @@
-function gc2gc{T<:FloatingPoint}(c1::Vector{T}, γ¹::Float64, m2::Int,
-                                 γ²::Float64)
+function gc2gc{T<:FloatingPoint}(c1::AbstractVector{T}, γ¹::FloatingPoint,
+                                 m2::Int, γ²::FloatingPoint)
     m1 = length(c1)
     c2 = zeros(T, m2+1)
     c2[1] = c1[1]
@@ -28,7 +28,7 @@ function gc2gc{T<:FloatingPoint}(c1::Vector{T}, γ¹::Float64, m2::Int,
     c2
 end
 
-function gc2gc(c::MelGeneralizedCepstrum, m2::Int, γ²::Float64)
+function gc2gc(c::MelGeneralizedCepstrum, m2::Int, γ²::FloatingPoint)
     γ¹ = glog_gamma(c)
     raw = gc2gc(rawdata(c), γ¹, m2, γ²)
     MelGeneralizedCepstrum(allpass_alpha(c), γ², raw)

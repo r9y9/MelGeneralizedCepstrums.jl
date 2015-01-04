@@ -1,7 +1,7 @@
 # Mel-cepstrum analysis
 # re-coded from SPTK
 
-function fill_al!{T<:FloatingPoint}(al::Vector{T}, α::Float64)
+function fill_al!{T<:FloatingPoint}(al::Vector{T}, α::FloatingPoint)
     al[1] = one(T)
     for i=2:length(al)
         @inbounds al[i] = -α*al[i-1]

@@ -1,4 +1,4 @@
-function b2mc{T<:FloatingPoint}(b::Vector{T}, α::Float64)
+function b2mc{T<:FloatingPoint}(b::AbstractVector{T}, α::FloatingPoint)
     mc = Array(T, length(b))
     m = length(b)
 

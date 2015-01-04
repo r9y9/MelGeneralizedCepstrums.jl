@@ -1,5 +1,7 @@
-function mgc2mgc{T<:FloatingPoint}(c1::Vector{T}, α¹::Float64, γ¹::Float64,
-                                   m2::Int, α²::Float64, γ²::Float64)
+function mgc2mgc{T<:FloatingPoint}(c1::AbstractVector{T}, α¹::FloatingPoint,
+                                   γ¹::FloatingPoint,
+                                   m2::Int, α²::FloatingPoint,
+                                   γ²::FloatingPoint)
     c2 = zeros(T, m2+1)
 
     α = (α²-α¹) / (1.0-α²*α¹)
@@ -17,8 +19,8 @@ function mgc2mgc{T<:FloatingPoint}(c1::Vector{T}, α¹::Float64, γ¹::Float64,
     c2
 end
 
-function mgc2mgc(c::MelGeneralizedCepstrum, m2::Int, α²::Float64,
-                 γ²::Float64)
+function mgc2mgc(c::MelGeneralizedCepstrum, m2::Int, α²::FloatingPoint,
+                 γ²::FloatingPoint)
     α¹ = allpass_alpha(c)
     γ¹ = glog_gamma(c)
     raw = mgc2mgc(rawdata(c), α¹, γ¹, m2, α², γ²)

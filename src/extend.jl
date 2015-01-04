@@ -7,7 +7,7 @@ for f in [
           :ignorm!
           ]
     @eval begin
-        function ($f){T<:FloatingPoint}(x::Matrix{T}, args...; kargs...)
+        function ($f){T<:FloatingPoint}(x::AbstractMatrix{T}, args...; kargs...)
             for i = 1:size(x, 2)
                 @inbounds x[:, i] = $f(x[:, i], args...; kargs...)
             end
@@ -29,7 +29,7 @@ for f in [
           :mgc2mgc
           ]
     @eval begin
-        function ($f){T<:FloatingPoint}(x::Matrix{T}, args...; kargs...)
+        function ($f){T<:FloatingPoint}(x::AbstractMatrix{T}, args...; kargs...)
             r = $f(x[:, 1], args...; kargs...)
             ret = Array(eltype(x), size(r, 1), size(x, 2))
             for i = 1:length(r)

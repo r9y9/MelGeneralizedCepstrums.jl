@@ -1,6 +1,6 @@
 # Note that wc must be initialized.
 function freqt!{T<:FloatingPoint}(wc::AbstractVector{T}, c::AbstractVector{T},
-                                  α::Float64;
+                                  α::FloatingPoint;
                                   prev::Vector{T}=Array(T,length(wc)))
     desired_order = length(wc) - 1
 
@@ -21,12 +21,13 @@ function freqt!{T<:FloatingPoint}(wc::AbstractVector{T}, c::AbstractVector{T},
     wc
 end
 
-function freqt{T<:FloatingPoint}(c::AbstractVector{T}, order::Int, α::Float64)
+function freqt{T<:FloatingPoint}(c::AbstractVector{T}, order::Int,
+                                 α::FloatingPoint)
     wc = zeros(T, order+1)
     freqt!(wc, c, α)
 end
 
-function freqt(c::MelGeneralizedCepstrum, order::Int, α::Float64)
+function freqt(c::MelGeneralizedCepstrum, order::Int, α::FloatingPoint)
     raw = rawdata(c)
     cc = freqt(raw, order, α)
     MelGeneralizedCepstrum(allpass_alpha(c)+α, glog_gamma(c), cc)
@@ -35,7 +36,7 @@ end
 # Note that wc must be initialized.
 function frqtr!{T<:FloatingPoint}(wc::AbstractVector{T},
                                   c::AbstractVector{T},
-                                  α::Float64;
+                                  α::FloatingPoint;
                                   prev::Vector{T}=Array(T,length(wc)))
     desired_order = length(wc) - 1
 
@@ -53,12 +54,13 @@ function frqtr!{T<:FloatingPoint}(wc::AbstractVector{T},
     wc
 end
 
-function frqtr{T<:FloatingPoint}(c::AbstractVector{T}, order::Int, α::Float64)
+function frqtr{T<:FloatingPoint}(c::AbstractVector{T}, order::Int,
+                                 α::FloatingPoint)
     wc = zeros(T, order+1)
     frqtr!(wc, c, α)
 end
 
-function frqtr(c::MelGeneralizedCepstrum, order::Int, α::Float64)
+function frqtr(c::MelGeneralizedCepstrum, order::Int, α::FloatingPoint)
     raw = rawdata(c)
     cc = frqtr(raw, order, α)
     MelGeneralizedCepstrum(allpass_alpha(c)+α, glog_gamma(c), cc)

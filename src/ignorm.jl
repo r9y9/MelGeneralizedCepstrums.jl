@@ -1,4 +1,5 @@
-function ignorm!{T<:FloatingPoint}(c::Vector{T}, γ::Float64)
+function ignorm!{T<:FloatingPoint}(c::AbstractVector{T},
+                                   γ::FloatingPoint)
     if γ == one(T)
         c[1] = log(c[1])
         return c
@@ -11,7 +12,8 @@ function ignorm!{T<:FloatingPoint}(c::Vector{T}, γ::Float64)
     c
 end
 
-function ignorm{T<:FloatingPoint}(normalizedc::Vector{T}, γ::Float64)
+function ignorm{T<:FloatingPoint}(normalizedc::AbstractVector{T},
+                                  γ::FloatingPoint)
     c = copy(normalizedc)
     ignorm!(c, γ)
 end

@@ -1,4 +1,4 @@
-function c2ir{T<:FloatingPoint}(c::Vector{T}, len::Int)
+function c2ir{T<:FloatingPoint}(c::AbstractVector{T}, len::Int)
     h = Array(T, len)
     m = length(c) - 1
 
