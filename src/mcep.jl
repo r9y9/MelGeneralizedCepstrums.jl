@@ -57,11 +57,11 @@ end
 
 # Note that this mcep assumes that `x` is a windowed signal.
 function _mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
-                                miniter::Int=2,
-                                maxiter::Int=30,
-                                threshold::T=0.001,
-                                e::T=zero(T),
-                                verbose::Bool=false)
+                                 miniter::Int=2,
+                                 maxiter::Int=30,
+                                 threshold::T=0.001,
+                                 e::T=zero(T),
+                                 verbose::Bool=false)
     const xh = div(length(x),2)
 
     # create FFT workspace and plan
