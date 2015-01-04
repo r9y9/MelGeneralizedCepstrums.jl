@@ -64,7 +64,7 @@ function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
     mc = freqt(sub(c, 1:xh+1), order, α)
     s = c[1]
 
-    # solving linear equation (Tm + Hm)d = b to compute derivative
+    # Allocate memory for solving linear equation (Tm + Hm)d = b
     Tm = Array(T, order+1, order+1)
     Hm = Array(T, order+1, order+1)
     b = Array(T, order+1)  # elements of toeplitz matrix
@@ -113,7 +113,7 @@ function mcep2{T<:FloatingPoint}(x::Vector{T}, order::Int, α::Float64;
         fill_hankel!(Hm, h)
         fill_toeplitz!(Tm, sub(c, 1:order+1))
 
-        # solve!
+        # solve linear equation and add derivative
         mc += (Tm + Hm) \ b
     end
 
