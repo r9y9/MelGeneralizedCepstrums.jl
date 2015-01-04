@@ -56,7 +56,7 @@ function update_toeplitz_elements!(te::AbstractVector, c::AbstractVector)
 end
 
 # Note that this mcep assumes that `x` is a windowed signal.
-function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
+function _mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
                                 miniter::Int=2,
                                 maxiter::Int=30,
                                 threshold::T=0.001,
@@ -142,4 +142,9 @@ function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
     end
 
     mc
+end
+
+function mcep{T<:FloatingPoint,N}(x::Array{T,N}, order::Int, α::T; kargs...)
+    raw = _mcep(x, order, α; kargs...)
+    MelGeneralizedCepstrum{Mel,StandardLog,T,N}(α, zero(T), raw)
 end

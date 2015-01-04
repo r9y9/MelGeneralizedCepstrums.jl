@@ -54,8 +54,12 @@ function test_mcep(order::Int, α::Float64)
     srand(98765)
     x = rand(1024)
     mc = SPTK.mcep(x, order, α)
-    mĉ = mcep(x, order, α)
+    mĉ = MelGeneralizedCepstrums._mcep(x, order, α)
     @test_approx_eq mc mĉ
+
+    m_typed = mcep(x, order, α)
+    @test typeof(m_typed) <: MelCepstrum
+    @test_approx_eq mc rawdata(m_typed)
 end
 
 function test_gnorm(γ::Float64)
