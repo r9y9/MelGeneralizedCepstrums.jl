@@ -88,6 +88,7 @@ function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
     # Allocate memory for solving linear equation (Tm + Hm)d = b
     Tm = Array(T, order+1, order+1)
     Hm = Array(T, order+1, order+1)
+    Tm_plus_Hm = Array(T, order+1, order+1)
     he = Array(T, 2order+1) # elements of hankel matrix
     te = Array(T, order+1)  # elements of toeplitz matrix
     b = Array(T, order+1)   # right side of linear equation
@@ -129,8 +130,12 @@ function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
         fill_hankel!(Hm, he)
         fill_toeplitz!(Tm, te)
 
+        for i=1:order+1,j=1:order+1
+            @inbounds Tm_plus_Hm[i,j] = Hm[i,j] + Tm[i,j]
+        end
+
         # solve linear equation and add derivative
-        mc += (Tm + Hm) \ b
+        mc += Tm_plus_Hm \ b
     end
 
     mc
