@@ -49,10 +49,9 @@ function update_hankel_elements!(he::AbstractVector, c::AbstractVector)
 end
 
 function update_toeplitz_elements!(te::AbstractVector, c::AbstractVector)
-    for j=3:2:length(te)
+    for j=1:2:length(te)
         @inbounds te[j] += c[1]
     end
-    te[1] += c[1]
     te
 end
 
