@@ -59,7 +59,8 @@ function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
                                 miniter::Int=2,
                                 maxiter::Int=30,
                                 threshold::T=0.001,
-                                e::T=zero(T))
+                                e::T=zero(T),
+                                verbose::Bool=false)
     const xh = div(length(x),2)
 
     y = Array(Complex{T}, xh+1)
@@ -112,7 +113,9 @@ function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
 
         # check convergence
         if i >= miniter
-            if abs((c[1]-czero)/c[1]) < threshold
+            err = abs((c[1]-czero)/c[1])
+            verbose && println("czero nmse: $err")
+            if err < threshold
                 break
             end
             czero = c[1]
