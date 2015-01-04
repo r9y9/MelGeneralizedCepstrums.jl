@@ -49,6 +49,15 @@ function test_gc_basics()
     @test log_func(typeof(gc)) == GeneralizedLog
 end
 
+# need to improved
+function test_mcep(order::Int, α::Float64)
+    srand(98765)
+    x = rand(1024)
+    mc = SPTK.mcep(x, order, α)
+    mĉ = mcep(x, order, α)
+    @test_approx_eq mc mĉ
+end
+
 function test_gnorm(γ::Float64)
     srand(98765)
     x = rand(100)
@@ -191,6 +200,13 @@ end
 test_mgc_basics()
 test_mc_basics()
 test_gc_basics()
+
+for order in 10:2:30
+    for α in [0.35, 0.41, 0.544]
+        println("mcep: testing with order=$order, α=$α")
+        test_mcep(order, α)
+    end
+end
 
 for ns in 1:15
     γ = -1.0/ns
