@@ -227,14 +227,14 @@ for len in [128, 256, 512, 1024]
     test_c2ir(len)
 end
 
-for order in 20:2:30
+for order in 10:2:30
     for α in [0.35, 0.41, 0.544]
         println("freqt: testing with order=$order, α=$α")
         test_freqt(order, α)
     end
 end
 
-for order in 20:2:30
+for order in 10:2:30
     for α in [0.35, 0.41, 0.544]
         println("frqtr: testing with order=$order, α=$α")
         test_frqtr(order, α)
