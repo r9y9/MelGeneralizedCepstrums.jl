@@ -55,6 +55,7 @@ function update_toeplitz_elements!(te::AbstractVector, c::AbstractVector)
     te
 end
 
+# Note that this mcep assumes that `x` is a windowed signal.
 function mcep{T<:FloatingPoint}(x::Vector{T}, order::Int, α::T;
                                 miniter::Int=2,
                                 maxiter::Int=30,
