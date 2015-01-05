@@ -157,6 +157,16 @@ function test_freqt(order::Int, α::Float64)
     @test_approx_eq m rawdata(m̂)
 end
 
+function test_b2c(order::Int, α::Float64)
+    srand(98765)
+    x = rand(100)
+    mc = rand(21)
+
+    m = SPTK.b2c(mc, order, α)
+    m̂2 = b2c(mc, order, α)
+    @test_approx_eq m m̂2
+end
+
 function test_frqtr(order::Int, α::Float64)
     srand(98765)
     x = rand(100)
@@ -251,6 +261,13 @@ for order in 10:2:30
     for α in [0.35, 0.41, 0.544]
         println("freqt: testing with order=$order, α=$α")
         test_freqt(order, α)
+    end
+end
+
+for order in 10:2:30
+    for α in [0.35, 0.41, 0.544]
+        println("b2c: testing with order=$order, α=$α")
+        test_b2c(order, α)
     end
 end
 
