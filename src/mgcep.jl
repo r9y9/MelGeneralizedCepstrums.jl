@@ -73,8 +73,8 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         end
     else
         for i=1:length(x)
-            tr = one(T) + γ*real(y)[i]
-            ti = γ*imag(y)[i]
+            tr = one(T) + γ*real(y[i])
+            ti = γ*imag(y[i])
             trr, tii = tr*tr, ti*ti
             s = trr + tii
             t = x[i] * s^(-one(T)/γ)
@@ -91,7 +91,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
 
     # FFTW.execute(iplan.plan, y, c)
     # scale!(c, FFTW.normalization(c))
-    pr = real(ifft(complex(pr, imag(y))))
+    pr = real(ifft(pr))
 
     if α != zero(T)
         b2c!(sub(pr, 1:2order+1), pr[1:n+1], α)
@@ -189,7 +189,7 @@ function mgcep{T<:FloatingPoint}(x::AbstractVector{T},
                                  e::Float64=0.0,
                                  threshold::Float64=0.0001,
                                  otype::Int=0,
-                                 verbose::Bool=true
+                                 verbose::Bool=false
     )
     const xh = div(length(x), 2)
 
