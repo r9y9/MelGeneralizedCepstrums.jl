@@ -34,6 +34,7 @@ export
     mgc2b,
     mgc2b!,
     b2mc,
+    b2mc!,
     b2c,
     b2c!,
     gnorm!,
