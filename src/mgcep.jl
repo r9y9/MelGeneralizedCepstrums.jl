@@ -1,17 +1,3 @@
-#=
-function mgcep{T<:FloatingPoint,N}(x::Array{T,N}, order::Int, α::FloatingPoint,
-                                   γ::FloatingPoint; kargs...)
-    raw = SPTK.mgcep(x, order, α, γ; kargs...)
-    MelGeneralizedCepstrum{Mel,GeneralizedLog,T,N}(α, γ, raw)
-end
-
-function gcep{T<:FloatingPoint,N}(x::Array{T,N}, order::Int, γ::FloatingPoint;
-                                  kargs...)
-    raw = SPTK.gcep(x, order, γ; kargs...)
-    MelGeneralizedCepstrum{Linear,GeneralizedLog,T,N}(zero(T), γ, raw)
-end
-=#
-
 function ptrans!{T}(p::AbstractVector{T},  m::Int, α::FloatingPoint)
     d, o = zero(T), zero(T)
 
@@ -55,8 +41,8 @@ end
 function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     x::AbstractVector{T}, # modified periodogram
                     order::Int,           # order of cepstrum
-                    α::FloatingPoint,    # allpass constant
-                    γ::FloatingPoint,    # paramter of generalized log function
+                    α::FloatingPoint,     # allpass constant
+                    γ::FloatingPoint,     # paramter of generalized log function
                     n::Int,               # the numbe of ..
                     iter::Int             # current iter #
     )
@@ -103,11 +89,6 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         end
     end
 
-    #for i=1:length(x)
-   #     println("pr[$i]: $(pr[i])")
-   # end
-
-
     # FFTW.execute(iplan.plan, y, c)
     # scale!(c, FFTW.normalization(c))
     pr = real(ifft(complex(pr, imag(y))))
@@ -115,8 +96,6 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     if α != zero(T)
         b2c!(sub(pr, 1:2order+1), pr[1:n+1], α)
     end
-
-    ### OK: pr[i:2order+1]
 
     if γ == zero(T) || γ == -one(T)
         copy!(qr, 1, pr, 1, 2order+1)
@@ -133,17 +112,12 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         end
     end
 
-    # OK pr[1:2order+1, rr[1:order+1]] when gamma = -1.0
-
     if α != zero(T)
         ptrans!(pr, order, α)
         qtrans!(qr, order, α)
     end
 
-    # OK pr[1:order+1],  qr[1:order+1]
-
     ϵ = zero(T)
-    # c[0] : gain, t : epsilon
     if γ != -one(T)
         ϵ = gain(rr, c, order, γ)
         c[1] = sqrt(ϵ)
@@ -157,15 +131,14 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         end
     end
 
-    # solve linear eq. here
-    te = sub(pr, 1:order)
     Tm = Array(T, order, order)
-    fill_toeplitz!(Tm, te)
     Hm = Array(T, order, order)
+    te = sub(pr, 1:order)
+    fill_toeplitz!(Tm, te)
     he = sub(qr, 3:2order+1)
     fill_hankel!(Hm, he)
 
-    # OK!
+    # solve linear equation
     b = (Tm + Hm) \ sub(rr, 2:order+1)
 
     for i=2:order+1
@@ -180,29 +153,22 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     log(ϵ)
 end
 
-const libSPTK = "libSPTK"
-function norm!(mgc::Vector{Float64},
-               α::Float64,
-               γ::Float64,
-               otype::Int)
+function mgcepnorm!(mgc::Vector{Float64},
+                    α::Float64,
+                    γ::Float64,
+                    otype::Int)
     order = length(mgc)-1
 
     if otype == 0 || otype == 1 || otype == 2 || otype == 4
-        ccall((:ignorm, libSPTK), Void, (Ptr{Float64}, Ptr{Float64},
-                                           Int, Float64),
-              mgc, mgc, order, γ)
+        ignorm!(mgc, γ)
     end
 
     if otype == 0 || otype == 2 || otype == 4
-        ccall((:b2mc, libSPTK), Void,
-              (Ptr{Float64}, Ptr{Float64}, Int, Float64),
-              mgc, mgc, order, α)
+        b2mc!(mgc, α)
     end
 
     if otype == 2 || otype == 4
-        ccall((:gnorm, libSPTK), Void, (Ptr{Float64}, Ptr{Float64},
-                                          Int, Float64),
-              mgc, mgc, order, γ)
+        gnorm!(mgc, γ)
     end
 
     if otype == 4 || otype == 5
@@ -240,12 +206,6 @@ function mgcep2{T<:FloatingPoint}(x::AbstractVector{T},
     b = zeros(order+1)
     d = zeros(order+1)
     ϵ⁰ = newton!(b, periodogram, order, α, -one(T), n, 1)
-    # ϵ⁰ = newton!(b, periodogram, order, α, γ, n, 1)
-    # ϵ⁰ = newton!(b, periodogram, order, α, γ, n, 1)
-    println("initial eps: $(ϵ⁰)")
-
-    # norm!(b, α, γ, otype)
-    # return b
 
     if γ != -one(T)
         if α != zero(T)
@@ -265,9 +225,6 @@ function mgcep2{T<:FloatingPoint}(x::AbstractVector{T},
         end
     end
 
-    # OK!
-
-    # \
     if γ != -one(T)
         ϵᵗ = ϵ⁰
         for i=1:maxiter
@@ -282,6 +239,6 @@ function mgcep2{T<:FloatingPoint}(x::AbstractVector{T},
             ϵᵗ = ϵ
         end
     end
-    norm!(b, α, γ, otype)
-    b
+
+    mgcepnorm!(b, α, γ, otype)
 end
