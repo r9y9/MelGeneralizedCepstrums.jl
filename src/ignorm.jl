@@ -1,6 +1,6 @@
 function ignorm!{T<:FloatingPoint}(c::AbstractVector{T},
                                    γ::FloatingPoint)
-    if γ == one(T)
+    if γ == zero(T)
         c[1] = log(c[1])
         return c
     end
