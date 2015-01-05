@@ -68,6 +68,8 @@ function test_mgcep(order::Int, α::Float64, γ::Float64)
     x = rand(1024)
     mgc = SPTK.mgcep(x, order, α, γ)
     mgĉ = MelGeneralizedCepstrums.mgcep(x, order, α, γ)
+
+    # numerical error or bug?
     @test_approx_eq_eps mgc mgĉ 1e-3
 end
 
@@ -231,16 +233,14 @@ for order in 10:2:30
     end
 end
 
-#=
 for order in 25:5:35
     for α in [0.0, 0.35, 0.41, 0.544]
-        for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
+        for γ in [-1.0, -0.75, -0.5, -0.25] # 0.0
             println("mgcep: testing with order=$order, α=$α, γ=$γ")
             test_mgcep(order, α, γ)
         end
     end
 end
-=#
 
 for ns in 1:15
     γ = -1.0/ns
