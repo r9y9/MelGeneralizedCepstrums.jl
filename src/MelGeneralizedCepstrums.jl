@@ -25,7 +25,6 @@ export
     # Feature extraction
     mgcep,
     mcep,
-    gcep,
 
     # Conversions
     mc2b,
