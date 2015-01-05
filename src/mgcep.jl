@@ -178,18 +178,18 @@ function mgcepnorm!(mgc::Vector{Float64},
     mgc
 end
 
-function mgcep2{T<:FloatingPoint}(x::AbstractVector{T},
-                                  order::Int=40,
-                                  α::Float64=0.41,
-                                  γ::Float64=0.0;
-                                  n::Int=length(x)-1,
-                                  miniter::Int=2,
-                                  maxiter::Int=30,
-                                  dd::Float64=0.001,
-                                  e::Float64=0.0,
-                                  threshold::Float64=0.0001,
-                                  otype::Int=0,
-                                  verbose::Bool=true
+function mgcep{T<:FloatingPoint}(x::AbstractVector{T},
+                                 order::Int=40,
+                                 α::Float64=0.41,
+                                 γ::Float64=0.0;
+                                 n::Int=length(x)-1,
+                                 miniter::Int=2,
+                                 maxiter::Int=30,
+                                 dd::Float64=0.001,
+                                 e::Float64=0.0,
+                                 threshold::Float64=0.0001,
+                                 otype::Int=0,
+                                 verbose::Bool=true
     )
     const xh = div(length(x), 2)
 

@@ -62,6 +62,15 @@ function test_mcep(order::Int, α::Float64)
     @test_approx_eq mc rawdata(m_typed)
 end
 
+# need to improved
+function test_mgcep(order::Int, α::Float64, γ::Float64)
+    srand(98765)
+    x = rand(1024)
+    mgc = SPTK.mgcep(x, order, α, γ)
+    mgĉ = MelGeneralizedCepstrums.mgcep(x, order, α, γ)
+    @test_approx_eq_eps mgc mgĉ 1e-3
+end
+
 function test_gnorm(γ::Float64)
     srand(98765)
     x = rand(100)
@@ -221,6 +230,17 @@ for order in 10:2:30
         test_mcep(order, α)
     end
 end
+
+#=
+for order in 25:5:35
+    for α in [0.0, 0.35, 0.41, 0.544]
+        for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
+            println("mgcep: testing with order=$order, α=$α, γ=$γ")
+            test_mgcep(order, α, γ)
+        end
+    end
+end
+=#
 
 for ns in 1:15
     γ = -1.0/ns
