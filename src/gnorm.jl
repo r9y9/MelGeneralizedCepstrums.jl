@@ -1,7 +1,7 @@
 function gnorm!{T<:FloatingPoint}(c::AbstractVector{T}, γ::FloatingPoint)
-    if γ == zeros(T)
+    if γ == zero(T)
         c[1] = exp(c[1])
-        return normalizedc
+        return c
     end
 
     gain = one(T) + γ*c[1]
