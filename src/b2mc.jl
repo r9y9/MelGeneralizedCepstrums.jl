@@ -1,5 +1,5 @@
 function b2mc!{T<:FloatingPoint}(mc::AbstractVector{T}, α::FloatingPoint)
-    m = length(mc)-1
+    m = length(mc)
     o = zero(T)
 
     mc[m] = mc[m]
