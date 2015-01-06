@@ -225,14 +225,14 @@ test_mc_basics()
 test_gc_basics()
 
 for order in 10:2:30
-    for α in [0.35, 0.41, 0.544]
+    for α in [-0.544, -0.41, -0.35, 0.0, 0.35, 0.41, 0.544]
         println("mcep: testing with order=$order, α=$α")
         test_mcep(order, α)
     end
 end
 
 for order in 25:5:35
-    for α in [0.0, 0.35, 0.41, 0.544]
+    for α in [-0.544, -0.41, -0.35, 0.0, 0.35, 0.41, 0.544]
         for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
             println("mgcep: testing with order=$order, α=$α, γ=$γ")
             test_mgcep(order, α, γ)
@@ -240,32 +240,30 @@ for order in 25:5:35
     end
 end
 
-for ns in 1:15
-    γ = -1.0/ns
+for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
     println("gnorm: testing with γ=$γ")
     test_gnorm(γ)
 end
 
-for ns in 1:15
-    γ = -1.0/ns
+for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
     println("ignorm: testing with γ=$γ")
     test_ignorm(γ)
 end
 
-for α in [0.35, 0.41, 0.544]
+for α in [-0.544, -0.41, -0.35, 0.0, 0.35, 0.41, 0.544]
     println("mc2b: testing with α=$α")
     test_mc2b(α)
 end
 
-for α in [0.35, 0.41, 0.544]
-    for ns in 1:15
-        γ = -1.0/ns
+# TODO(ryuichi): tests don't passed when α -0.544, -0.41, -0.35, γ = -1.0
+for α in [0.0, 0.35, 0.41, 0.544]
+    for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
         println("mgc2b: testing with α=$α, γ=$γ")
         test_mgc2b(α, γ)
     end
 end
 
-for α in [0.35, 0.41, 0.544]
+for α in [-0.544, -0.41, -0.35, 0.0, 0.35, 0.41, 0.544]
     println("mc2b: testing with α=$α")
     test_b2mc(α)
 end
@@ -276,21 +274,21 @@ for len in [128, 256, 512, 1024]
 end
 
 for order in 10:2:30
-    for α in [0.35, 0.41, 0.544]
+    for α in [-0.544, -0.41, -0.35, 0.0, 0.35, 0.41, 0.544]
         println("freqt: testing with order=$order, α=$α")
         test_freqt(order, α)
     end
 end
 
 for order in 10:2:30
-    for α in [0.35, 0.41, 0.544]
+    for α in [-0.544, -0.41, -0.35, 0.0, 0.35, 0.41, 0.544]
         println("b2c: testing with order=$order, α=$α")
         test_b2c(order, α)
     end
 end
 
 for order in 10:2:30
-    for α in [0.35, 0.41, 0.544]
+    for α in [-0.544, -0.41, -0.35, 0.0, 0.35, 0.41, 0.544]
         println("frqtr: testing with order=$order, α=$α")
         test_frqtr(order, α)
     end
@@ -304,7 +302,7 @@ for order in 15:5:35
 end
 
 for order in 15:5:35
-    for α in [0.35, 0.41, 0.544]
+    for α in [-0.544, -0.41, -0.35, 0.35, 0.41, 0.544]
         for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
             println("mgc2mgc: testing with order=$order, α=$α, γ=$γ")
             test_gc2gc(order, γ)
