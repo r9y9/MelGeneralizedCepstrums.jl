@@ -1,8 +1,5 @@
 module MelGeneralizedCepstrums
 
-# TODO: remove this dependency
-import SPTK
-
 export
     # Types
     MelGeneralizedCepstrum,

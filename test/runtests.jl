@@ -1,6 +1,7 @@
 using MelGeneralizedCepstrums
 using Base.Test
 
+import SPTK
 import MelGeneralizedCepstrums: frequency_scale, log_func, rawdata, Mel, Linear,
   StandardLog, GeneralizedLog
 
