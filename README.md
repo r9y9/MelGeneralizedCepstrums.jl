@@ -55,4 +55,4 @@ and generalized cepstrum is represented as:
 typealias GeneralizedCepstrum{T,N} MelGeneralizedCepstrum{Linear,GeneralizedLog,T,N}
 ```
 
-For more information about types, please check [common.jl]](src/common.jl). 
+For more information about types, please check [common.jl](src/common.jl). 
