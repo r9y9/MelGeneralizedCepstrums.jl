@@ -3,21 +3,21 @@ module MelGeneralizedCepstrums
 export
     # Types
     MelGeneralizedCepstrum,
-
     MelFrequencyCepstrum,
     LinearFrequencyCepstrum,
     GeneralizedLogCepstrum,
     StandardLogCepstrum,
     AllPoleCepstrum,
-    AllZeroCepstrum,
+    LinearCepstrum,
     MelCepstrum,
     GeneralizedCepstrum,
+    MelAllPoleCepstrum,
 
     # Basic property of Mel-generalized cepstrum
-    order,
+    order,           # order of cepstrum (not including 0-th coef.)
     allpass_alpha,   # all-pass constant (alpha)
     glog_gamma,      # parameter of generalized log function
-    powercoef,
+    powercoef,       # power coef. (0-th order of mgcep)
 
     # Feature extraction
     mgcep,

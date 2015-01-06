@@ -178,7 +178,7 @@ function mgcepnorm!(mgc::Vector{Float64},
     mgc
 end
 
-function mgcep{T<:FloatingPoint}(x::AbstractVector{T},
+function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
                                  order::Int=40,
                                  α::FloatingPoint=0.41,
                                  γ::FloatingPoint=0.0;
@@ -240,4 +240,13 @@ function mgcep{T<:FloatingPoint}(x::AbstractVector{T},
     end
 
     mgcepnorm!(b, α, γ, otype)
+end
+
+function mgcep{T<:FloatingPoint}(x::AbstractVector{T},
+                                 order::Int=40,
+                                 α::FloatingPoint=0.41,
+                                 γ::FloatingPoint=0.0;
+                                 kargs...)
+    raw = _mgcep(x, order, α, γ; kargs...)
+    MelGeneralizedCepstrum(α, γ, raw)
 end

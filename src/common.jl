@@ -17,8 +17,6 @@ type StandardLog <: Log
 end
 type AllPoleLog <: Log
 end
-type AllZeroLog <: Log
-end
 
 frequency_scale{F<:Frequency,L<:Log,T,N}(::Type{AbstractMelGeneralizedCepstrumArray{F,L,T,N}}) = F
 frequency_scale{T<:AbstractMelGeneralizedCepstrumArray}(::Type{T}) = frequency_scale(super(T))
@@ -47,22 +45,23 @@ function MelGeneralizedCepstrum{T,N}(α::T, γ::T, data::Array{T,N})
         L = StandardLog
     elseif γ == -one(T)
         L = AllPoleLog
-    elseif γ == one(T)
-        L = AllZeroLog
     end
 
     MelGeneralizedCepstrum{F,L,T,N}(α, γ, data)
 end
 
+# 3 type parameters
 typealias MelFrequencyCepstrum{L,T,N} MelGeneralizedCepstrum{Mel,L,T,N}
 typealias LinearFrequencyCepstrum{L,T,N} MelGeneralizedCepstrum{Linear,L,T,N}
 typealias GeneralizedLogCepstrum{F,T,N} MelGeneralizedCepstrum{F,GeneralizedLog,T,N}
 typealias StandardLogCepstrum{F,T,N} MelGeneralizedCepstrum{F,StandardLog,T,N}
 typealias AllPoleCepstrum{F,T,N} MelGeneralizedCepstrum{F,AllPoleLog,T,N}
-typealias AllZeroCepstrum{F,T,N} MelGeneralizedCepstrum{F,AllZeroLog,T,N}
 
+# 2 type parameters
+typealias LinearCepstrum{T,N} MelGeneralizedCepstrum{Linear,StandardLog,T,N}
 typealias MelCepstrum{T,N} MelGeneralizedCepstrum{Mel,StandardLog,T,N}
 typealias GeneralizedCepstrum{T,N} MelGeneralizedCepstrum{Linear,GeneralizedLog,T,N}
+typealias MelAllPoleCepstrum{T,N} MelGeneralizedCepstrum{Mel,AllPoleLog,T,N}
 
 ## AbstractArray implementation ##
 

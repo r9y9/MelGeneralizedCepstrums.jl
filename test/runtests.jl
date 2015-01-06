@@ -3,12 +3,63 @@ using Base.Test
 
 import SPTK
 import MelGeneralizedCepstrums: frequency_scale, log_func, rawdata, Mel, Linear,
-  StandardLog, GeneralizedLog
+  StandardLog, GeneralizedLog, AllPoleLog
 
 srand(98765)
 c = rand(Float64, 21)
 
-function test_mgc_basics()
+function test_mcep_type()
+    srand(98765)
+    x = rand(1024)
+    order = 20
+
+    # Linear frequency cepstrum
+    mc_typed = mcep(x, 3, 0.0)
+
+    # For type stability, mcep always returns a Type{::MelCepstrum}-typed value
+    # even if α = 0.0. To get expected type that can be estimated from α,
+    # just pass it to the generic constructor as follows:
+    mc_typed = MelGeneralizedCepstrum(allpass_alpha(mc_typed),
+                                      glog_gamma(mc_typed),
+                                      rawdata(mc_typed))
+    # turn out to be linear cepstrum
+    @test isa(mc_typed, LinearCepstrum)
+
+    mc_typed = mcep(x, 3, 0.41)
+    @test isa(mc_typed, MelCepstrum)
+end
+
+function test_mgcep_type()
+    srand(98765)
+    x = rand(1024)
+    order = 20
+
+    # Linear frequency cepstrum
+    mgc_typed = mgcep(x, 3, 0.0, 0.0)
+    @test isa(mgc_typed, LinearCepstrum)
+
+    # Mel-cepstrum
+    mgc_typed = mgcep(x, 3, 0.41, 0.0)
+    @test isa(mgc_typed, MelCepstrum)
+
+    # Generalized cepstrum
+    mgc_typed = mgcep(x, 3, 0.0, -0.1)
+    @test isa(mgc_typed, GeneralizedCepstrum)
+
+    # All-pole cepstrum (Linear prediction)
+    mgc_typed = mgcep(x, 3, 0.0, -1.0)
+    @test isa(mgc_typed, AllPoleCepstrum)
+
+    # Mel all-pole cepstrum (Warped linear prediction)
+    mgc_typed = mgcep(x, 3, 0.41, -1.0)
+    @test isa(mgc_typed, MelAllPoleCepstrum)
+
+    # Mel-Generalized Cesptrum
+    mgc_typed = mgcep(x, 3, 0.41, -0.1)
+    @test isa(mgc_typed, MelGeneralizedCepstrum)
+end
+
+function test_mgcep_basics()
     mgc = MelGeneralizedCepstrum(0.41, -0.01, c)
     @test isa(mgc, MelFrequencyCepstrum)
     @test isa(mgc, GeneralizedLogCepstrum)
@@ -22,7 +73,7 @@ function test_mgc_basics()
     @test log_func(typeof(mgc)) == GeneralizedLog
 end
 
-function test_mc_basics()
+function test_mcep_basics()
     mc = MelGeneralizedCepstrum(0.41, 0.0, c)
     @test isa(mc, MelCepstrum)
     @test isa(mc, StandardLogCepstrum)
@@ -36,7 +87,7 @@ function test_mc_basics()
     @test log_func(typeof(mc)) == StandardLog
 end
 
-function test_gc_basics()
+function test_gcep_basics()
     gc = MelGeneralizedCepstrum(0.0, -0.01, c)
     @test isa(gc, GeneralizedCepstrum)
     @test isa(gc, LinearFrequencyCepstrum)
@@ -48,27 +99,24 @@ function test_gc_basics()
 
     @test frequency_scale(typeof(gc)) == Linear
     @test log_func(typeof(gc)) == GeneralizedLog
+
+    gc = MelGeneralizedCepstrum(0.0, -1.0, c)
+    @test log_func(typeof(gc)) == AllPoleLog
 end
 
-# need to improved
 function test_mcep(order::Int, α::Float64)
     srand(98765)
     x = rand(1024)
     mc = SPTK.mcep(x, order, α)
     mĉ = MelGeneralizedCepstrums._mcep(x, order, α)
     @test_approx_eq mc mĉ
-
-    m_typed = mcep(x, order, α)
-    @test isa(m_typed, MelCepstrum)
-    @test_approx_eq mc rawdata(m_typed)
 end
 
-# need to improved
 function test_mgcep(order::Int, α::Float64, γ::Float64)
     srand(98765)
     x = rand(1024)
     mgc = SPTK.mgcep(x, order, α, γ; dd=0.001)
-    mgĉ = MelGeneralizedCepstrums.mgcep(x, order, α, γ; threshold=0.001)
+    mgĉ = MelGeneralizedCepstrums._mgcep(x, order, α, γ; threshold=0.001)
     @test_approx_eq mgc mgĉ
 end
 
@@ -221,9 +269,12 @@ function test_gc2gc(order::Int, α::Float64, γ::Float64)
     @test glog_gamma(mgc2²) == γ
 end
 
-test_mgc_basics()
-test_mc_basics()
-test_gc_basics()
+test_mcep_type()
+test_mgcep_type()
+
+test_mgcep_basics()
+test_mcep_basics()
+test_gcep_basics()
 
 for order in 10:2:30
     for α in [-0.544, -0.41, -0.35, 0.0, 0.35, 0.41, 0.544]
