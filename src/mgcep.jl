@@ -1,3 +1,6 @@
+# Mel generalized cepstrum analysis
+# re-coded from SPTK
+
 function ptrans!{T}(p::AbstractVector{T},  m::Int, α::FloatingPoint)
     d, o = zero(T), zero(T)
 
@@ -179,16 +182,16 @@ function mgcepnorm!(mgc::Vector{Float64},
 end
 
 function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
-                                 order::Int=40,
-                                 α::FloatingPoint=0.41,
-                                 γ::FloatingPoint=0.0;
-                                 n::Int=length(x)-1,
-                                 miniter::Int=2,
-                                 maxiter::Int=30,
-                                 threshold::FloatingPoint=0.001,
-                                 e::FloatingPoint=0.0,
-                                 otype::Int=0,
-                                 verbose::Bool=false
+                                  order::Int=40,
+                                  α::FloatingPoint=0.41,
+                                  γ::FloatingPoint=0.0;
+                                  n::Int=length(x)-1,
+                                  miniter::Int=2,
+                                  maxiter::Int=30,
+                                  threshold::FloatingPoint=0.001,
+                                  e::FloatingPoint=0.0,
+                                  otype::Int=0,
+                                  verbose::Bool=false
     )
     const xh = div(length(x), 2)
 
