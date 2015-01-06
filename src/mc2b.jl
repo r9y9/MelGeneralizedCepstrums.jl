@@ -1,8 +1,10 @@
 function mc2b!{T<:FloatingPoint}(mc::AbstractVector{T}, α::FloatingPoint)
+    b = mc
+
     for i=length(mc)-1:-1:1
-        @inbounds mc[i] = mc[i] - α*mc[i+1]
+        @inbounds b[i] = b[i] - α*b[i+1]
     end
-    mc
+    b
 end
 
 function mc2b{T<:FloatingPoint}(mc::AbstractVector{T}, α::FloatingPoint)

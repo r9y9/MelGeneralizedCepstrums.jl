@@ -1,4 +1,3 @@
-# Note that wc must be initialized.
 function b2c!{T<:FloatingPoint}(wc::AbstractVector{T}, c::AbstractVector{T},
                                 α::FloatingPoint;
                                 prev::Vector{T}=Array(T,length(wc)))
@@ -23,6 +22,6 @@ end
 
 function b2c{T<:FloatingPoint}(c::AbstractVector{T}, order::Int,
                                α::FloatingPoint)
-    wc = zeros(T, order+1)
+    wc = Array(T, order+1)
     b2c!(wc, c, α)
 end
