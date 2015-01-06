@@ -188,7 +188,7 @@ function mgcep{T<:FloatingPoint}(x::AbstractVector{T},
                                  threshold::FloatingPoint=0.001,
                                  e::FloatingPoint=0.0,
                                  otype::Int=0,
-                                 verbose::Bool=true
+                                 verbose::Bool=false
     )
     const xh = div(length(x), 2)
 
