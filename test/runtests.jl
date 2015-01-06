@@ -14,7 +14,7 @@ function test_mcep_type()
     order = 20
 
     # Linear frequency cepstrum
-    mc_typed = mcep(x, 3, 0.0)
+    mc_typed = mcep(x, order, 0.0)
 
     # For type stability, mcep always returns a Type{::MelCepstrum}-typed value
     # even if α = 0.0. To get expected type that can be estimated from α,
@@ -24,7 +24,7 @@ function test_mcep_type()
     # turn out to be linear cepstrum
     @test isa(mc_typed, LinearCepstrum)
 
-    mc_typed = mcep(x, 3, 0.41)
+    mc_typed = mcep(x, order, 0.41)
     @test isa(mc_typed, MelCepstrum)
 end
 
@@ -34,27 +34,27 @@ function test_mgcep_type()
     order = 20
 
     # Linear frequency cepstrum
-    mgc_typed = mgcep(x, 3, 0.0, 0.0)
+    mgc_typed = mgcep(x, order, 0.0, 0.0)
     @test isa(mgc_typed, LinearCepstrum)
 
     # Mel-cepstrum
-    mgc_typed = mgcep(x, 3, 0.41, 0.0)
+    mgc_typed = mgcep(x, order, 0.41, 0.0)
     @test isa(mgc_typed, MelCepstrum)
 
     # Generalized cepstrum
-    mgc_typed = mgcep(x, 3, 0.0, -0.1)
+    mgc_typed = mgcep(x, order, 0.0, -0.1)
     @test isa(mgc_typed, GeneralizedCepstrum)
 
     # All-pole cepstrum (Linear prediction)
-    mgc_typed = mgcep(x, 3, 0.0, -1.0)
+    mgc_typed = mgcep(x, order, 0.0, -1.0)
     @test isa(mgc_typed, AllPoleCepstrum)
 
     # Mel all-pole cepstrum (Warped linear prediction)
-    mgc_typed = mgcep(x, 3, 0.41, -1.0)
+    mgc_typed = mgcep(x, order, 0.41, -1.0)
     @test isa(mgc_typed, MelAllPoleCepstrum)
 
     # Mel-Generalized Cesptrum
-    mgc_typed = mgcep(x, 3, 0.41, -0.1)
+    mgc_typed = mgcep(x, order, 0.41, -0.1)
     @test isa(mgc_typed, MelGeneralizedCepstrum)
 end
 
