@@ -5,9 +5,6 @@ import SPTK
 import MelGeneralizedCepstrums: frequency_scale, log_func, rawdata, Mel, Linear,
   StandardLog, GeneralizedLog, AllPoleLog
 
-srand(98765)
-c = rand(Float64, 21)
-
 function test_mcep_type()
     srand(98765)
     x = rand(1024)
@@ -59,6 +56,9 @@ function test_mgcep_type()
 end
 
 function test_mgcep_basics()
+    srand(98765)
+    c = rand(21)
+
     mgc = MelGeneralizedCepstrum(0.41, -0.01, c)
     @test isa(mgc, MelFrequencyCepstrum)
     @test isa(mgc, GeneralizedLogCepstrum)
@@ -73,11 +73,14 @@ function test_mgcep_basics()
 end
 
 function test_mcep_basics()
+    srand(98765)
+    c = rand(21)
+
     mc = MelGeneralizedCepstrum(0.41, 0.0, c)
     @test isa(mc, MelCepstrum)
     @test isa(mc, StandardLogCepstrum)
     @test allpass_alpha(mc) == 0.41
-    @test glog_gamma(mc) == zero(Float64)
+    @test glog_gamma(mc) == 0.0
     @test order(mc) == 20
     @test powercoef(mc) == mc[1]
     @test size(mc) == size(c)
@@ -87,6 +90,9 @@ function test_mcep_basics()
 end
 
 function test_gcep_basics()
+    srand(98765)
+    c = rand(21)
+
     gc = MelGeneralizedCepstrum(0.0, -0.01, c)
     @test isa(gc, GeneralizedCepstrum)
     @test isa(gc, LinearFrequencyCepstrum)
