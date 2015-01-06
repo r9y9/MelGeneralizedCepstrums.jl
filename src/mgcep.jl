@@ -190,7 +190,7 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
                                   otype::Int=0,
                                   verbose::Bool=false
     )
-    const xh = div(length(x), 2)
+    const xh = length(x)>>1
 
     # Periodogram
     y = fft(x)

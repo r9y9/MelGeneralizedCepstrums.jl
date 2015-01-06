@@ -22,7 +22,7 @@ function fill_toeplitz!{T}(A::AbstractMatrix{T}, t::AbstractVector{T})
 end
 
 function fill_hankel!{T}(A::AbstractMatrix{T}, h::AbstractVector{T})
-    n = div(length(h),2) + 1
+    n = length(h)>>1 + 1
     for i=1:n, j=1:n
         @inbounds A[i,j] = h[i+j-1]
     end
@@ -63,7 +63,7 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T}, # a *windowed* signal
                                  threshold::T=0.001,   # stoppoing criteria
                                  e::T=zero(T),         # floor of periodogram
                                  verbose::Bool=false)
-    const xh = div(length(x),2)
+    const xh = length(x)>>1
 
     # create FFT workspace and plan
     y = Array(Complex{T}, xh+1)
