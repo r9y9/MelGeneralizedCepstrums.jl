@@ -5,7 +5,7 @@ function ptrans!{T}(p::AbstractVector{T},  m::Int, α::FloatingPoint)
     d, o = zero(T), zero(T)
 
     d = p[m+1]
-    for i=m-1:-1:1
+    @inbounds for i=m-1:-1:1
         o = p[i+1] + α * d
         d = p[i+1]
         p[i+1] = o
@@ -19,7 +19,7 @@ end
 
 function qtrans!{T}(q::AbstractVector{T},  m::Int, α::FloatingPoint)
     d = q[2]
-    for i=2:2m
+    @inbounds for i=2:2m
         o = q[i+1] + α*d
         d = q[i+1]
         q[i+1] = o
@@ -33,7 +33,7 @@ function gain{T}(er::AbstractVector{T}, c::AbstractVector{T}, m::Int,
     t = zero(T)
     if g != zero(T)
         for i=2:m+1
-            t += er[i] * c[i]
+            @inbounds t += er[i] * c[i]
         end
         return er[1] + g*t
     else
@@ -46,7 +46,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     order::Int,           # order of cepstrum
                     α::FloatingPoint,     # allpass constant
                     γ::FloatingPoint,     # paramter of generalized log function
-                    n::Int,               # the numbe of ..
+                    n::Int,               # the order of recursion
                     iter::Int             # current iter #
     )
     @assert length(x) > length(c)
@@ -66,16 +66,15 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     end
 
     y = fft(cr)
-    # FFTW.execute(fplan.plan, cr, y)
 
     if γ == -one(T)
         copy!(pr, 1, x, 1, length(x))
     elseif γ == zero(T)
         for i=1:length(x)
-            pr[i] = x[i] / exp(2real(y[i]))
+            @inbounds pr[i] = x[i] / exp(2real(y[i]))
         end
     else
-        for i=1:length(x)
+        @inbounds for i=1:length(x)
             tr = one(T) + γ*real(y[i])
             ti = γ*imag(y[i])
             trr, tii = tr*tr, ti*ti
@@ -92,8 +91,6 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         end
     end
 
-    # FFTW.execute(iplan.plan, y, c)
-    # scale!(c, FFTW.normalization(c))
     pr = real(ifft(pr))
 
     if α != zero(T)
@@ -130,7 +127,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         fill!(qr, zero(T))
     elseif γ != zero(T)
         for i=3:2order+1
-            qr[i] *= one(T) + γ
+            @inbounds qr[i] *= one(T) + γ
         end
     end
 
@@ -145,7 +142,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     b = (Tm + Hm) \ sub(rr, 2:order+1)
 
     for i=2:order+1
-        c[i] += b[i-1]
+        @inbounds c[i] += b[i-1]
     end
 
     if γ == -one(T)
@@ -156,10 +153,10 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     log(ϵ)
 end
 
-function mgcepnorm!(mgc::Vector{Float64},
-                    α::Float64,
-                    γ::Float64,
-                    otype::Int)
+function mgcepnorm!{T<:FloatingPoint}(mgc::AbstractVector{T},
+                                      α::FloatingPoint,
+                                      γ::FloatingPoint,
+                                      otype::Int)
     order = length(mgc)-1
 
     if otype == 0 || otype == 1 || otype == 2 || otype == 4
@@ -195,20 +192,14 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
     )
     const xh = div(length(x), 2)
 
-    # create FFT workspace and plan
-    # y = Array(Complex{T}, xh+1)
-    # c = Array(T, length(x))
-    # fplan = FFTW.Plan(c, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
-    # iplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
-
     # Periodogram
     y = fft(x)
     periodogram = abs2(y)
 
     b = zeros(order+1)
-    d = zeros(order+1)
     ϵ⁰ = newton!(b, periodogram, order, α, -one(T), n, 1)
 
+    d = zeros(order+1)
     if γ != -one(T)
         if α != zero(T)
             ignorm!(b, -1.0)
