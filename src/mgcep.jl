@@ -180,16 +180,15 @@ end
 
 function mgcep{T<:FloatingPoint}(x::AbstractVector{T},
                                  order::Int=40,
-                                 α::Float64=0.41,
-                                 γ::Float64=0.0;
+                                 α::FloatingPoint=0.41,
+                                 γ::FloatingPoint=0.0;
                                  n::Int=length(x)-1,
                                  miniter::Int=2,
                                  maxiter::Int=30,
-                                 dd::Float64=0.001,
-                                 e::Float64=0.0,
-                                 threshold::Float64=0.0001,
+                                 threshold::FloatingPoint=0.001,
+                                 e::FloatingPoint=0.0,
                                  otype::Int=0,
-                                 verbose::Bool=false
+                                 verbose::Bool=true
     )
     const xh = div(length(x), 2)
 
