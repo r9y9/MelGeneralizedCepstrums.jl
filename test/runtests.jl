@@ -19,9 +19,8 @@ function test_mcep_type()
     # For type stability, mcep always returns a Type{::MelCepstrum}-typed value
     # even if α = 0.0. To get expected type that can be estimated from α,
     # just pass it to the generic constructor as follows:
-    mc_typed = MelGeneralizedCepstrum(allpass_alpha(mc_typed),
-                                      glog_gamma(mc_typed),
-                                      rawdata(mc_typed))
+    mc_typed = MelGeneralizedCepstrum(mc_typed)
+
     # turn out to be linear cepstrum
     @test isa(mc_typed, LinearCepstrum)
 

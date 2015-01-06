@@ -50,6 +50,12 @@ function MelGeneralizedCepstrum{T,N}(α::T, γ::T, data::Array{T,N})
     MelGeneralizedCepstrum{F,L,T,N}(α, γ, data)
 end
 
+function MelGeneralizedCepstrum(mgc::MelGeneralizedCepstrum)
+    α = allpass_alpha(mgc)
+    γ = glog_gamma(mgc)
+    MelGeneralizedCepstrum(α, γ, rawdata(mgc))
+end
+
 # 3 type parameters
 typealias MelFrequencyCepstrum{L,T,N} MelGeneralizedCepstrum{Mel,L,T,N}
 typealias LinearFrequencyCepstrum{L,T,N} MelGeneralizedCepstrum{Linear,L,T,N}
