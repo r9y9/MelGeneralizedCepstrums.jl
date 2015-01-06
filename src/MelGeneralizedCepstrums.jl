@@ -57,6 +57,7 @@ for fname in [
               "ignorm",
               "c2ir",
               "freqt",
+              "frqtr",
               "gc2gc",
               "mgc2mgc",
               "extend"
