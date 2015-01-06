@@ -66,11 +66,9 @@ end
 function test_mgcep(order::Int, α::Float64, γ::Float64)
     srand(98765)
     x = rand(1024)
-    mgc = SPTK.mgcep(x, order, α, γ)
-    mgĉ = MelGeneralizedCepstrums.mgcep(x, order, α, γ)
-
-    # numerical error or bug?
-    @test_approx_eq_eps mgc mgĉ 1e-3
+    mgc = SPTK.mgcep(x, order, α, γ; dd=0.001)
+    mgĉ = MelGeneralizedCepstrums.mgcep(x, order, α, γ; threshold=0.001)
+    @test_approx_eq mgc mgĉ
 end
 
 function test_gnorm(γ::Float64)
@@ -235,7 +233,7 @@ end
 
 for order in 25:5:35
     for α in [0.0, 0.35, 0.41, 0.544]
-        for γ in [-1.0, -0.75, -0.5, -0.25] # 0.0
+        for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
             println("mgcep: testing with order=$order, α=$α, γ=$γ")
             test_mgcep(order, α, γ)
         end
