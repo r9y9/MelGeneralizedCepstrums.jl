@@ -18,6 +18,7 @@ end
 
 for f in [
           :_mcep,
+          :_mgcep,
           :mc2b,
           :mc2e,
           :mgc2b,

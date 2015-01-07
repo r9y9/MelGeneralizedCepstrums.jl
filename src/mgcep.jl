@@ -233,11 +233,11 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
     mgcepnorm!(b, α, γ, otype)
 end
 
-function mgcep{T<:FloatingPoint}(x::AbstractVector{T},
-                                 order::Int=40,
-                                 α::FloatingPoint=0.41,
-                                 γ::FloatingPoint=0.0;
-                                 kargs...)
+function mgcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
+                                   order::Int=40,
+                                   α::FloatingPoint=0.41,
+                                   γ::FloatingPoint=0.0;
+                                   kargs...)
     raw = _mgcep(x, order, α, γ; kargs...)
     MelGeneralizedCepstrum(α, γ, raw)
 end
