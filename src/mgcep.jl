@@ -172,7 +172,7 @@ function mgcepnorm!{T<:FloatingPoint}(mgc::AbstractVector{T},
     end
 
     if otype == 4 || otype == 5
-        mgc = [mgc[1], mgc[2:end]*γ]
+        mgc[2:end] *= γ
     end
 
     mgc
@@ -190,16 +190,13 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
                                   otype::Int=0,
                                   verbose::Bool=false
     )
-    const xh = length(x)>>1
-
     # Periodogram
-    y = fft(x)
-    periodogram = abs2(y)
+    periodogram = abs2(fft(x))
 
     b = zeros(order+1)
     ϵ⁰ = newton!(b, periodogram, order, α, -one(T), n, 1)
 
-    d = zeros(order+1)
+    d = Array(T, order+1)
     if γ != -one(T)
         if α != zero(T)
             ignorm!(b, -1.0)
