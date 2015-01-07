@@ -178,20 +178,22 @@ function mgcepnorm!{T<:FloatingPoint}(mgc::AbstractVector{T},
     mgc
 end
 
-function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
-                                  order::Int=40,
-                                  α::FloatingPoint=0.41,
-                                  γ::FloatingPoint=0.0;
-                                  n::Int=length(x)-1,
+function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* signal
+                                  order::Int=40,                 # order of mgcep
+                                  α::FloatingPoint=0.41,        # all-pass constant
+                                  γ::FloatingPoint=0.0;         # parameter of generalized log
+                                  n::Int=length(x)-1,            # order of recursion
                                   miniter::Int=2,
                                   maxiter::Int=30,
-                                  criteria::FloatingPoint=0.001,
-                                  e::FloatingPoint=0.0,
-                                  otype::Int=0,
+                                  criteria::FloatingPoint=0.001, # stopping criteria
+                                  e::T=zero(T),                  # floor of
+                                  otype::Int=0,                  # output type
                                   verbose::Bool=false
     )
+    @assert n < length(x)
+
     # Periodogram
-    periodogram = abs2(fft(x))
+    periodogram = abs2(fft(x)) + e
 
     b = zeros(order+1)
     ϵ⁰ = newton!(b, periodogram, order, α, -one(T), n, 1)

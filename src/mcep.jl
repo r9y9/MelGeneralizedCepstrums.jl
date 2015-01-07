@@ -55,13 +55,13 @@ function update_toeplitz_elements!(te::AbstractVector, c::AbstractVector)
     te
 end
 
-function _mcep{T<:FloatingPoint}(x::AbstractVector{T}, # a *windowed* signal
-                                 order::Int,           # order of mel-cepstrum
-                                 α::T;                # all-pass constant
+function _mcep{T<:FloatingPoint}(x::AbstractVector{T},           # a *windowed* signal
+                                 order::Int=40,                  # order of mel-cepstrum
+                                 α::FloatingPoint=0.41;         # all-pass constant
                                  miniter::Int=2,
                                  maxiter::Int=30,
-                                 criteria::T=0.001,    # stoppoing criteria
-                                 e::T=zero(T),         # floor of periodogram
+                                 criteria::FloatingPoint=0.001,  # stopping criteria
+                                 e::T=zero(T),                   # floor of periodogram
                                  verbose::Bool=false)
     const xh = length(x)>>1
 
@@ -146,8 +146,8 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T}, # a *windowed* signal
 end
 
 function mcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
-                                  order::Int,
-                                  α::T;
+                                  order::Int=40,
+                                  α::FloatingPoint=0.41;
                                   kargs...)
     raw = _mcep(x, order, α; kargs...)
     MelGeneralizedCepstrum{Mel,StandardLog,T,N}(α, zero(T), raw)
