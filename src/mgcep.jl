@@ -185,7 +185,7 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
                                   n::Int=length(x)-1,
                                   miniter::Int=2,
                                   maxiter::Int=30,
-                                  threshold::FloatingPoint=0.001,
+                                  criteria::FloatingPoint=0.001,
                                   e::FloatingPoint=0.0,
                                   otype::Int=0,
                                   verbose::Bool=false
@@ -225,7 +225,7 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
             if i >= miniter
                 err = abs((ϵᵗ - ϵ)/ϵ)
                 verbose && println("nmse: $err")
-                if err < threshold
+                if err < criteria
                     break
                 end
             end

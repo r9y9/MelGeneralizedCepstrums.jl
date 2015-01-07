@@ -121,7 +121,7 @@ function test_mgcep(order::Int, α::Float64, γ::Float64)
     srand(98765)
     x = rand(1024)
     mgc = SPTK.mgcep(x, order, α, γ; dd=0.001)
-    mgĉ = MelGeneralizedCepstrums._mgcep(x, order, α, γ; threshold=0.001)
+    mgĉ = MelGeneralizedCepstrums._mgcep(x, order, α, γ; criteria=0.001)
     @test_approx_eq mgc mgĉ
 end
 

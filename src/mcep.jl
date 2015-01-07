@@ -60,7 +60,7 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T}, # a *windowed* signal
                                  α::T;                # all-pass constant
                                  miniter::Int=2,
                                  maxiter::Int=30,
-                                 threshold::T=0.001,   # stoppoing criteria
+                                 criteria::T=0.001,    # stoppoing criteria
                                  e::T=zero(T),         # floor of periodogram
                                  verbose::Bool=false)
     const xh = length(x)>>1
@@ -116,7 +116,7 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T}, # a *windowed* signal
         if i >= miniter
             err = abs((c[1]-czero)/c[1])
             verbose && println("czero nmse: $err")
-            if err < threshold
+            if err < criteria
                 break
             end
             czero = c[1]
