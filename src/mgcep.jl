@@ -196,8 +196,8 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
     b = zeros(order+1)
     ϵ⁰ = newton!(b, periodogram, order, α, -one(T), n, 1)
 
-    d = Array(T, order+1)
     if γ != -one(T)
+        d = Array(T, order+1)
         if α != zero(T)
             ignorm!(b, -1.0)
             b2mc!(b, α)
