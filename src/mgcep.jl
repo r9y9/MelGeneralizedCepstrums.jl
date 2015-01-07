@@ -203,7 +203,7 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
     if γ != -one(T)
         if α != zero(T)
             ignorm!(b, -1.0)
-            b = b2mc(b, α)
+            b2mc!(b, α)
             copy!(d, b)
             gnorm!(d, -1.0)
         else
@@ -213,7 +213,7 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},
 
         if α != zero(T)
             ignorm!(b, γ)
-            b = mc2b(b, α)
+            mc2b!(b, α)
             gnorm!(b, γ)
         end
     end
