@@ -42,7 +42,7 @@ export
     c2ir,            # cepstrum -> impulse response
     freqt,           # frequency transform
     freqt!,          #
-    frqtr,           # freqt in _mcep.c
+    frqtr,           # frqtr in _mcep.c
     frqtr!,          #
     gc2gc,           # generalized cepstrum -> genralized cepstrum
     mgc2mgc          # mel-generalized cepstrum -> mel-generalized cepstrum
