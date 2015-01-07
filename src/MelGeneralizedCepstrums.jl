@@ -20,8 +20,10 @@ export
     powercoef,       # power coef. (0-th order of mgcep)
 
     # Feature extraction
-    mgcep,
-    mcep,
+    mgcep,           # mel-generalized cepstrum analysis
+    mcep,            # mel-cepstrum analysis
+
+    mcepalpha,       # determine appropriate all pass constant in mel-cesptum
 
     # Conversions
     mc2b,            # mel-cepstrum -> mlsadf filter coef.
@@ -49,6 +51,7 @@ for fname in [
               "common",
               "mgcep",
               "mcep",
+              "mcepalpha",
               "mc2b",
               "mgc2b",
               "b2mc",
