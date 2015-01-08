@@ -126,6 +126,52 @@ function test_mgcep(order::Int, α::Float64, γ::Float64)
     @test_approx_eq mgc mgĉ
 end
 
+function test_extend()
+    srand(98765)
+    mc = rand(21)
+    mc_mat = repmat(mc, 1, 2)
+    mc_mat2 = copy(mc_mat)
+    mc_submat = sub(mc_mat2, 1:size(mc_mat2, 1), 1:size(mc_mat2, 2))
+
+    # case 1: Vector input
+    r1 = mc2b(mc, 0.41)
+    # case 2: Matrix input
+    r2 = mc2b(mc_mat, 0.41)
+    # case 3: SubArray input
+    r3 = mc2b(mc_submat, 0.41)
+
+    # make sure non-inplace function doesn't destoy input
+    @test r1 != mc
+    @test r2 != mc_mat
+    @test r3 != mc_mat2
+
+    @test r1 == r2[:,1]
+    @test r1 == r3[:,1]
+end
+
+function test_inplace_extend()
+    srand(98765)
+    mc = rand(21)
+    mc_mat = repmat(mc, 1, 2)
+    mc_mat2 = copy(mc_mat)
+    mc_submat = sub(mc_mat2, 1:size(mc_mat2, 1), 1:size(mc_mat2, 2))
+
+    mc_org = copy(mc)
+
+    # case 1: Vector input
+    mc2b!(mc, 0.41)
+    # case 2: Matrix input
+    mc2b!(mc_mat, 0.41)
+    # case 3: SubArray input
+    mc2b!(mc_submat, 0.41)
+
+    @test mc != mc_org
+
+    # all of the cases above must get an equal result for same input
+    @test mc == mc_mat[:,1]
+    @test mc == mc_submat[:,1]
+end
+
 function test_gnorm(γ::Float64)
     srand(98765)
     mc = rand(21)
@@ -270,6 +316,9 @@ test_mgcep_type()
 test_mgcep_basics()
 test_mcep_basics()
 test_gcep_basics()
+
+test_extend()
+test_inplace_extend()
 
 for order in 10:2:30
     for α in [-0.544, -0.41, -0.35, 0.0, 0.35, 0.41, 0.544]
