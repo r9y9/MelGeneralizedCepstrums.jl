@@ -69,7 +69,7 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T},           # a *windowed* 
     y = Array(Complex{T}, xh+1)
     c = Array(T, length(x))
     fplan = FFTW.Plan(c, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
-    iplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+    bplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
 
     # Periodogram
     FFTW.execute(fplan.plan, x, y)
@@ -78,7 +78,7 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T},           # a *windowed* 
 
     # Initial value of cepstrum
     fill_only_real_part!(y, logperiodogram)
-    FFTW.execute(iplan.plan, y, c)
+    FFTW.execute(bplan.plan, y, c)
     scale!(c, FFTW.normalization(c))
     c[1] /= 2.0
     c[xh+1] /= 2.0
@@ -107,7 +107,7 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T},           # a *windowed* 
         for i=1:length(y)
             @inbounds y[i] = Complex(periodogram[i] / exp(2real(y[i])), zero(T))
         end
-        FFTW.execute(iplan.plan, y, c)
+        FFTW.execute(bplan.plan, y, c)
         scale!(c, FFTW.normalization(c))
 
         frqtr!(sub(c, 1:2order+1), c[1:xh+1], α)
