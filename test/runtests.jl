@@ -128,7 +128,6 @@ end
 
 function test_gnorm(γ::Float64)
     srand(98765)
-    x = rand(100)
     mc = rand(21)
 
     g = SPTK.gnorm(mc, γ)
@@ -145,7 +144,6 @@ end
 
 function test_ignorm(γ::Float64)
     srand(98765)
-    x = rand(100)
     mc = rand(21)
 
     g = SPTK.ignorm(mc, γ)
@@ -162,7 +160,6 @@ end
 
 function test_mc2b(α::Float64)
     srand(98765)
-    x = rand(100)
     mc = rand(21)
 
     b = SPTK.mc2b(mc, α)
@@ -175,7 +172,6 @@ end
 
 function test_mgc2b(α::Float64, γ::Float64)
     srand(98765)
-    x = rand(100)
     mgc = rand(21)
 
     b = mgc2b(mgc, α, γ)
@@ -189,7 +185,6 @@ end
 
 function test_b2mc(α::Float64)
     srand(98765)
-    x = rand(100)
     b = rand(21)
 
     mc = SPTK.b2mc(b, α)
@@ -199,7 +194,6 @@ end
 
 function test_c2ir(len::Int=512)
     srand(98765)
-    x = rand(100)
     c = rand(21)
 
     ir = SPTK.c2ir(c, len)
@@ -209,7 +203,6 @@ end
 
 function test_freqt(order::Int, α::Float64)
     srand(98765)
-    x = rand(100)
     mc = rand(21)
 
     m = SPTK.freqt(mc, order, α)
@@ -223,7 +216,6 @@ end
 
 function test_b2c(order::Int, α::Float64)
     srand(98765)
-    x = rand(100)
     mc = rand(21)
 
     m = SPTK.b2c(mc, order, α)
@@ -233,7 +225,6 @@ end
 
 function test_frqtr(order::Int, α::Float64)
     srand(98765)
-    x = rand(100)
     mc = rand(21)
 
     m = SPTK.frqtr(mc, order, α)
@@ -247,7 +238,6 @@ end
 
 function test_gc2gc(order::Int, γ::Float64)
     srand(98765)
-    x = rand(100)
     gc = rand(21)
 
     gc2 = SPTK.gc2gc(gc, 0.0, order, γ)
@@ -261,7 +251,6 @@ end
 
 function test_gc2gc(order::Int, α::Float64, γ::Float64)
     srand(98765)
-    x = rand(100)
     mgc = rand(21)
 
     mgc2 = SPTK.mgc2gc(gc, 0.0, 0.0, order, α, γ)
