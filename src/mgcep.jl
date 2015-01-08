@@ -180,8 +180,8 @@ end
 
 function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* signal
                                   order::Int=40,                 # order of mgcep
-                                  α::FloatingPoint=0.41,        # all-pass constant
-                                  γ::FloatingPoint=0.0;         # parameter of generalized log
+                                  α::FloatingPoint=0.41,         # all-pass constant
+                                  γ::FloatingPoint=0.0;          # parameter of generalized log
                                   n::Int=length(x)-1,            # order of recursion
                                   miniter::Int=2,
                                   maxiter::Int=30,

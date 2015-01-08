@@ -57,7 +57,7 @@ end
 
 function _mcep{T<:FloatingPoint}(x::AbstractVector{T},           # a *windowed* signal
                                  order::Int=40,                  # order of mel-cepstrum
-                                 α::FloatingPoint=0.41;         # all-pass constant
+                                 α::FloatingPoint=0.41;          # all-pass constant
                                  miniter::Int=2,
                                  maxiter::Int=30,
                                  criteria::FloatingPoint=0.001,  # stopping criteria

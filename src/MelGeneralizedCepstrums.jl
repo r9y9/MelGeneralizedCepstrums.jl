@@ -35,10 +35,10 @@ export
     b2mc!,           #
     b2c,             # b2c in _mgcep.c
     b2c!,            #
-    gnorm!,          # gain normalization for mel-generalized cepstrum
-    gnorm,           #
-    ignorm!,         # inverse gain normalization for mel-generalized cepstrum
-    ignorm,          #
+    gnorm,           # gain normalization for mel-generalized cepstrum
+    gnorm!,          #
+    ignorm,          # inverse gain normalization for mel-generalized cepstrum
+    ignorm!,         #
     c2ir,            # cepstrum -> impulse response
     freqt,           # frequency transform
     freqt!,          #
