@@ -3,13 +3,23 @@
 for f in [
           :mc2b!,
           :mgc2b!,
+          :b2mc!,
+          :b2c!,
           :gnorm!,
-          :ignorm!
+          :ignorm!,
+          :freqt!,
+          :frqtr!
           ]
     @eval begin
         function ($f){T<:FloatingPoint}(x::AbstractMatrix{T}, args...; kargs...)
             for i = 1:size(x, 2)
                 @inbounds x[:, i] = $f(x[:, i], args...; kargs...)
+            end
+            x
+        end
+        function ($f){T<:FloatingPoint}(x::Matrix{T}, args...; kargs...)
+            for i = 1:size(x, 2)
+                @inbounds $f(sub(x, 1:size(x, 1), i), args...; kargs...)
             end
             x
         end
@@ -20,7 +30,6 @@ for f in [
           :_mcep,
           :_mgcep,
           :mc2b,
-          :mc2e,
           :mgc2b,
           :gnorm,
           :ignorm,

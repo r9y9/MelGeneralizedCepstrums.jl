@@ -53,6 +53,7 @@ for fname in [
               "mcep",
               "mcepalpha",
               "mc2b",
+              "mc2e",
               "mgc2b",
               "b2mc",
               "b2c",
