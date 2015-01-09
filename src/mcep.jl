@@ -99,9 +99,12 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T},           # a *windowed* 
     fill_al!(al, α)
 
     # Newton raphson roop
+    ch = sub(c, 1:xh+1)
+    ch_copy = Array(T, xh+1)
+    c_frqtr = sub(c, 1:2order+1)
     for i=1:maxiter
         fill!(c, zero(T))
-        freqt!(sub(c, 1:xh+1), mc, -α)
+        freqt!(ch, mc, -α)
 
         FFTW.execute(fplan.plan, c, y)
         for i=1:length(y)
@@ -110,7 +113,8 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T},           # a *windowed* 
         FFTW.execute(bplan.plan, y, c)
         scale!(c, FFTW.normalization(c))
 
-        frqtr!(sub(c, 1:2order+1), c[1:xh+1], α)
+        copy!(ch_copy, ch)
+        frqtr!(c_frqtr, ch_copy, α)
 
         # check convergence
         if i >= miniter
