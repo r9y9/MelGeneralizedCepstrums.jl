@@ -6,7 +6,7 @@ MelGeneralizedCepstrums.jl provides a mel generalized-log cepstrum anlysis for s
 
 ## Type design
 
-MelGeneralizedCepstrums.jl provides a general type `MelGeneralizedCepstrum{F,L,T,N}` which is a subtype of `AbstractArray{T,N}`, where `F` represents a type of frequency scale and `L` represents a type of log function. Linear Prediction-based cepstrum, mel-cepstrum, generalized cepstrum and other kind of cepstrum are represented as a special type with specific type pareamters of `MelGeneralizedCepstrum{F,L,T,N}`.
+MelGeneralizedCepstrums.jl provides a general type `MelGeneralizedCepstrum{F,L,T,N}` which is a subtype of `AbstractArray{T,N}`, where `F` represents a type of frequency scale and `L` represents a type of log function. Linear Prediction-based cepstrum, mel-cepstrum, generalized cepstrum and other kind of cepstrum are represented as a special type with specific type parameters of `MelGeneralizedCepstrum{F,L,T,N}`.
 
 The actual type definition is as follows:
 

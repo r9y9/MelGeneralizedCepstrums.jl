@@ -45,7 +45,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     x::AbstractVector{T}, # modified periodogram
                     order::Int,           # order of cepstrum
                     α::FloatingPoint,     # allpass constant
-                    γ::FloatingPoint,     # paramter of generalized log function
+                    γ::FloatingPoint,     # parameter of generalized log function
                     n::Int,               # the order of recursion
                     iter::Int             # current iter #
     )
