@@ -1,7 +1,5 @@
-function mgc2sp{T<:FloatingPoint}(mgc::AbstractVector{T},
-                                  α::FloatingPoint,
-                                  γ::FloatingPoint,
-                                  fftlen::Int)
+function mgc2sp(mgc::AbstractVector, α::FloatingPoint, γ::FloatingPoint,
+                fftlen::Int)
     # transform to cesptrum
     c = mgc2mgc(mgc, α, γ, fftlen>>1, 0.0, 0.0)
 
