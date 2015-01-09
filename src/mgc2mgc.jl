@@ -9,6 +9,7 @@ function mgc2mgc{T<:FloatingPoint}(c1::AbstractVector{T}, α¹::FloatingPoint,
     if α == zero(T)
         c2 = gnorm(c1, γ¹)
         c2 = gc2gc(c2, γ¹, m2, γ²)
+        c2 = ignorm(c2, γ²)
     else
         c2 = freqt(c1, m2, α)
         c2 = gnorm(c2, γ¹)
