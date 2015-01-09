@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/r9y9/MelGeneralizedCepstrums.jl.svg?branch=master)](https://travis-ci.org/r9y9/MelGeneralizedCepstrums.jl)
 
-MelGeneralizedCepstrums.jl provides a mel generalized-log cepstrum anlysis for spectrum envelope estimation, which includes Linear Predicition, Mel-Cepstrum analysis and Generalized Cepstrum analysis for Julia. The core is re-writen by pure Julia language based on [Speech Signal Processing Toolkit (SPTK)](http://sp-tk.sourceforge.net/).
+MelGeneralizedCepstrums.jl provides a mel generalized-log cepstrum anlysis for spectrum envelope estimation, which includes Linear Predicition, Mel-Cepstrum analysis and Generalized Cepstrum analysis for Julia. The core is re-writen by pure Julia language based on [Speech Signal Processing Toolkit (SPTK)](http://sp-tk.sourceforge.net/). It works linux, osx and windows.
 
 ## Type design
 
@@ -66,6 +66,33 @@ This package provides you two ways to estimate (mel-generalized) cepstrum from a
 
 `mgcep` is more general than mcep but 2~5x slower than `mcep`. You can choose one of them for your need.
 
+A basic API of `mcep` is
+
+```julia
+function mcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
+                                  order::Int=40,
+                                  α::FloatingPoint=0.41;
+                                  kargs...)
+    ...
+end
+```
+
+where `x` is a input windowed signal, `order` is a order of cepstrum and `α` is a frequency warping parameter. When `α = 0`, mel-cepstrum analysis corresponds to unbiased cepstrum analysis.
+
+A basic API of `mgcep` is
+
+```julia
+function mgcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
+                                   order::Int=40,
+                                   α::FloatingPoint=0.41,
+                                   γ::FloatingPoint=0.0;
+                                   kargs...)
+    ...
+end
+```
+
+where `x` is a input windowed signal, order is a order of cepstrum, `α` is a frequency warping parameter and `γ` is a paramter of generalized log function. When `γ = 0`, mel-generalized cepstrum analysis corresponds to mel-cepstrum analysis.
+
 ## How spectral envelop estimation works
 
 We show how spectrum envelop estimation works. Suppose that we have a *windowed* speech signal `x` and we want to extact spectral enelope from that.
@@ -120,4 +147,4 @@ mgc = mgcep(x, 20, 0.41, -0.35)
 
 ![](examples/mgcep.png)
 
-For the complete code of visualizations shown above, please check [the ijulia notebook]().
+For the complete code of visualizations shown above, please check [the ijulia notebook](http://nbviewer.ipython.org/github/r9y9/MelGeneralizedCepstrums.jl/blob/master/examples/MelGeneralizedCepstrumsBasedEnvelope.ipynb).
