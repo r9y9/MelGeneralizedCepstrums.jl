@@ -31,6 +31,7 @@ export
     mc2e,            # mel-cesptrum to energy
     mgc2b,           # mel-generalized cepstrum -> mglsadf coef.
     mgc2b!,          #
+    mgc2sp,          # mel-generalized cepstrum -> spectrum envelope
     b2mc,            # mlsadf filter coef. -> mel-cepstrum
     b2mc!,           #
     b2c,             # b2c in _mgcep.c
@@ -55,6 +56,7 @@ for fname in [
               "mc2b",
               "mc2e",
               "mgc2b",
+              "mgc2sp",
               "b2mc",
               "b2c",
               "gnorm",

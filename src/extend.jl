@@ -31,6 +31,7 @@ for f in [
           :_mgcep,
           :mc2b,
           :mgc2b,
+          :mgc2sp,
           :gnorm,
           :ignorm,
           :c2ir,
