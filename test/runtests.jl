@@ -295,19 +295,32 @@ function test_gc2gc(order::Int, γ::Float64)
     @test_approx_eq gc2 rawdata(gc2̂)
 end
 
-function test_gc2gc(order::Int, α::Float64, γ::Float64)
+function test_mgc2mgc(order::Int, α::Float64, γ::Float64)
     srand(98765)
     mgc = rand(21)
 
-    mgc2 = SPTK.mgc2gc(gc, 0.0, 0.0, order, α, γ)
-    mgc2̂ = mgc2gc(gc, 0.0, 0.0, order, α, γ)
+    mgc2 = SPTK.mgc2mgc(mgc, 0.0, 0.0, order, α, γ)
+    mgc2̂ = mgc2mgc(mgc, 0.0, 0.0, order, α, γ)
     @test_approx_eq mgc2 mgc2̂
 
-    mgc = MelGeneralizedCepstrum(0.0, 0.0, gc)
-    mgc2̂ = mgc2gc(gc, order, α, γ)
+    mgc = MelGeneralizedCepstrum(0.0, 0.0, mgc)
+    mgc2̂ = mgc2mgc(mgc, order, α, γ)
     @test_approx_eq mgc2 rawdata(mgc2̂)
-    @test allpass_alpha(mgc2²) == α
-    @test glog_gamma(mgc2²) == γ
+    @test allpass_alpha(mgc2̂) == α
+    @test glog_gamma(mgc2̂) == γ
+end
+
+function test_mgc2sp(α::Float64, γ::Float64)
+    srand(98765)
+    mgc = rand(21)
+
+    fftlen = 1024
+    sp = mgc2sp(mgc, α, γ, fftlen)
+    @assert length(sp) == fftlen>>1 + 1
+
+    mgc = MelGeneralizedCepstrum(α, γ, mgc)
+    sp = mgc2sp(mgc, fftlen)
+    @assert length(sp) == fftlen>>1 + 1
 end
 
 test_mcep_type()
@@ -401,8 +414,15 @@ for order in 15:5:35
     for α in [-0.544, -0.41, -0.35, 0.35, 0.41, 0.544]
         for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
             println("mgc2mgc: testing with order=$order, α=$α, γ=$γ")
-            test_gc2gc(order, γ)
+            test_mgc2mgc(order, α, γ)
         end
+    end
+end
+
+for α in [-0.544, -0.41, -0.35, 0.35, 0.41, 0.544]
+    for γ in [-0.75, -0.5, -0.25, 0.0] # TODO(ryuichi) -1.0
+        println("mgc2sp: testing with α=$α and γ=$γ")
+        test_mgc2sp(α, γ)
     end
 end
 
