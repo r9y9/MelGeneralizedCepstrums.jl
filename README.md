@@ -93,9 +93,9 @@ end
 
 where `x` is a input windowed signal, `order` is order of cepstrum, `α` is a frequency warping parameter and `γ` is a paramter of generalized log function. When `γ = 0`, mel-generalized cepstrum analysis corresponds to mel-cepstrum analysis. For more information about mel-generalized cepstrum, please see [the paper].(http://www.sp.nitech.ac.jp/~tokuda/selected_pub/pdf/conference/tokuda_icslp1994.pdf)
 
-## How spectral envelop estimation works
+## How spectral envelope estimation works
 
-We show how spectrum envelop estimation works. Suppose that we have a *windowed* speech signal `x` and we want to extact spectral enelope from that.
+We show how spectrum envelope estimation works. Suppose that we have a *windowed* speech signal `x` and we want to extact spectral enelope from that.
 
 ![](examples/windowed.png)
 
