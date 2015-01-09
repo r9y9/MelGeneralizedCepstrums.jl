@@ -25,7 +25,7 @@ immutable MelGeneralizedCepstrum{F<:Frequency,L<:Log,T<:FloatingPoint,N} <: Abst
 end
 ```
 
-where 
+where
 
 ```julia
 abstract Frequency
@@ -43,7 +43,7 @@ type AllPoleLog <: Log
 end
 ```
 
-Following the above definition, for example, mel-cepstrum is represented as 
+Following the above definition, for example, mel-cepstrum is represented as
 
 ```julia
 typealias MelCepstrum{T,N} MelGeneralizedCepstrum{Mel,StandardLog,T,N}
@@ -55,4 +55,69 @@ and generalized cepstrum is represented as:
 typealias GeneralizedCepstrum{T,N} MelGeneralizedCepstrum{Linear,GeneralizedLog,T,N}
 ```
 
-For more information about types, please check [common.jl](src/common.jl). 
+For more information about types, please check [src/common.jl](src/common.jl).
+
+## Mel-generalized cepstrum estimation
+
+This package provides you two ways to estimate (mel-generalized) cepstrum from a speech signal:
+
+- `mcep` - Mel-cepstrum analysis
+- `mgcep` - Mel-generalized cesptrum analysis
+
+`mgcep` is more general than mcep but 2~5x slower than `mcep`. You can choose one of them for your need.
+
+## How spectral envelop estimation works
+
+We show how spectrum envelop estimation works. Suppose that we have a *windowed* speech signal `x` and we want to extact spectral enelope from that.
+
+![](examples/windowed.png)
+
+### Linear Cepstrum
+
+```julia
+c = mcep(x, 20, 0.0)
+```
+
+![](examples/c.png)
+
+### Mel-Cepstrum
+
+```julia
+mc = mcep(x, 20, 0.41)
+```
+
+![](examples/mcep.png)
+
+### Linear Prediction
+
+```julia
+mgc = mgcep(x, 20, 0.0, -1.0)
+```
+
+![](examples/lpc.png)
+
+### Warped Linear Prediction
+
+```julia
+mgc = mgcep(x, 20, 0.41, -1.0)
+```
+
+![](examples/wlpc.png)
+
+### Generalized Cepstrum
+
+```julia
+mgc = mgcep(x, 20, 0.0, -0.35)
+```
+
+![](examples/gcep.png)
+
+### Mel-Generalized Cepstrum
+
+```julia
+mgc = mgcep(x, 20, 0.41, -0.35)
+```
+
+![](examples/mgcep.png)
+
+For the complete code of visualizations shown above, please check [the ijulia notebook]().
