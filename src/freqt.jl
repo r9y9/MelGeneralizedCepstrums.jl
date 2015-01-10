@@ -27,8 +27,10 @@ function freqt{T<:FloatingPoint}(c::AbstractVector{T}, order::Int,
     freqt!(wc, c, α)
 end
 
-function freqt(c::MelGeneralizedCepstrum, order::Int, α::FloatingPoint)
+function freqt(c::MelGeneralizedCepstrum, order::Int, α²::FloatingPoint)
     raw = rawdata(c)
+    α¹ = allpass_alpha(c)
+    α = (α²-α¹) / (1.0-α²*α¹)
     cc = freqt(raw, order, α)
-    MelGeneralizedCepstrum(allpass_alpha(c)+α, glog_gamma(c), cc)
+    MelGeneralizedCepstrum(α, glog_gamma(c), cc)
 end
