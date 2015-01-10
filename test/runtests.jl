@@ -299,11 +299,11 @@ function test_mgc2mgc(order::Int, α::Float64, γ::Float64)
     srand(98765)
     mgc = rand(21)
 
-    mgc2 = SPTK.mgc2mgc(mgc, 0.0, 0.0, order, α, γ)
-    mgc2̂ = mgc2mgc(mgc, 0.0, 0.0, order, α, γ)
+    mgc2 = SPTK.mgc2mgc(mgc, 0.41, 0.0, order, α, γ)
+    mgc2̂ = mgc2mgc(mgc, 0.41, 0.0, order, α, γ)
     @test_approx_eq mgc2 mgc2̂
 
-    mgc = MelGeneralizedCepstrum(0.0, 0.0, mgc)
+    mgc = MelGeneralizedCepstrum(0.41, 0.0, mgc)
     mgc2̂ = mgc2mgc(mgc, order, α, γ)
     @test_approx_eq mgc2 rawdata(mgc2̂)
     @test allpass_alpha(mgc2̂) == α

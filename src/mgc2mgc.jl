@@ -2,19 +2,19 @@ function mgc2mgc{T<:FloatingPoint}(c1::AbstractVector{T}, α¹::FloatingPoint,
                                    γ¹::FloatingPoint,
                                    m2::Int, α²::FloatingPoint,
                                    γ²::FloatingPoint)
-    c2 = zeros(T, m2+1)
+    c2 = Array(T, m2+1)
 
     α = (α²-α¹) / (1.0-α²*α¹)
 
     if α == zero(T)
         c2 = gnorm(c1, γ¹)
         c2 = gc2gc(c2, γ¹, m2, γ²)
-        c2 = ignorm(c2, γ²)
+        ignorm!(c2, γ²)
     else
-        c2 = freqt(c1, m2, α)
-        c2 = gnorm(c2, γ¹)
+        freqt!(c2, c1, α)
+        gnorm!(c2, γ¹)
         c2 = gc2gc(c2, γ¹, m2, γ²)
-        c2 = ignorm(c2, γ²)
+        ignorm!(c2, γ²)
     end
 
     c2
