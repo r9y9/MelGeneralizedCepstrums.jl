@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/r9y9/MelGeneralizedCepstrums.jl.svg?branch=master)](https://travis-ci.org/r9y9/MelGeneralizedCepstrums.jl)
 
-MelGeneralizedCepstrums.jl provides a mel generalized-log cepstrum anlysis for spectrum envelope estimation, which includes Linear Predicition, Mel-Cepstrum, Generalized Cepstrum and Mel-Generalized Cepstrum analysis for Julia. The core is re-writen by pure Julia language based on [Speech Signal Processing Toolkit (SPTK)](http://sp-tk.sourceforge.net/). It works linux, osx and windows.
+MelGeneralizedCepstrums.jl provides a mel generalized cepstrum anlysis for spectrum envelope estimation, which includes linear predicition, mel-cepstrum, generalized cepstrum and mel-generalized cepstrum analysis for Julia. This package also provides mel-generalized cepstrum conversions, e.g mel-generalized cepstrum to mel-cepstrum, mel-cepstrum to (linear) cepstrum, mel-cesptrum to coefficients of waveform synthesis filter (known as mel-log spectrum approximation digital filter), and vise versa. The core is re-writen by pure Julia language based on [Speech Signal Processing Toolkit (SPTK)](http://sp-tk.sourceforge.net/).
 
 ## Type design
 
@@ -64,7 +64,7 @@ This package provides you two ways to estimate (mel-generalized) cepstrum from a
 - `mcep` - Mel-cepstrum analysis
 - `mgcep` - Mel-generalized cesptrum analysis
 
-`mgcep` is more general than mcep but 2~5x slower than `mcep`. You can choose one of them for your need.
+`mgcep` is more general than `mcep` but 2~5x slower than `mcep`. You can choose one of them for your need.
 
 A basic API of `mcep` is
 
@@ -77,7 +77,7 @@ function mcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
 end
 ```
 
-where `x` is a input windowed signal, `order` is order of cepstrum and `α` is a frequency warping parameter. When `α = 0`, mel-cepstrum analysis corresponds to unbiased cepstrum analysis.
+where `x` is a input windowed signal, `order` is order of cepstrum and `α` is a frequency warping parameter. It returns a value typed `MelGeneralizedCepstrum{Mel,StandardLog,T,N}` which is typealised as `MelCepstrum{T,N}`. When `α = 0`, mel-cepstrum analysis corresponds to unbiased cepstrum analysis.
 
 A basic API of `mgcep` is
 
@@ -91,7 +91,7 @@ function mgcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
 end
 ```
 
-where `x` is a input windowed signal, `order` is the order of cepstrum (expect for 0-th), `α` is a frequency warping parameter and `γ` is a paramter of generalized log function. When `γ = 0`, mel-generalized cepstrum analysis corresponds to mel-cepstrum analysis. For more information about mel-generalized cepstrum, please see [the paper](http://www.sp.nitech.ac.jp/~tokuda/selected_pub/pdf/conference/tokuda_icslp1994.pdf).
+where `x` is a input windowed signal, `order` is the order of cepstrum (expect for 0-th), `α` is a frequency warping parameter and `γ` is a paramter of generalized log function. It returns a value typed `MelGeneralizedCepstrum{F,L,T,N}` which `F` and `L` are estimated by the value of `α` and `γ`. When `γ = 0`, mel-generalized cepstrum analysis corresponds to mel-cepstrum analysis. For more information about mel-generalized cepstrum, please see [the paper](http://www.sp.nitech.ac.jp/~tokuda/selected_pub/pdf/conference/tokuda_icslp1994.pdf).
 
 ## How spectrum envelope estimation works
 
@@ -103,6 +103,12 @@ We show how the spectrum envelope estimation works. Suppose that we have a *wind
 
 ```julia
 c = mcep(x, 20, 0.0)
+# For type stability, mcep always returns a Type{::MelCepstrum}-typed value even if α = 0.0.
+# To get expected type that can be estimated from α, just pass it to the generic constructor.
+c = MelGeneralizedCepstrum(c)
+# Turn out to be linear cepstrum
+@assert isa(c, LinearCepstrum)
+
 logH = mgc2sp(c, 1024)
 logspec = 20.0/log(10)*logH # 20log10(|H(ω)|)  = 20/log(10)*log(|H(ω)|)
 ```
@@ -113,6 +119,8 @@ logspec = 20.0/log(10)*logH # 20log10(|H(ω)|)  = 20/log(10)*log(|H(ω)|)
 
 ```julia
 mc = mcep(x, 20, 0.41)
+@assert isa(mc, MelCepstrum)
+
 logH = mgc2sp(mc, 1024)
 logspec = 20.0/log(10)*logH
 ```
@@ -123,6 +131,8 @@ logspec = 20.0/log(10)*logH
 
 ```julia
 mgc = mgcep(x, 20, 0.0, -1.0)
+@assert isa(mgc, AllPoleCepstrum)
+
 logH = mgc2sp(mgc, 1024)
 logspec = 20.0/log(10)*logH
 ```
@@ -133,6 +143,8 @@ logspec = 20.0/log(10)*logH
 
 ```julia
 mgc = mgcep(x, 20, 0.41, -1.0)
+@assert isa(mgc, MelAllPoleCepstrum)
+
 logH = mgc2sp(mgc, 1024)
 logspec = 20.0/log(10)*logH
 ```
@@ -143,6 +155,8 @@ logspec = 20.0/log(10)*logH
 
 ```julia
 mgc = mgcep(x, 20, 0.0, -0.35)
+@assert isa(mgc, GeneralizedCepstrum)
+
 logH = mgc2sp(mgc, 1024)
 logspec = 20.0/log(10)*logH
 ```
@@ -153,6 +167,8 @@ logspec = 20.0/log(10)*logH
 
 ```julia
 mgc = mgcep(x, 20, 0.41, -0.35)
+@assert isa(mgc, MelGeneralizedCepstrum)
+
 logH = mgc2sp(mgc, 1024)
 logspec = 20.0/log(10)*logH
 ```
