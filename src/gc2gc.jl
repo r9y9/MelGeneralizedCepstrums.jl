@@ -1,7 +1,18 @@
-function gc2gc{T<:FloatingPoint}(c1::AbstractVector{T}, γ¹::FloatingPoint,
-                                 m2::Int, γ²::FloatingPoint)
+function gc2gc{T<:FloatingPoint}(c1::AbstractVector{T},
+                                 γ¹::FloatingPoint,
+                                 m2::Int,
+                                 γ²::FloatingPoint)
+    c2 = Array(T, m2+1)
+    gc2gc!(c2, c1, γ¹, γ²)
+end
+
+function gc2gc!{T<:FloatingPoint}(c2::AbstractVector{T},
+                                  c1::AbstractVector{T},
+                                  γ¹::FloatingPoint,
+                                  γ²::FloatingPoint)
+    fill!(c2, zero(T))
+    m2 = length(c2)-1
     m1 = length(c1)-1
-    c2 = zeros(T, m2+1)
     c2[1] = c1[1]
 
     for m=2:m2+1

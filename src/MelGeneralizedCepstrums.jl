@@ -46,6 +46,7 @@ export
     frqtr,           # frqtr in _mcep.c
     frqtr!,          #
     gc2gc,           # generalized cepstrum -> genralized cepstrum
+    gc2gc!,          #
     mgc2mgc          # mel-generalized cepstrum -> mel-generalized cepstrum
 
 for fname in [

@@ -8,7 +8,8 @@ for f in [
           :gnorm!,
           :ignorm!,
           :freqt!,
-          :frqtr!
+          :frqtr!,
+          :gc2gc!
           ]
     @eval begin
         function ($f){T<:FloatingPoint}(x::AbstractMatrix{T}, args...; kargs...)
