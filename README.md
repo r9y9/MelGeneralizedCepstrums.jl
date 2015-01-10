@@ -93,9 +93,9 @@ end
 
 where `x` is a input windowed signal, `order` is order of cepstrum, `α` is a frequency warping parameter and `γ` is a paramter of generalized log function. When `γ = 0`, mel-generalized cepstrum analysis corresponds to mel-cepstrum analysis. For more information about mel-generalized cepstrum, please see [the paper](http://www.sp.nitech.ac.jp/~tokuda/selected_pub/pdf/conference/tokuda_icslp1994.pdf).
 
-## How spectral envelope estimation works
+## How spectrum envelope estimation works
 
-We show how spectrum envelope estimation works. Suppose that we have a *windowed* speech signal `x` and we want to extact spectral enelope from that.
+We show how the spectrum envelope estimation works. Suppose that we have a *windowed* speech signal `x` and we want to extact spectral enelope from that.
 
 ![](examples/windowed.png)
 
@@ -103,6 +103,7 @@ We show how spectrum envelope estimation works. Suppose that we have a *windowed
 
 ```julia
 c = mcep(x, 20, 0.0)
+envelope = 20.0/log(10)*mgc2sp(c, 1024) # 20log10(|H(ω)|)  = 20/log(10) * log(|H(ω)|)
 ```
 
 ![](examples/c.png)
@@ -111,6 +112,7 @@ c = mcep(x, 20, 0.0)
 
 ```julia
 mc = mcep(x, 20, 0.41)
+envelope = 20.0/log(10)*mgc2sp(mc, 1024)
 ```
 
 ![](examples/mcep.png)
@@ -119,6 +121,7 @@ mc = mcep(x, 20, 0.41)
 
 ```julia
 mgc = mgcep(x, 20, 0.0, -1.0)
+envelope = 20.0/log(10)*mgc2sp(mgc, 1024)
 ```
 
 ![](examples/lpc.png)
@@ -127,6 +130,7 @@ mgc = mgcep(x, 20, 0.0, -1.0)
 
 ```julia
 mgc = mgcep(x, 20, 0.41, -1.0)
+envelope = 20.0/log(10)*mgc2sp(mgc, 1024)
 ```
 
 ![](examples/wlpc.png)
@@ -135,6 +139,7 @@ mgc = mgcep(x, 20, 0.41, -1.0)
 
 ```julia
 mgc = mgcep(x, 20, 0.0, -0.35)
+envelope = 20.0/log(10)*mgc2sp(mgc, 1024)
 ```
 
 ![](examples/gcep.png)
@@ -143,6 +148,7 @@ mgc = mgcep(x, 20, 0.0, -0.35)
 
 ```julia
 mgc = mgcep(x, 20, 0.41, -0.35)
+envelope = 20.0/log(10)*mgc2sp(mgc, 1024)
 ```
 
 ![](examples/mgcep.png)
