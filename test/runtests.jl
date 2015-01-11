@@ -316,11 +316,12 @@ function test_mgc2sp(α::Float64, γ::Float64)
 
     fftlen = 1024
     sp = mgc2sp(mgc, α, γ, fftlen)
-    @assert length(sp) == fftlen>>1 + 1
+    @test length(sp) == fftlen>>1 + 1
+    @test eltype(sp) == Complex{eltype(mgc)}
 
     mgc = MelGeneralizedCepstrum(α, γ, mgc)
     sp = mgc2sp(mgc, fftlen)
-    @assert length(sp) == fftlen>>1 + 1
+    @test length(sp) == fftlen>>1 + 1
 end
 
 test_mcep_type()

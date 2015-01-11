@@ -8,7 +8,7 @@ function mgc2sp(mgc::AbstractVector, α::FloatingPoint, γ::FloatingPoint,
     copy!(buf, 1, c, 1, length(c))
 
     # FFT
-    real(rfft(buf))
+    rfft(buf)
 end
 
 function mgc2sp(mgc::MelGeneralizedCepstrum, fftlen::Int)
