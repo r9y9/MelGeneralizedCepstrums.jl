@@ -109,7 +109,7 @@ c = MelGeneralizedCepstrum(c)
 # Turn out to be linear cepstrum
 @assert isa(c, LinearCepstrum)
 
-logH = mgc2sp(c, 1024)
+logH = real(mgc2sp(c, 1024))
 logspec = 20.0/log(10)*logH # 20log10(|H(ω)|)  = 20/log(10)*log(|H(ω)|)
 ```
 
@@ -121,7 +121,7 @@ logspec = 20.0/log(10)*logH # 20log10(|H(ω)|)  = 20/log(10)*log(|H(ω)|)
 mc = mcep(x, 20, 0.41)
 @assert isa(mc, MelCepstrum)
 
-logH = mgc2sp(mc, 1024)
+logH = real(mgc2sp(mc, 1024))
 logspec = 20.0/log(10)*logH
 ```
 
@@ -133,7 +133,7 @@ logspec = 20.0/log(10)*logH
 mgc = mgcep(x, 20, 0.0, -1.0)
 @assert isa(mgc, AllPoleCepstrum)
 
-logH = mgc2sp(mgc, 1024)
+logH = real(mgc2sp(mgc, 1024))
 logspec = 20.0/log(10)*logH
 ```
 
@@ -145,7 +145,7 @@ logspec = 20.0/log(10)*logH
 mgc = mgcep(x, 20, 0.41, -1.0)
 @assert isa(mgc, MelAllPoleCepstrum)
 
-logH = mgc2sp(mgc, 1024)
+logH = real(mgc2sp(mgc, 1024))
 logspec = 20.0/log(10)*logH
 ```
 
@@ -157,7 +157,7 @@ logspec = 20.0/log(10)*logH
 mgc = mgcep(x, 20, 0.0, -0.35)
 @assert isa(mgc, GeneralizedCepstrum)
 
-logH = mgc2sp(mgc, 1024)
+logH = real(mgc2sp(mgc, 1024))
 logspec = 20.0/log(10)*logH
 ```
 
@@ -169,7 +169,7 @@ logspec = 20.0/log(10)*logH
 mgc = mgcep(x, 20, 0.41, -0.35)
 @assert isa(mgc, MelGeneralizedCepstrum)
 
-logH = mgc2sp(mgc, 1024)
+logH = real(mgc2sp(mgc, 1024))
 logspec = 20.0/log(10)*logH
 ```
 
