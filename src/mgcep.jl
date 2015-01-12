@@ -157,8 +157,6 @@ function mgcepnorm!{T<:FloatingPoint}(mgc::AbstractVector{T},
                                       α::FloatingPoint,
                                       γ::FloatingPoint,
                                       otype::Int)
-    order = length(mgc)-1
-
     if otype == 0 || otype == 1 || otype == 2 || otype == 4
         ignorm!(mgc, γ)
     end

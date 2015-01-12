@@ -6,7 +6,9 @@ function ignorm!{T<:FloatingPoint}(c::AbstractVector{T},
     end
 
     gain = c[1]^γ
-    c[1:end] = c[1:end]*gain
+    for i=2:length(c)
+        @inbounds c[i] *= gain
+    end
     c[1] = (gain - one(T))/γ
 
     c

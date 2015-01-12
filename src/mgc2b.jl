@@ -13,7 +13,9 @@ function mgc2b!{T<:FloatingPoint}(mgc::AbstractVector{T}, α::FloatingPoint,
 
     # scale by gamma
     b[1] = log(b[1])
-    b[2:end] *= γ
+    for i=2:length(b)
+        @inbounds b[i] *= γ
+    end
 
     b
 end

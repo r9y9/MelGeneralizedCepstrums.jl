@@ -5,7 +5,9 @@ function gnorm!{T<:FloatingPoint}(c::AbstractVector{T}, γ::FloatingPoint)
     end
 
     gain = one(T) + γ*c[1]
-    c[2:end] = c[2:end]/gain
+    for i=2:length(c)
+        @inbounds c[i] /= gain
+    end
     c[1] = gain^(one(T)/γ)
 
     c
