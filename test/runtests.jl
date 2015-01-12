@@ -7,7 +7,7 @@ import MelGeneralizedCepstrums: frequency_scale, log_func, rawdata, Mel, Linear,
 
 function test_mcep_type()
     srand(98765)
-    x = rand(1024)
+    x = rand(512)
     order = 20
 
     # Linear frequency cepstrum
@@ -28,7 +28,7 @@ end
 
 function test_mgcep_type()
     srand(98765)
-    x = rand(1024)
+    x = rand(512)
     order = 20
 
     # Linear frequency cepstrum
@@ -112,7 +112,7 @@ end
 
 function test_mcep(order::Int, α::Float64)
     srand(98765)
-    x = rand(1024)
+    x = rand(512)
     mc = SPTK.mcep(x, order, α)
     mĉ = MelGeneralizedCepstrums._mcep(x, order, α)
     @test_approx_eq mc mĉ
@@ -120,10 +120,32 @@ end
 
 function test_mgcep(order::Int, α::Float64, γ::Float64)
     srand(98765)
-    x = rand(1024)
+    x = rand(512)
     mgc = SPTK.mgcep(x, order, α, γ; dd=0.001)
     mgĉ = MelGeneralizedCepstrums._mgcep(x, order, α, γ; criteria=0.001)
     @test_approx_eq mgc mgĉ
+end
+
+function test_mgcep_otypes(α::Float64, γ::Float64)
+    srand(98765)
+    x = rand(512)
+    order = 20
+
+    mgc_2 = MelGeneralizedCepstrums._mgcep(x, order, α, γ; otype=2)
+    mgc_3 = MelGeneralizedCepstrums._mgcep(x, order, α, γ; otype=3)
+    mgc_4 = MelGeneralizedCepstrums._mgcep(x, order, α, γ; otype=4)
+    mgc_5 = MelGeneralizedCepstrums._mgcep(x, order, α, γ; otype=5)
+
+    mgc_2̂ = MelGeneralizedCepstrums._mgcep(10x, order, α, γ; otype=2)
+    mgc_3̂ = MelGeneralizedCepstrums._mgcep(10x, order, α, γ; otype=3)
+    mgc_4̂ = MelGeneralizedCepstrums._mgcep(10x, order, α, γ; otype=4)
+    mgc_5̂ = MelGeneralizedCepstrums._mgcep(10x, order, α, γ; otype=5)
+
+    # check if gain normalized
+    @test_approx_eq_eps mgc_2[2:end] mgc_2̂[2:end] 1.0e-3
+    @test_approx_eq_eps mgc_3[2:end] mgc_3̂[2:end] 1.0e-3
+    @test_approx_eq_eps mgc_4[2:end] mgc_4̂[2:end] 1.0e-3
+    @test_approx_eq_eps mgc_5[2:end] mgc_5̂[2:end] 1.0e-3
 end
 
 function test_extend()
@@ -314,7 +336,7 @@ function test_mgc2sp(α::Float64, γ::Float64)
     srand(98765)
     mgc = rand(21)
 
-    fftlen = 1024
+    fftlen = 512
     sp = SPTK.mgc2sp(mgc, α, γ, fftlen)
     sp̂ = mgc2sp(mgc, α, γ, fftlen)
     @test_approx_eq sp sp̂
@@ -349,6 +371,13 @@ for order in 25:5:35
             println("mgcep: testing with order=$order, α=$α, γ=$γ")
             test_mgcep(order, α, γ)
         end
+    end
+end
+
+for α in [-0.35, 0.0, 0.35]
+    for γ in [-1.0, -0.5, 0.0]
+        println("mgcep_otypes: testing with α=$α and γ=$γ")
+        test_mgcep_otypes(α, γ)
     end
 end
 
