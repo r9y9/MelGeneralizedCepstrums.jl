@@ -1,6 +1,13 @@
 # Mel generalized cepstrum analysis
 # re-coded from SPTK
 
+# Overview:
+# Tokuda, Keiichi, et al. "Mel-generalized cepstral analysis-a unified approach
+# to speech spectral estimation." ICSLP. 1994.
+# Details:
+# 徳田恵一, et al. "メル一般化ケプストラム分析による音声のスペクトル推定."
+# 電子情報通信学会論文誌 A 75.7 (1992): 1124-1134.
+
 function ptrans!{T}(p::AbstractVector{T},  m::Int, α::FloatingPoint)
     d, o = zero(T), zero(T)
 
