@@ -160,10 +160,12 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     log(ϵ)
 end
 
-function mgcepnorm!{T<:FloatingPoint}(mgc::AbstractVector{T},
+function mgcepnorm!{T<:FloatingPoint}(bᵧ′::AbstractVector{T},
                                       α::FloatingPoint,
                                       γ::FloatingPoint,
                                       otype::Int)
+    mgc = bᵧ′
+
     if otype == 0 || otype == 1 || otype == 2 || otype == 4
         ignorm!(mgc, γ)
     end
@@ -200,32 +202,32 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
     # Periodogram
     periodogram = abs2(fft(x)) + e
 
-    b = zeros(order+1)
-    ϵ⁰ = newton!(b, periodogram, order, α, -one(T), n, 1)
+    bᵧ′ = zeros(order+1)
+    ϵ⁰ = newton!(bᵧ′, periodogram, order, α, -one(T), n, 1)
 
     if γ != -one(T)
         d = Array(T, order+1)
         if α != zero(T)
-            ignorm!(b, -1.0)
-            b2mc!(b, α)
-            copy!(d, b)
+            ignorm!(bᵧ′, -1.0)
+            b2mc!(bᵧ′, α)
+            copy!(d, bᵧ′)
             gnorm!(d, -1.0)
         else
-            copy!(d, b)
+            copy!(d, bᵧ′)
         end
-        b = gc2gc(d, -1.0, order, γ)
+        bᵧ′ = gc2gc(d, -1.0, order, γ)
 
         if α != zero(T)
-            ignorm!(b, γ)
-            mc2b!(b, α)
-            gnorm!(b, γ)
+            ignorm!(bᵧ′, γ)
+            mc2b!(bᵧ′, α)
+            gnorm!(bᵧ′, γ)
         end
     end
 
     if γ != -one(T)
         ϵᵗ = ϵ⁰
         for i=1:maxiter
-            ϵ = newton!(b, periodogram, order, α, γ, n, i)
+            ϵ = newton!(bᵧ′, periodogram, order, α, γ, n, i)
             if i >= miniter
                 err = abs((ϵᵗ - ϵ)/ϵ)
                 verbose && println("nmse: $err")
@@ -237,7 +239,7 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
         end
     end
 
-    mgcepnorm!(b, α, γ, otype)
+    mgcepnorm!(bᵧ′, α, γ, otype)
 end
 
 function mgcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
