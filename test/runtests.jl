@@ -71,6 +71,11 @@ function test_mgcep_basics()
 
     @test frequency_scale(typeof(mgc)) == Mel
     @test log_func(typeof(mgc)) == GeneralizedLog
+
+    c = repmat(c, 1, 2)
+    mgc = MelGeneralizedCepstrum(0.41, -0.01, c)
+    @test size(mgc) == (21, 2)
+    @test isa(mgc[:,1], MelGeneralizedCepstrum)
 end
 
 function test_mcep_basics()

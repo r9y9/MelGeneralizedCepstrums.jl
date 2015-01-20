@@ -1,5 +1,7 @@
 # Common types and functions
 
+import Base: eltype, length, size, getindex
+
 # Mel-Generalized Cepstrum is parametrized by type of frequency scale (F) and
 # log function (L). It is designed to be a subtype of AbstractArray{T,N}.
 abstract AbstractMelGeneralizedCepstrumArray{F,L,T,N} <: AbstractArray{T,N}
@@ -71,14 +73,18 @@ typealias MelAllPoleCepstrum{T,N} MelGeneralizedCepstrum{Mel,AllPoleLog,T,N}
 
 ## AbstractArray implementation ##
 
-Base.eltype(c::MelGeneralizedCepstrum) = eltype(c.data)
-Base.length(c::MelGeneralizedCepstrum) = length(c.data)
-Base.size(c::MelGeneralizedCepstrum) = size(c.data)
-Base.getindex(c::MelGeneralizedCepstrum, i::Real) = getindex(c.data, i)
-Base.getindex(c::MelGeneralizedCepstrum, i::Real...) = getindex(c.data, i...)
-Base.getindex(c::MelGeneralizedCepstrum, i::Range,j::Real) = getindex(c.data, i, j)
-Base.getindex(c::MelGeneralizedCepstrum, i::Real, j::Range) = getindex(c.data, i, j)
-Base.eltype(c::MelGeneralizedCepstrum) = Base.eltype(g.data)
+eltype(c::MelGeneralizedCepstrum) = eltype(c.data)
+length(c::MelGeneralizedCepstrum) = length(c.data)
+size(c::MelGeneralizedCepstrum) = size(c.data)
+getindex(c::MelGeneralizedCepstrum, i::Real) = getindex(c.data, i)
+getindex(c::MelGeneralizedCepstrum, i::Real...) = getindex(c.data, i...)
+function getindex(c::MelGeneralizedCepstrum, i::Range, j::Real)
+    α = allpass_alpha(c)
+    γ = glog_gamma(c)
+    MelGeneralizedCepstrum(α, γ, getindex(c.data, i, j))
+end
+getindex(c::MelGeneralizedCepstrum, i::Real, j::Range) = getindex(c.data, i, j)
+eltype(c::MelGeneralizedCepstrum) = Base.eltype(g.data)
 
 ## Mel-generalized cepstrum related functions ##
 
