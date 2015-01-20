@@ -76,6 +76,9 @@ function test_mgcep_basics()
     mgc = MelGeneralizedCepstrum(0.41, -0.01, c)
     @test size(mgc) == (21, 2)
     @test isa(mgc[:,1], MelGeneralizedCepstrum)
+
+    @test_throws ArgumentError MelGeneralizedCepstrum(1.0, -0.01, c)
+    @test_throws ArgumentError MelGeneralizedCepstrum(0.41, 0.01, c)
 end
 
 function test_mcep_basics()

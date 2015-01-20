@@ -32,8 +32,8 @@ immutable MelGeneralizedCepstrum{F<:Frequency,L<:Log,T<:FloatingPoint,N} <: Abst
     data::Array{T,N}
 
     function MelGeneralizedCepstrum(α::T, γ::T, data::Array{T,N})
-        abs(α) < 1 || error("|α| < 1 is supported")
-        (-1 <= γ <= 0) || error("-1 <= γ <= 0 is supported")
+        abs(α) < 1 || throw(ArgumentError("|α| < 1 is supported"))
+        (-1 <= γ <= 0) || throw(ArgumentError("-1 <= γ <= 0 is supported"))
         @assert size(data, 1) > 1
         new(α, γ, data)
     end
