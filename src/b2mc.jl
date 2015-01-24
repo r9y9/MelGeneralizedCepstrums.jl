@@ -18,4 +18,9 @@ function b2mc{T<:FloatingPoint}(b::AbstractVector{T}, α::FloatingPoint)
     b2mc!(mc, α)
 end
 
-# TODO(ryuichi): add b2mc using MelGeneralizedCepstrum type
+function b2mc{F,L,T,N}(c::MelGeneralizedCepstrumFilterCoef{F,L,T,N})
+    α = allpass_alpha(c)
+    γ = glog_gamma(c)
+    raw = b2mc(rawdata(c), α)
+    MelGeneralizedCepstrumFilter{F,L,T,N}(α, γ, raw)
+end

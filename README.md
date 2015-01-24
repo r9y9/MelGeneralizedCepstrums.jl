@@ -127,7 +127,7 @@ logspec = 20.0/log(10)*logH
 
 ![](examples/mcep.png)
 
-### Linear Prediction
+### Linear Prediction Cepstrum
 
 ```julia
 mgc = mgcep(x, 20, 0.0, -1.0)

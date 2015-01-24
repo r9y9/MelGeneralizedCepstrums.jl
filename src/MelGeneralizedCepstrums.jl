@@ -13,6 +13,11 @@ export
     GeneralizedCepstrum,
     MelAllPoleCepstrum,
 
+    MelLinearPredictionCoef,
+    LinearPredictionCoef,
+
+    MelGeneralizedCepstrumFilterCoef,
+
     # Basic property of Mel-generalized cepstrum
     order,           # order of cepstrum (not including 0-th coef.)
     allpass_alpha,   # all-pass constant (alpha)
@@ -22,6 +27,7 @@ export
     # Feature extraction
     mgcep,           # mel-generalized cepstrum analysis
     mcep,            # mel-cepstrum analysis
+    lpc,             # linaer prediction (pipe to mgcep for now)
 
     mcepalpha,       # determine appropriate all pass constant in mel-cesptum
 
@@ -53,6 +59,7 @@ for fname in [
               "common",
               "mgcep",
               "mcep",
+              "lpc",
               "mcepalpha",
               "mc2b",
               "mc2e",
