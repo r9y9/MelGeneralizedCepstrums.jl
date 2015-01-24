@@ -26,7 +26,7 @@ typealias LinearPredictionCoef{T,N} MelLinearPredictionCoef{Linear,T,N}
 
 function MelLinearPredictionCoef{T,N}(α::T, data::Array{T,N}, loggain::Bool)
     F = ifelse(α == zero(T), Linear, Mel)
-    MelLinearPredictionCoef{F,T,N}(α, γ, data, loggain)
+    MelLinearPredictionCoef{F,T,N}(α, data, loggain)
 end
 
 function MelLinearPredictionCoef(mlpc::MelLinearPredictionCoef)
