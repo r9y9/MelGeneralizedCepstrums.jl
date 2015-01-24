@@ -8,6 +8,36 @@
 # 徳田恵一, et al. "メル一般化ケプストラム分析による音声のスペクトル推定."
 # 電子情報通信学会論文誌 A 75.7 (1992): 1124-1134.
 
+# memo(ryuichi):
+# Definition of generalized log function:
+# sᵧ(ω) =
+# (ωᵞ - 1)/γ, 0 < |γ| ≤ 1,
+# log(ω), γ = 0.
+#
+# Definition of inverse generalized log function:
+# sᵧ⁻¹(ω) =
+# (1 + γω)¹/ᵞ, 0 < |γ| ≤ 1,
+# exp(ω), γ = 0.
+#
+# All-pass filter model:
+# z̃⁻¹ = Ψ(z) = (z⁻¹ - α)/(1 - αz⁻¹)
+#
+# A spectral model based on a mel generalized cepstrum:
+# H(z) = sᵧ⁻¹(∑ₘ cₐ,ᵧ(m)z̃⁻ᵐ) =
+# (1 + γ∑ₘ cₐ,ᵧ(m)z̃⁻ᵐ)¹/ᵞ, 0 < |γ| ≤ 1,
+# exp (∑ₘ cₐ,ᵧ(m) z̃⁻ᵐ), γ = 0.
+#
+# Another representation with explicit gain `K`:
+# H(z) = sᵧ⁻¹(∑ₘ bₐ,ᵧ(m)Φₘ(z)) = K⋅D(z)
+# where
+# K = sᵧ⁻¹(bₐ,ᵧ(0)),
+# D(z) =
+#  (1 + γ∑ₘ bₐ,ᵧ'(m)z̃⁻ᵐ)¹/ᵞ, 0 < |γ| ≤ 1,
+#  exp (∑ₘ bₐ,ᵧ'(m) z̃⁻ᵐ), γ = 0,
+#
+# Gain normalization (e.g. b -> b'):
+# bₐ,ᵧ'(m) = bₐ,ᵧ(m) / (1 + γbₐ,ᵧ(0))
+
 function ptrans!{T}(p::AbstractVector{T},  m::Int, α::FloatingPoint)
     d, o = zero(T), zero(T)
 
@@ -160,26 +190,48 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     log(ϵ)
 end
 
+
+# mgcepnorm! changes form of mel-generalized cepstrums
+# input:
+# K, bₐ,ᵧ'(1), ..., bₐ,ᵧ'(m)
+#
+# output(otype):
+# 0: cₐ,ᵧ(0), cₐ,ᵧ(1), ..., cₐ,ᵧ(m)
+# 1: bₐ,ᵧ(0), bₐ,ᵧ(1), ..., bₐ,ᵧ(m)
+# 2: Kₐ, cₐ,ᵧ'(1), ..., cₐ,ᵧ'(m)
+# 3: K, bₐ,ᵧ'(1), ..., bₐ,ᵧ'(m)
+# 4: Kₐ, γcₐ,ᵧ'(1), ..., γcₐ,ᵧ'(m)
+# 5: K, γbₐ,ᵧ'(1), ..., γbₐ,ᵧ'(m)
+#
+# For simplicity, we represent bₐ,ᵧ as bᵧ.
 function mgcepnorm!{T<:FloatingPoint}(bᵧ′::AbstractVector{T},
                                       α::FloatingPoint,
                                       γ::FloatingPoint,
                                       otype::Int)
+    0<=otype<=5 || throw(ArgumentError("0 ≤ otype ≤ 5 are supported"))
+
     mgc = bᵧ′
 
     if otype == 0 || otype == 1 || otype == 2 || otype == 4
+        # K, bᵧ' -> bᵧ
         ignorm!(mgc, γ)
     end
 
     if otype == 0 || otype == 2 || otype == 4
+        # bᵞ -> cᵞ
         b2mc!(mgc, α)
     end
 
     if otype == 2 || otype == 4
+        # cᵧ -> cᵧ'
         gnorm!(mgc, γ)
     end
 
     if otype == 4 || otype == 5
-        mgc[2:end] *= γ
+        # cᵧ' -> γcᵧ'
+        for i=2:length(mgc)
+            @inbounds mgc[i] *= γ
+        end
     end
 
     mgc

@@ -3,7 +3,7 @@ using Base.Test
 
 import SPTK
 import MelGeneralizedCepstrums: frequency_scale, log_func, rawdata, Mel, Linear,
-  StandardLog, GeneralizedLog, AllPoleLog
+  StandardLog, GeneralizedLog, AllPoleLog, mgcepnorm!
 
 function test_mcep_type()
     srand(98765)
@@ -79,6 +79,8 @@ function test_mgcep_basics()
 
     @test_throws ArgumentError MelGeneralizedCepstrum(1.0, -0.01, c)
     @test_throws ArgumentError MelGeneralizedCepstrum(0.41, 0.01, c)
+    @test_throws ArgumentError mgcepnorm!(rand(2), 0.41, -0.01, -1)
+    @test_throws ArgumentError mgcepnorm!(rand(2), 0.41, -0.01, 6)
 end
 
 function test_mcep_basics()
