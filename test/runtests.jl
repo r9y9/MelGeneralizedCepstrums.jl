@@ -129,6 +129,33 @@ function test_gcep_basics()
     @test log_func(typeof(gc)) == AllPoleLog
 end
 
+function test_lpc_basics()
+    srand(98765)
+    c = rand(21)
+
+    l = MelLinearPredictionCoef(0.0, c, false)
+    @test isa(l, LinearPredictionCoef)
+    l = MelLinearPredictionCoef(0.41, c, false)
+    @test !isa(l, LinearPredictionCoef)
+    @test isa(l, MelLinearPredictionCoef)
+
+    @test allpass_alpha(l) == 0.41
+    @test glog_gamma(l) == -1.0
+    @test order(l) == 20
+    @test powercoef(l) == l[1]
+    @test size(l) == size(c)
+
+    @test frequency_scale(typeof(l)) == Mel
+    @test log_func(typeof(l)) == AllPoleLog
+
+    c = repmat(c, 1, 2)
+    l = MelLinearPredictionCoef(0.0, c, false)
+    @test size(l) == (21, 2)
+    @test isa(l[:,1], MelLinearPredictionCoef)
+
+    @test_throws ArgumentError MelLinearPredictionCoef(1.0, c, false)
+end
+
 function test_mcep(order::Int, α::Float64)
     srand(98765)
     x = rand(512)
@@ -392,6 +419,7 @@ test_lpc_type()
 test_mgcep_basics()
 test_mcep_basics()
 test_gcep_basics()
+test_lpc_basics()
 
 test_extend()
 test_inplace_extend()

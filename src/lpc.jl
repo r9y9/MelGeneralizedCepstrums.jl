@@ -19,7 +19,7 @@ end
 
 function getindex(c::MelLinearPredictionCoef, i::Range, j::Real)
     α = allpass_alpha(c)
-    MelLinearPredictionCoef(α, getindex(c.data, i, j))
+    MelLinearPredictionCoef(α, getindex(c.data, i, j), c.loggain)
 end
 
 typealias LinearPredictionCoef{T,N} MelLinearPredictionCoef{Linear,T,N}
