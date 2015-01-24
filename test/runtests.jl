@@ -56,6 +56,15 @@ function test_mgcep_type()
     @test isa(mgc_typed, MelGeneralizedCepstrum)
 end
 
+function test_lpc_type()
+    srand(98765)
+    x = rand(512)
+    order = 20
+
+    lpc_typed = lpc(x, order)
+    @test isa(lpc_typed, LinearPredictionCoef)
+end
+
 function test_mgcep_basics()
     srand(98765)
     c = rand(21)
@@ -246,6 +255,12 @@ function test_mc2b(α::Float64)
     b̂ = copy(mc)
     mc2b!(b̂, α)
     @test_approx_eq b b̂
+
+    if α != 0.0
+        mc = MelGeneralizedCepstrum(α, 0.0, mc)
+        b̂ = mc2b(mc)
+        @test isa(b̂, MLSADFCoef)
+    end
 end
 
 function test_mgc2b(α::Float64, γ::Float64)
@@ -259,6 +274,9 @@ function test_mgc2b(α::Float64, γ::Float64)
     mgc = MelGeneralizedCepstrum(α, γ, mgc)
     b̂ = mgc2b(mgc)
     @test_approx_eq b rawdata(b̂)
+    if α != 0.0 && γ != 0.0 && γ != -1.0
+        @test isa(b̂, MGLSADFCoef)
+    end
 end
 
 function test_b2mc(α::Float64)
@@ -268,6 +286,15 @@ function test_b2mc(α::Float64)
     mc = SPTK.b2mc(b, α)
     mĉ = b2mc(b, α)
     @test_approx_eq mc mĉ
+
+    mc = MelGeneralizedCepstrum(α, 0.0, b)
+    b = mc2b(mc)
+    mĉ = b2mc(b)
+    if α != 0.0
+        @test isa(mĉ, MelCepstrum)
+        @test rawdata(mc) != rawdata(b)
+    end
+    @test_approx_eq rawdata(mc) rawdata(mĉ)
 end
 
 function test_c2ir(len::Int=512)
@@ -360,6 +387,7 @@ end
 
 test_mcep_type()
 test_mgcep_type()
+test_lpc_type()
 
 test_mgcep_basics()
 test_mcep_basics()

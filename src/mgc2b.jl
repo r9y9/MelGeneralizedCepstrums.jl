@@ -26,9 +26,15 @@ function mgc2b{T<:FloatingPoint}(mgc::AbstractVector{T}, α::FloatingPoint,
     mgc2b!(b, α, γ)
 end
 
-function mgc2b(c::MelGeneralizedCepstrum)
+function mgc2b{F,L,T,N}(c::MelGeneralizedCepstrum{F,L,T,N})
     α = allpass_alpha(c)
     γ = glog_gamma(c)
     raw = mgc2b(rawdata(c), α, γ)
-    MelGeneralizedCepstrum(α, γ, raw)
+    MelGeneralizedCepstrumFilterCoef{F,L,T,N}(α, γ, raw)
+end
+
+function mgc2b{T,N}(c::MelGeneralizedCepstrum{Linear,StandardLog,T,N})
+    α = allpass_alpha(c)
+    γ = glog_gamma(c)
+    MelGeneralizedCepstrumFilterCoef{Linear,StandardLog,T,N}(α, γ, rawdata(c))
 end
