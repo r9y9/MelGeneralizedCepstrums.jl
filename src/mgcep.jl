@@ -84,18 +84,17 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     α::FloatingPoint,     # allpass constant
                     γ::FloatingPoint,     # parameter of generalized log function
                     n::Int,               # the order of recursion
-                    iter::Int             # current iter #
+                    iter::Int,            # current iter #
+                    cr::Vector{T} = zeros(T, length(x)),
+                    pr::Vector{T} = zeros(T, length(x)),
+                    rr::Vector{T} = zeros(T, length(x)),
+                    ri::Vector{T} = zeros(T, length(x)),
+                    qr::Vector{T} = zeros(T, length(x)),
+                    qi::Vector{T} = zeros(T, length(x))
     )
     @assert length(x) > length(c)
     @assert n < length(x)
 
-    # Allocate memory
-    cr = zeros(T, length(x))
-    pr = zeros(T, length(x))
-    rr = zeros(T, length(x))
-    ri = zeros(T, length(x))
-    qr = zeros(T, length(x))
-    qi = zeros(T, length(x))
     copy!(cr, 2, c, 2, order)
 
     if α != zero(T)
@@ -254,8 +253,17 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
     # Periodogram
     periodogram = abs2(fft(x)) + e
 
+    # Allocate memory
+    cr = zeros(T, length(x))
+    pr = zeros(T, length(x))
+    rr = zeros(T, length(x))
+    ri = zeros(T, length(x))
+    qr = zeros(T, length(x))
+    qi = zeros(T, length(x))
+
     bᵧ′ = zeros(order+1)
-    ϵ⁰ = newton!(bᵧ′, periodogram, order, α, -one(T), n, 1)
+    ϵ⁰ = newton!(bᵧ′, periodogram, order, α, -one(T), n, 1,
+                 cr, pr, rr, ri, qr, qi)
 
     if γ != -one(T)
         d = Array(T, order+1)
@@ -279,7 +287,8 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
     if γ != -one(T)
         ϵᵗ = ϵ⁰
         for i=1:maxiter
-            ϵ = newton!(bᵧ′, periodogram, order, α, γ, n, i)
+            ϵ = newton!(bᵧ′, periodogram, order, α, γ, n, i,
+                 cr, pr, rr, ri, qr, qi)
             if i >= miniter
                 err = abs((ϵᵗ - ϵ)/ϵ)
                 verbose && println("nmse: $err")
