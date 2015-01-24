@@ -108,7 +108,7 @@ end
 
 typealias LMADFCoef{T,N} MelGeneralizedCepstrumFilterCoef{Linear,StandardLog,T,N}
 typealias MLSADFCoef{T,N} MelGeneralizedCepstrumFilterCoef{Mel,StandardLog,T,N}
-typealias MGLSADFCoef{T,N} MelGeneralizedCepstrumFilterCoef{Linear,GeneralizedLog,T,N}
+typealias MGLSADFCoef{T,N} MelGeneralizedCepstrumFilterCoef{Mel,GeneralizedLog,T,N}
 
 ## AbstractArray implementation ##
 

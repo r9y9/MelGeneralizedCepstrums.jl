@@ -22,5 +22,5 @@ function b2mc{F,L,T,N}(c::MelGeneralizedCepstrumFilterCoef{F,L,T,N})
     α = allpass_alpha(c)
     γ = glog_gamma(c)
     raw = b2mc(rawdata(c), α)
-    MelGeneralizedCepstrumFilter{F,L,T,N}(α, γ, raw)
+    MelGeneralizedCepstrum{F,L,T,N}(α, γ, raw)
 end

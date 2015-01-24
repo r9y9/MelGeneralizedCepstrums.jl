@@ -17,6 +17,9 @@ export
     LinearPredictionCoef,
 
     MelGeneralizedCepstrumFilterCoef,
+    LMADFCoef,
+    MLSADFCoef,
+    MGLSADFCoef,
 
     # Basic property of Mel-generalized cepstrum
     order,           # order of cepstrum (not including 0-th coef.)
@@ -27,7 +30,7 @@ export
     # Feature extraction
     mgcep,           # mel-generalized cepstrum analysis
     mcep,            # mel-cepstrum analysis
-    lpc,             # linaer prediction (pipe to mgcep for now)
+    lpc,             # linear prediction (pipe to mgcep for now)
 
     mcepalpha,       # determine appropriate all pass constant in mel-cesptum
 
