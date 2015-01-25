@@ -35,6 +35,8 @@ export
     mcepalpha,       # determine appropriate all pass constant in mel-cesptum
 
     # Conversions
+    lpc2c,           # LPC to cepstrum
+    lpc2c!,          #
     mc2b,            # mel-cepstrum -> mlsadf filter coef.
     mc2b!,           #
     mc2e,            # mel-cesptrum to energy
@@ -63,6 +65,7 @@ for fname in [
               "mgcep",
               "mcep",
               "lpc",
+              "lpc2c",
               "mcepalpha",
               "mc2b",
               "mc2e",
