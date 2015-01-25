@@ -251,12 +251,18 @@ function test_lpc2c()
     lpc2c!(ĉ, a)
     @test_approx_eq c ĉ
 
-    a = MelLinearPredictionCoef(0.0, a, false)
-    c = lpc2c(a)
+    a_typed = MelLinearPredictionCoef(0.0, a, false)
+    c = lpc2c(a_typed)
     @test isa(c, LinearCepstrum)
+    @test c[1] == log(a_typed[1])
 
-    a = MelLinearPredictionCoef(0.41, rawdata(a), false)
-    @test_throws ArgumentError lpc2c(a)
+    # assume a has loggain
+    a_typed = MelLinearPredictionCoef(0.0, a, true)
+    c = lpc2c(a_typed)
+    @test c[1] == a_typed[1]
+
+    a_typed = MelLinearPredictionCoef(0.41, a, false)
+    @test_throws ArgumentError lpc2c(a_typed)
 end
 
 function test_gnorm(γ::Float64)
