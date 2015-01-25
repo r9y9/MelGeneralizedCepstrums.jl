@@ -240,6 +240,25 @@ function test_inplace_extend()
     @test mc == mc_submat[:,1]
 end
 
+function test_lpc2c()
+    srand(98765)
+    a = rand(21)
+
+    c = SPTK.lpc2c(a)
+    ĉ = lpc2c(a)
+    @test_approx_eq c ĉ
+    ĉ = similar(a)
+    lpc2c!(ĉ, a)
+    @test_approx_eq c ĉ
+
+    a = MelLinearPredictionCoef(0.0, a, false)
+    c = lpc2c(a)
+    @test isa(c, LinearCepstrum)
+
+    a = MelLinearPredictionCoef(0.41, rawdata(a), false)
+    @test_throws ArgumentError lpc2c(a)
+end
+
 function test_gnorm(γ::Float64)
     srand(98765)
     mc = rand(21)
@@ -446,6 +465,9 @@ for α in [-0.35, 0.0, 0.35]
         test_mgcep_otypes(α, γ)
     end
 end
+
+println("lpc2c: testing")
+test_lpc2c()
 
 for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
     println("gnorm: testing with γ=$γ")

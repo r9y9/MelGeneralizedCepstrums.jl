@@ -1,6 +1,7 @@
 ## Extend functions for matrix input (col-wise) ##
 
 for f in [
+          :lpc2c!,
           :mc2b!,
           :mgc2b!,
           :b2mc!,
@@ -30,6 +31,7 @@ end
 for f in [
           :_mcep,
           :_mgcep,
+          :lpc2c!,
           :mc2b,
           :mgc2b,
           :mgc2sp,
