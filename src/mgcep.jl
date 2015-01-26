@@ -85,8 +85,8 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     γ::FloatingPoint,     # parameter of generalized log function
                     n::Int,               # the order of recursion
                     iter::Int,            # current iter #
-                    y_fft::Array{Complex{T}}, # *size must be length(x)*
-                    z_fft::Array{Complex{T}}, # *size must be length(x)*
+                    y_fft::Array{Complex{T}}, # *length must be equal to length(x)*
+                    z_fft::Array{Complex{T}}, # *length must be equal to length(x)*
                     bplan::FFTW.Plan,     # FFTW.Plan used in backward fft
                     cr::Vector{T} = zeros(T, length(x)),
                     pr::Vector{T} = zeros(T, length(x)),
