@@ -65,6 +65,37 @@ function test_lpc_type()
     @test isa(lpc_typed, LinearPredictionCoef)
 end
 
+function test_lpc_basics()
+    srand(98765)
+    x = rand(512)
+    order = 20
+    a = rand(order+1)
+
+    l = LinearPredictionCoef(0.41, a, false)
+    @test isa(l, MelLinearPredictionCoef)
+    @test !isa(l, LinearPredictionCoef)
+    @test allpass_alpha(l) == 0.41
+    @test glog_gamma(l) == -1.0
+    @test order(l) == 20
+    @test powercoef(l) == a[1]
+    @test size(l) == size(a)
+    @test l.loggain == false
+    @test frequency_scale(typeof(l)) == Mel
+
+    l = LinearPredictionCoef(0.0, a, true)
+    @test isa(l, LinearPredictionCoef)
+    @test frequency_scale(typeof(l)) == Linear
+    @test l.loggain == true
+    @test powercoef(l) == log(a[1])
+
+    xmat = repmat(x, 1, 2)
+    lpc_mat = lpc(xmat, order)
+    @test size(lpc_mat) == (order+1, 2)
+    @test isa(lpc_mat[:,1], LinearPredictionCoef)
+
+    @test_throws ArgumentError MelLinearPredictionCoef(1.0, a, false)
+end
+
 function test_mgcep_basics()
     srand(98765)
     c = rand(21)
@@ -440,6 +471,7 @@ end
 test_mcep_type()
 test_mgcep_type()
 test_lpc_type()
+test_lpc_basics()
 
 test_mgcep_basics()
 test_mcep_basics()
