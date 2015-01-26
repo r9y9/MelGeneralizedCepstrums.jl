@@ -85,6 +85,9 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     γ::FloatingPoint,     # parameter of generalized log function
                     n::Int,               # the order of recursion
                     iter::Int,            # current iter #
+                    y_fft::Array{Complex{T}}, # *size must be length(x)*
+                    z_fft::Array{Complex{T}}, # *size must be length(x)*
+                    bplan::FFTW.Plan,     # FFTW.Plan used in backward fft
                     cr::Vector{T} = zeros(T, length(x)),
                     pr::Vector{T} = zeros(T, length(x)),
                     rr::Vector{T} = zeros(T, length(x)),
@@ -96,6 +99,8 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     )
     @assert length(x) > length(c)
     @assert n < length(x)
+    @assert length(y_fft) == length(x)
+    @assert length(z_fft) == length(x)
 
     copy!(cr, 2, c, 2, order)
 
@@ -130,7 +135,12 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         end
     end
 
-    pr = real(ifft(pr))
+    copy!(y_fft, pr)
+    FFTW.execute(bplan.plan, y_fft, z_fft)
+    scale!(z_fft, FFTW.normalization(z_fft))
+    for i=1:length(pr)
+        @inbounds pr[i] = real(z_fft[i])
+    end
 
     if α != zero(T)
         b2c!(sub(pr, 1:2order+1), pr[1:n+1], α)
@@ -140,10 +150,16 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         copy!(qr, 1, pr, 1, 2order+1)
         copy!(rr, 1, pr, 1, order+1)
     else
-        q1 = ifft(complex(qr, qi))
-        qr, qi = real(q1), imag(qi)
-        q2 = ifft(complex(rr, ri))
-        rr, ri = real(q2), imag(q2)
+        FFTW.execute(bplan.plan, complex(qr, qi), z_fft)
+        scale!(z_fft, FFTW.normalization(z_fft))
+        for i=1:length(qr)
+            @inbounds qr[i] = real(z_fft[i])
+        end
+        FFTW.execute(bplan.plan, complex(rr, ri), z_fft)
+        scale!(z_fft, FFTW.normalization(z_fft))
+        for i=1:length(rr)
+            @inbounds rr[i] = real(z_fft[i])
+        end
 
         if α != zero(T)
             b2c!(sub(qr, 1:n+1), qr[1:n+1], α)
@@ -264,8 +280,13 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
     Tm = Array(T, order, order)
     Hm = Array(T, order, order)
 
+    # FFT workspace
+    y = Array(Complex{T}, length(x))
+    z = Array(Complex{T}, length(x))
+    bplan = FFTW.Plan(y, z, 1, FFTW.BACKWARD, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+
     bᵧ′ = zeros(order+1)
-    ϵ⁰ = newton!(bᵧ′, periodogram, order, α, -one(T), n, 1,
+    ϵ⁰ = newton!(bᵧ′, periodogram, order, α, -one(T), n, 1, y, z, bplan,
                  cr, pr, rr, ri, qr, qi, Tm, Hm)
 
     if γ != -one(T)
@@ -290,8 +311,8 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
     if γ != -one(T)
         ϵᵗ = ϵ⁰
         for i=1:maxiter
-            ϵ = newton!(bᵧ′, periodogram, order, α, γ, n, i,
-                 cr, pr, rr, ri, qr, qi, Tm, Hm)
+            ϵ = newton!(bᵧ′, periodogram, order, α, γ, n, i, y, z, bplan,
+                        cr, pr, rr, ri, qr, qi, Tm, Hm)
             if i >= miniter
                 err = abs((ϵᵗ - ϵ)/ϵ)
                 verbose && println("nmse: $err")
