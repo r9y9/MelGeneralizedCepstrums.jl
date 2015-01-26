@@ -285,7 +285,7 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
     z = Array(Complex{T}, length(x))
     bplan = FFTW.Plan(y, z, 1, FFTW.BACKWARD, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
 
-    bᵧ′ = zeros(order+1)
+    bᵧ′ = zeros(T, order+1)
     ϵ⁰ = newton!(bᵧ′, periodogram, order, α, -one(T), n, 1, y, z, bplan,
                  cr, pr, rr, ri, qr, qi, Tm, Hm)
 
