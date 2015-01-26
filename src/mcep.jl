@@ -11,19 +11,15 @@ end
 
 function fill_toeplitz!{T}(A::AbstractMatrix{T}, t::AbstractVector{T})
     n = length(t)
-    for i=1:n, j=1:n
-        if i-j+1 >= 1
-            @inbounds A[i,j] = t[i-j+1]
-        else
-            @inbounds A[i,j] = t[j-i+1]
-        end
+    for j=1:n, i=1:n
+        @inbounds A[i,j] = ifelse(i-j+1 >= 1, t[i-j+1], t[j-i+1])
     end
     A
 end
 
 function fill_hankel!{T}(A::AbstractMatrix{T}, h::AbstractVector{T})
     n = length(h)>>1 + 1
-    for i=1:n, j=1:n
+    for j=1:n, i=1:n
         @inbounds A[i,j] = h[i+j-1]
     end
     A
@@ -138,7 +134,7 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T},           # a *windowed* 
         fill_hankel!(Hm, he)
         fill_toeplitz!(Tm, te)
 
-        for i=1:order+1,j=1:order+1
+        for j=1:order+1, i=1:order+1
             @inbounds Tm_plus_Hm[i,j] = Hm[i,j] + Tm[i,j]
         end
 

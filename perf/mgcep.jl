@@ -8,15 +8,19 @@ function perf_mcep()
     x = rand(1024)
 
     n = 500
-    order = 20
+    order = 25
     α = 0.41
 
-    elapsed = @elapsed for i=1:n
-        _mcep(x, order, α)
+    @time begin
+        elapsed = @elapsed for i=1:n
+            _mcep(x, order, α)
+        end
     end
 
-    elapsed_sptk = @elapsed for i=1:n
-        SPTK.mcep(x, order, α)
+    @time begin
+        elapsed_sptk = @elapsed for i=1:n
+            SPTK.mcep(x, order, α)
+        end
     end
 
     r = elapsed/elapsed_sptk
@@ -30,16 +34,20 @@ function perf_mgcep()
     x = rand(1024)
 
     n = 100
-    order = 20
+    order = 25
     α = 0.41
     γ = -0.1
 
-    elapsed = @elapsed for i=1:n
-        _mgcep(x, order, α, γ)
+    @time begin
+        elapsed = @elapsed for i=1:n
+            _mgcep(x, order, α, γ)
+        end
     end
 
-    elapsed_sptk  = @elapsed for i=1:n
-        SPTK.mgcep(x, order, α, γ)
+    @time begin
+        elapsed_sptk  = @elapsed for i=1:n
+            SPTK.mgcep(x, order, α, γ)
+        end
     end
 
     r = elapsed/elapsed_sptk

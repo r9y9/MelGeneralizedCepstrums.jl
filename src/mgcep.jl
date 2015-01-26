@@ -90,7 +90,9 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     rr::Vector{T} = zeros(T, length(x)),
                     ri::Vector{T} = zeros(T, length(x)),
                     qr::Vector{T} = zeros(T, length(x)),
-                    qi::Vector{T} = zeros(T, length(x))
+                    qi::Vector{T} = zeros(T, length(x)),
+                    Tm = Array(T, order, order),
+                    Hm = Array(T, order, order)
     )
     @assert length(x) > length(c)
     @assert n < length(x)
@@ -103,6 +105,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
 
     y = fft(cr)
 
+    γ⁻¹ = one(T)/γ
     if γ == -one(T)
         copy!(pr, 1, x, 1, length(x))
     elseif γ == zero(T)
@@ -115,7 +118,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
             ti = γ*imag(y[i])
             trr, tii = tr*tr, ti*ti
             s = trr + tii
-            t = x[i] * s^(-one(T)/γ)
+            t = x[i] * s^(-γ⁻¹)
             t /= s
             pr[i] = t
             rr[i] = tr * t
@@ -167,8 +170,6 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         end
     end
 
-    Tm = Array(T, order, order)
-    Hm = Array(T, order, order)
     te = sub(pr, 1:order)
     fill_toeplitz!(Tm, te)
     he = sub(qr, 3:2order+1)
@@ -260,10 +261,12 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
     ri = zeros(T, length(x))
     qr = zeros(T, length(x))
     qi = zeros(T, length(x))
+    Tm = Array(T, order, order)
+    Hm = Array(T, order, order)
 
     bᵧ′ = zeros(order+1)
     ϵ⁰ = newton!(bᵧ′, periodogram, order, α, -one(T), n, 1,
-                 cr, pr, rr, ri, qr, qi)
+                 cr, pr, rr, ri, qr, qi, Tm, Hm)
 
     if γ != -one(T)
         d = Array(T, order+1)
@@ -288,7 +291,7 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
         ϵᵗ = ϵ⁰
         for i=1:maxiter
             ϵ = newton!(bᵧ′, periodogram, order, α, γ, n, i,
-                 cr, pr, rr, ri, qr, qi)
+                 cr, pr, rr, ri, qr, qi, Tm, Hm)
             if i >= miniter
                 err = abs((ϵᵗ - ϵ)/ϵ)
                 verbose && println("nmse: $err")
