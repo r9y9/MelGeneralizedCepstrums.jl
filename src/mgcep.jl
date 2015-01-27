@@ -86,7 +86,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     n::Int,               # the order of recursion
                     iter::Int,            # current iter #
                     y_fft::Array{Complex{T}}, # *length must be equal to length(x)*
-                    z_fft::Array{Complex{T}}, # *length must be equal to length(x)*
+                    z_fft::Array{T},      # *length must be equal to length(x)*
                     bplan::FFTW.Plan,     # FFTW.Plan used in backward fft
                     cr::Vector{T} = zeros(T, length(x)),
                     pr::Vector{T} = zeros(T, length(x)),
@@ -136,11 +136,8 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     end
 
     copy!(y_fft, pr)
-    FFTW.execute(bplan.plan, y_fft, z_fft)
-    scale!(z_fft, FFTW.normalization(z_fft))
-    for i=1:length(pr)
-        @inbounds pr[i] = real(z_fft[i])
-    end
+    FFTW.execute(bplan.plan, y_fft, pr)
+    scale!(pr, FFTW.normalization(pr))
 
     if α != zero(T)
         b2c!(sub(pr, 1:2order+1), pr[1:n+1], α)
@@ -150,16 +147,16 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         copy!(qr, 1, pr, 1, 2order+1)
         copy!(rr, 1, pr, 1, order+1)
     else
-        FFTW.execute(bplan.plan, complex(qr, qi), z_fft)
-        scale!(z_fft, FFTW.normalization(z_fft))
         for i=1:length(qr)
-            @inbounds qr[i] = real(z_fft[i])
+            @inbounds y_fft[i] = Complex(qr[i], qi[i])
         end
-        FFTW.execute(bplan.plan, complex(rr, ri), z_fft)
-        scale!(z_fft, FFTW.normalization(z_fft))
+        FFTW.execute(bplan.plan, y_fft, qr)
+        scale!(qr, FFTW.normalization(qr))
         for i=1:length(rr)
-            @inbounds rr[i] = real(z_fft[i])
+            @inbounds y_fft[i] = Complex(rr[i], ri[i])
         end
+        FFTW.execute(bplan.plan, y_fft, rr)
+        scale!(rr, FFTW.normalization(rr))
 
         if α != zero(T)
             b2c!(sub(qr, 1:n+1), qr[1:n+1], α)
@@ -282,8 +279,8 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
 
     # FFT workspace
     y = Array(Complex{T}, length(x))
-    z = Array(Complex{T}, length(x))
-    bplan = FFTW.Plan(y, z, 1, FFTW.BACKWARD, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+    z = Array(T, length(x))
+    bplan = FFTW.Plan(y, z, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
 
     bᵧ′ = zeros(T, order+1)
     ϵ⁰ = newton!(bᵧ′, periodogram, order, α, -one(T), n, 1, y, z, bplan,
