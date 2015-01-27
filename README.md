@@ -139,7 +139,7 @@ logspec = 20.0/log(10)*logH
 
 ![](examples/lpc.png)
 
-### Warped Linear Prediction
+### Warped Linear Prediction Cepstrum
 
 ```julia
 mgc = mgcep(x, 20, 0.41, -1.0)
