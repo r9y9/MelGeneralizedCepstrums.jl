@@ -94,8 +94,8 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     ri::Vector{T} = zeros(T, length(x)),
                     qr::Vector{T} = zeros(T, length(x)),
                     qi::Vector{T} = zeros(T, length(x)),
-                    Tm = Array(T, order, order),
-                    Hm = Array(T, order, order)
+                    Tm::Matrix{T} = Array(T, order, order),
+                    Hm::Matrix{T} = Array(T, order, order)
     )
     @assert length(x) > length(c)
     @assert n < length(x)
