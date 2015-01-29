@@ -1,17 +1,17 @@
 # This code is a julia translation of the following project:
 # https://bitbucket.org/happyalu/mcep_alpha_calc
 
-# mcepalpha computes appropriate alpha for a given sampling frequency.
+# mcepalpha computes appropriate α for a given sampling frequency.
 function mcepalpha(fs::Real;
                    start::FloatingPoint=0.0,
                    stop::FloatingPoint=1.0,
                    step::FloatingPoint=0.001,
                    numpoints::Integer=1000)
-    alpha_candidates = start:step:stop
+    α_candidates = start:step:stop
     mel = melscale_vector(fs, numpoints)
-    distances = [rms_distance(mel, warping_vector(alpha, numpoints)) for
-                 alpha in alpha_candidates]
-    return alpha_candidates[indmin(distances)]
+    distances = [rms_distance(mel, warping_vector(α, numpoints)) for
+                 α in α_candidates]
+    return α_candidates[indmin(distances)]
 end
 
 function melscale_vector(fs::Real, len::Integer)
@@ -20,11 +20,11 @@ function melscale_vector(fs::Real, len::Integer)
     return melscalev / melscalev[end]
 end
 
-function warping_vector(alpha::Float64, len::Integer)
+function warping_vector(α::Float64, len::Integer)
     const step = π / len
-    omega = step .* (1:len)
-    num = (1-alpha*alpha) * sin(omega)
-    den = (1+alpha*alpha) * cos(omega) - 2*alpha
+    ω = step .* (1:len)
+    num = (1-α*α) * sin(ω)
+    den = (1+α*α) * cos(ω) - 2*α
     warpfreq = atan(num./den)
     warpfreq[warpfreq .< 0] += π
     return warpfreq / warpfreq[end]

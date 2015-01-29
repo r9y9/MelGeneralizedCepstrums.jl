@@ -172,7 +172,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     ϵ = zero(T)
     if γ != -one(T)
         ϵ = gain(rr, c, order, γ)
-        c[1] = sqrt(ϵ)
+        c[1] = √ϵ
     end
 
     if γ == -one(T)
@@ -197,7 +197,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
 
     if γ == -one(T)
         ϵ = gain(rr, c, order, γ)
-        c[1] = sqrt(ϵ)
+        c[1] = √ϵ
     end
 
     log(ϵ)
