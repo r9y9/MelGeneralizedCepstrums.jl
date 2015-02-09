@@ -4,7 +4,7 @@ using Base.Test
 import MelGeneralizedCepstrums: frequency_scale, log_func, rawdata, Mel, Linear,
   StandardLog, GeneralizedLog, AllPoleLog, mgcepnorm!
 
-@unix_only include("consistency.jl")
+@unix_only include("sptk.jl")
 
 function test_mcep_type()
     srand(98765)
