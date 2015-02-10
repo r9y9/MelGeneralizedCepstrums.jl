@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/r9y9/MelGeneralizedCepstrums.jl.svg?branch=master)](https://travis-ci.org/r9y9/MelGeneralizedCepstrums.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/gr17ty0m7fagqsh5/branch/master?svg=true)](https://ci.appveyor.com/project/r9y9/melgeneralizedcepstrums-jl/branch/master)
+[![Coverage Status](https://coveralls.io/repos/r9y9/MelGeneralizedCepstrums.jl/badge.svg?branch=master)](https://coveralls.io/r/r9y9/MelGeneralizedCepstrums.jl?branch=master)
 
 MelGeneralizedCepstrums.jl provides a mel generalized cepstrum anlysis for spectrum envelope estimation, which includes linear predicition, mel-cepstrum, generalized cepstrum and mel-generalized cepstrum analysis for Julia. This package also provides mel-generalized cepstrum conversions, e.g mel-generalized cepstrum to mel-cepstrum, mel-cepstrum to (linear) cepstrum, mel-cesptrum to coefficients of waveform synthesis filter (known as mel-log spectrum approximation digital filter), and vise versa. The core is re-writen by pure Julia language based on [Speech Signal Processing Toolkit (SPTK)](http://sp-tk.sourceforge.net/).
 
