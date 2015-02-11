@@ -272,6 +272,15 @@ function test_mgc2b(α::Float64, γ::Float64)
     end
 end
 
+let
+    srand(98765)
+    order = 20
+    x = rand(1024)
+    mc1 = MelGeneralizedCepstrums._mcep(x, order, 0.41)
+    mc2 = periodogram2mcep(abs2(rfft(x)), order, 0.41)
+    @test_approx_eq mc1 mc2
+end
+
 test_mcep_type()
 test_mgcep_type()
 test_lpc_type()

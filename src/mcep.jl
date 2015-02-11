@@ -51,26 +51,24 @@ function update_toeplitz_elements!(te::AbstractVector, c::AbstractVector)
     te
 end
 
-function _mcep{T<:FloatingPoint}(x::AbstractVector{T},           # a *windowed* signal
-                                 order::Int=40,                  # order of mel-cepstrum
-                                 α::FloatingPoint=0.41;          # all-pass constant
-                                 miniter::Int=2,
-                                 maxiter::Int=30,
-                                 criteria::FloatingPoint=0.001,  # stopping criteria
-                                 e::T=zero(T),                   # floor of periodogram
-                                 verbose::Bool=false)
-    const xh = length(x)>>1
+function periodogram2mcep{T<:FloatingPoint}(periodogram::AbstractVector{T}, # modified periodogram
+                                            order::Int=40,                  # order of mel-cepstrum
+                                            α::FloatingPoint=0.41;          # all-pass constant
+                                            miniter::Int=2,
+                                            maxiter::Int=30,
+                                            criteria::FloatingPoint=0.001,  # stopping criteria
+                                            e::T=zero(T),                   # floor of periodogram
+                                            verbose::Bool=false)
+    logperiodogram = log(periodogram + e)
+
+    fftlen = (size(logperiodogram, 1)-1)*2
+    const xh = fftlen>>1
 
     # create FFT workspace and plan
     y = Array(Complex{T}, xh+1)
-    c = Array(T, length(x))
+    c = Array(T, fftlen)
     fplan = FFTW.Plan(c, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
     bplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
-
-    # Periodogram
-    FFTW.execute(fplan.plan, x, y)
-    periodogram = abs2(y)
-    logperiodogram = log(periodogram + e)
 
     # Initial value of cepstrum
     fill_only_real_part!(y, logperiodogram)
@@ -138,11 +136,18 @@ function _mcep{T<:FloatingPoint}(x::AbstractVector{T},           # a *windowed* 
             @inbounds Tm_plus_Hm[i,j] = Hm[i,j] + Tm[i,j]
         end
 
-        # solve linear equation and add derivative
+        # solve linear equation and add the solution vector to mel-cepstrum
         mc += Tm_plus_Hm \ b
     end
 
     mc
+end
+
+function _mcep{T}(x::AbstractVector{T}, # a *windowed* signal
+               order::Int=40,           # order of mel-cepstrum
+               α::FloatingPoint=0.41;   # all-pass constant
+               kargs...)
+    periodogram2mcep(abs2(rfft(x)), order, α; kargs...)
 end
 
 function mcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
