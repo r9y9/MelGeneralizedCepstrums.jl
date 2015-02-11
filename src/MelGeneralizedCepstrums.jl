@@ -31,6 +31,7 @@ export
     mgcep,           # mel-generalized cepstrum analysis
     mcep,            # mel-cepstrum analysis
     lpc,             # linear prediction (pipe to mgcep for now)
+    periodogram2mcep,# periodogram to mel-cepstrum
 
     mcepalpha,       # determine appropriate all pass constant in mel-cesptum
 
