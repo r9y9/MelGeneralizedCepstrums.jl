@@ -2,6 +2,8 @@ using MelGeneralizedCepstrums: _mcep, _mgcep, mc2b
 import SPTK
 
 function perf_mc2b()
+    println("benchmark: mc2b")
+
     srand(98765)
     mc = rand(21)
     α = 0.41
@@ -76,6 +78,13 @@ function perf_mgcep()
     println("$r x slower than SPTK implementation")
 end
 
+gc_disable()
+
+gc()
 perf_mcep()
+
+gc()
 perf_mgcep()
+
+gc()
 perf_mc2b()

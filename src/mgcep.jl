@@ -95,7 +95,9 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     qr::Vector{T} = zeros(T, length(x)),
                     qi::Vector{T} = zeros(T, length(x)),
                     Tm::Matrix{T} = Array(T, order, order),
-                    Hm::Matrix{T} = Array(T, order, order)
+                    Hm::Matrix{T} = Array(T, order, order),
+                    Tm_plus_Hm::Matrix{T} = Array(T, order, order),
+                    b::Vector{T} = Array(T, order), # right side of equation Ax = b
     )
     @assert length(x) > length(c)
     @assert n < length(x)
@@ -188,9 +190,16 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     he = sub(qr, 3:2order+1)
     fill_hankel!(Hm, he)
 
-    # solve linear equation
-    b = (Tm + Hm) \ sub(rr, 2:order+1)
+    for i=1:length(Hm)
+        @inbounds Tm_plus_Hm[i] = Hm[i] + Tm[i]
+    end
 
+    # Solve Ax = b
+    # NOTE: both Tm_plus_Hm and b are overwritten
+    copy!(b, 1, rr, 2, order)
+    A_ldiv_B!(lufact!(Tm_plus_Hm), b)
+
+    # Add the solution vector
     for i=2:order+1
         @inbounds c[i] += b[i-1]
     end
@@ -276,6 +285,8 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
     qi = zeros(T, length(x))
     Tm = Array(T, order, order)
     Hm = Array(T, order, order)
+    Tm_plus_Hm = Array(T, order, order)
+    b = Array(T, order)
 
     # FFT workspace
     y = Array(Complex{T}, length(x))
@@ -284,7 +295,7 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
 
     bᵧ′ = zeros(T, order+1)
     ϵ⁰ = newton!(bᵧ′, periodogram, order, α, -one(T), n, 1, y, z, bplan,
-                 cr, pr, rr, ri, qr, qi, Tm, Hm)
+                 cr, pr, rr, ri, qr, qi, Tm, Hm, Tm_plus_Hm, b)
 
     if γ != -one(T)
         d = Array(T, order+1)
@@ -309,7 +320,7 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
         ϵᵗ = ϵ⁰
         for i=1:maxiter
             ϵ = newton!(bᵧ′, periodogram, order, α, γ, n, i, y, z, bplan,
-                        cr, pr, rr, ri, qr, qi, Tm, Hm)
+                        cr, pr, rr, ri, qr, qi, Tm, Hm, Tm_plus_Hm, b)
             if i >= miniter
                 err = abs((ϵᵗ - ϵ)/ϵ)
                 verbose && println("nmse: $err")
