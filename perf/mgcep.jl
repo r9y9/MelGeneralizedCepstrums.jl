@@ -2,6 +2,8 @@ using MelGeneralizedCepstrums: _mcep, _mgcep, mc2b
 import SPTK
 
 function perf_mc2b()
+    println("benchmark: mc2b")
+
     srand(98765)
     mc = rand(21)
     α = 0.41
