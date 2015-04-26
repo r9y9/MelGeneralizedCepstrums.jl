@@ -132,8 +132,8 @@ function periodogram2mcep{T<:FloatingPoint}(periodogram::AbstractVector{T}, # mo
         fill_hankel!(Hm, he)
         fill_toeplitz!(Tm, te)
 
-        for j=1:order+1, i=1:order+1
-            @inbounds Tm_plus_Hm[i,j] = Hm[i,j] + Tm[i,j]
+        for i=1:length(Hm)
+            @inbounds Tm_plus_Hm[i] = Hm[i] + Tm[i]
         end
 
         # Solve Ax = b

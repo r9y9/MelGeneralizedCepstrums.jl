@@ -190,8 +190,8 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     he = sub(qr, 3:2order+1)
     fill_hankel!(Hm, he)
 
-    for j=1:order, i=1:order
-        @inbounds Tm_plus_Hm[i,j] = Hm[i,j] + Tm[i,j]
+    for i=1:length(Hm)
+        @inbounds Tm_plus_Hm[i] = Hm[i] + Tm[i]
     end
 
     # Solve Ax = b
