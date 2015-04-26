@@ -136,8 +136,14 @@ function periodogram2mcep{T<:FloatingPoint}(periodogram::AbstractVector{T}, # mo
             @inbounds Tm_plus_Hm[i,j] = Hm[i,j] + Tm[i,j]
         end
 
-        # solve linear equation and add the solution vector to mel-cepstrum
-        mc += Tm_plus_Hm \ b
+        # Solve Ax = b
+        # NOTE: both Tm_plus_Hm and b are overwritten
+        A_ldiv_B!(lufact!(Tm_plus_Hm), b)
+
+        # Add the solution vector to mel-cepstrum
+        for i=1:length(b)
+            @inbounds mc[i] += b[i]
+        end
     end
 
     mc
