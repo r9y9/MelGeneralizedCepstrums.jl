@@ -9,6 +9,9 @@ function perf_mc2b()
     α = 0.41
     n = 50000
 
+    mc2b(mc, α)
+    SPTK.mc2b(mc, α)
+
     @time begin
         elapsed = @elapsed for i=1:n
             mc2b(mc, α)
@@ -34,6 +37,9 @@ function perf_mcep()
     n = 2000
     order = 25
     α = 0.41
+
+    _mcep(x, order, α)
+    SPTK.mcep(x, order, α)
 
     @time begin
         elapsed = @elapsed for i=1:n
@@ -61,6 +67,9 @@ function perf_mgcep()
     order = 25
     α = 0.41
     γ = -0.1
+
+    _mgcep(x, order, α, γ)
+    SPTK.mgcep(x, order, α, γ)
 
     @time begin
         elapsed = @elapsed for i=1:n
