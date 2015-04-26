@@ -76,6 +76,13 @@ function perf_mgcep()
     println("$r x slower than SPTK implementation")
 end
 
+gc_disable()
+
+gc()
 perf_mcep()
+
+gc()
 perf_mgcep()
+
+gc()
 perf_mc2b()
