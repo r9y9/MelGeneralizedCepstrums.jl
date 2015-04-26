@@ -12,7 +12,7 @@ end
 function fill_toeplitz!{T}(A::AbstractMatrix{T}, t::AbstractVector{T})
     n = length(t)
     for j=1:n, i=1:n
-        @inbounds A[i,j] = ifelse(i-j+1 >= 1, t[i-j+1], t[j-i+1])
+        @inbounds A[i,j] = i-j+1 >= 1 ? t[i-j+1] : t[j-i+1]
     end
     A
 end
