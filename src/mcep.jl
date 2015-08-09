@@ -67,13 +67,18 @@ function periodogram2mcep{T<:FloatingPoint}(periodogram::AbstractVector{T}, # mo
     # create FFT workspace and plan
     y = Array(Complex{T}, xh+1)
     c = Array(T, fftlen)
-    fplan = FFTW.Plan(c, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
-    bplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+    # fplan = FFTW.Plan(c, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+    # bplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+    fplan = plan_rfft(c)
+    bplan = plan_brfft(y, fftlen)
 
     # Initial value of cepstrum
     fill_only_real_part!(y, logperiodogram)
-    FFTW.execute(bplan.plan, y, c)
-    scale!(c, FFTW.normalization(c))
+    A_mul_B!(c, bplan, y)
+    # FFTW.execute(T, bplan.plan)
+    # FFTW.execute(bplan.plan, y, c)
+    scale!(c, 1. / fftlen)
+    # scale!(c, FFTW.normalization(c))
     c[1] /= 2.0
     c[xh+1] /= 2.0
 
@@ -100,12 +105,15 @@ function periodogram2mcep{T<:FloatingPoint}(periodogram::AbstractVector{T}, # mo
         fill!(c, zero(T))
         freqt!(ch, mc, -α)
 
-        FFTW.execute(fplan.plan, c, y)
+        A_mul_B!(y, fplan, c)
+        # FFTW.execute(fplan.plan, c, y)
         for i=1:length(y)
             @inbounds y[i] = Complex(periodogram[i] / exp(2real(y[i])), zero(T))
         end
-        FFTW.execute(bplan.plan, y, c)
-        scale!(c, FFTW.normalization(c))
+        A_mul_B!(c, bplan, y)
+        # FFTW.execute(bplan.plan, y, c)
+        # scale!(c, FFTW.normalization(c))
+        scale!(c, 1.0 / fftlen)
 
         copy!(ch_copy, ch)
         frqtr!(c_frqtr, ch_copy, α)
@@ -149,17 +157,24 @@ function periodogram2mcep{T<:FloatingPoint}(periodogram::AbstractVector{T}, # mo
     mc
 end
 
-function _mcep{T}(x::AbstractVector{T}, # a *windowed* signal
-               order::Int=40,           # order of mel-cepstrum
-               α::FloatingPoint=0.41;   # all-pass constant
+function _mcep(x::AbstractVector,  # a *windowed* signal
+               order=25,           # order of mel-cepstrum
+               α=0.35;             # all-pass constant
                kargs...)
     periodogram2mcep(abs2(rfft(x)), order, α; kargs...)
 end
 
-function mcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
-                                  order::Int=40,
-                                  α::FloatingPoint=0.41;
-                                  kargs...)
-    raw = _mcep(x, order, α; kargs...)
-    MelGeneralizedCepstrum{Mel,StandardLog,T,N}(α, zero(T), raw)
+function estimate(mgc::MelCepstrum, x::AbstractArray;
+                  use_sptk::Bool=false,
+                  kargs...)
+    order = param_order(mgc)
+    α = allpass_alpha(mgc)
+    # Note that mcep in julia is more stable than SPTK.mcep
+    mcepfunc::Function = use_sptk ? SPTK.mcep : _mcep
+    data = mcepfunc(x, order, α; kargs...)
+    SpectralParamState(mgc, data, true, true)
+end
+
+function mcep(x::AbstractArray, order=25, α=0.35; kargs...)
+    estimate(MelGeneralizedCepstrum(order, α, 0.0), x; kargs...)
 end

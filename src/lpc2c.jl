@@ -1,8 +1,7 @@
-function lpc2c!{T<:FloatingPoint}(c::AbstractVector{T}, a::AbstractVector{T},
-                                  loggain::Bool=false)
+function lpc2c!(c::AbstractVector, a::AbstractVector, loggain::Bool=false)
     @assert length(a) == length(c)
     m = length(a) - 1
-    fill!(c, zero(T))
+    fill!(c, zero(eltype(c)))
     if loggain
         c[1] = a[1]
     else
@@ -21,14 +20,14 @@ function lpc2c!{T<:FloatingPoint}(c::AbstractVector{T}, a::AbstractVector{T},
     c
 end
 
-function lpc2c{T<:FloatingPoint}(a::AbstractVector{T}, loggain::Bool=false)
-    c = similar(a)
-    lpc2c!(c, a, loggain)
-end
+lpc2c(a::AbstractVector, loggain::Bool=false) = lpc2c!(similar(a), a, loggain)
 
-function lpc2c{F,T,N}(a::MelLinearPredictionCoef{F,T,N})
-    isa(a, LinearPredictionCoef) || throw(ArgumentError("unexpected lpc form"))
-    α = allpass_alpha(a)
-    raw = lpc2c(rawdata(a), a.loggain)
-    MelGeneralizedCepstrum{F,StandardLog,T,N}(α, -1.0, raw)
+function lpc2c(state::SpectralParamState{LinearPredictionCoef})
+    assert_not_ready_to_filt(state)
+
+    def = paramdef(state)
+    newdef = LinearCepstrum(param_order(def))
+    data = rawdata(state)
+    SpectralParamState(newdef, lpc2c(data, has_loggain(state)),
+                       true, gain_normalized(state))
 end

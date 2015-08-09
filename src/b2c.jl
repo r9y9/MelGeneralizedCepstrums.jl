@@ -1,6 +1,7 @@
-function b2c!{T<:FloatingPoint}(wc::AbstractVector{T}, c::AbstractVector{T},
-                                α::FloatingPoint;
-                                prev::Vector{T}=Array(T,length(wc)))
+function b2c!(wc::AbstractVector, c::AbstractVector, α,
+              prev=Array(eltype(wc),length(wc)))
+    T = eltype(wc)
+
     fill!(wc, zero(T))
     desired_order = length(wc) - 1
 
@@ -20,8 +21,4 @@ function b2c!{T<:FloatingPoint}(wc::AbstractVector{T}, c::AbstractVector{T},
     wc
 end
 
-function b2c{T<:FloatingPoint}(c::AbstractVector{T}, order::Int,
-                               α::FloatingPoint)
-    wc = Array(T, order+1)
-    b2c!(wc, c, α)
-end
+b2c(c::AbstractVector, order, α) = b2c!(Array(eltype(c), order+1), c, α)

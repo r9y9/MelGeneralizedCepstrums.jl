@@ -1,191 +1,185 @@
 using MelGeneralizedCepstrums
 using Base.Test
 
-import MelGeneralizedCepstrums: frequency_scale, log_func, rawdata, Mel, Linear,
-  StandardLog, GeneralizedLog, AllPoleLog, mgcepnorm!
+import MelGeneralizedCepstrums: freq_form, log_form, rawdata, MelFrequency,
+    LinearFrequency, StandardLog, GeneralizedLog, AllPoleLog, mgcepnorm!, retype
 
 @unix_only include("sptk.jl")
 
-function test_mcep_type()
-    srand(98765)
-    x = rand(512)
-    order = 20
+### Test functions ###
 
+function test_mcep_special_cases(order=20)
     # Linear frequency cepstrum
-    mc_typed = mcep(x, order, 0.0)
-
-    # For type stability, mcep always returns a Type{::MelCepstrum}-typed value
-    # even if α = 0.0. To get expected type that can be estimated from α,
-    # just pass it to the generic constructor as follows:
-    @test !isa(mc_typed, LinearCepstrum)
-    mc_typed = MelGeneralizedCepstrum(mc_typed)
-
-    # turn out to be linear cepstrum
-    @test isa(mc_typed, LinearCepstrum)
-
-    mc_typed = mcep(x, order, 0.41)
-    @test isa(mc_typed, MelCepstrum)
+    mc = MelCepstrum(order, 0.0)
+    mc_retyped = MelGeneralizedCepstrum(mc)
+    # should turn out to be linear cepstrum
+    @test isa(mc_retyped, LinearCepstrum)
 end
 
-function test_mgcep_type()
+function test_mcep_basics(order=20, α=0.41)
     srand(98765)
     x = rand(512)
-    order = 20
 
+    mc = MelCepstrum(order, α)
+    @test isa(mc, MelCepstrum)
+    @test params(mc) == (order, α)
+    @test allpass_alpha(mc) == α
+    @test glog_gamma(mc) == 0.0
+    @test param_order(mc) == order
+
+    @test freq_form(typeof(mc)) == MelFrequency
+    @test log_form(typeof(mc)) == StandardLog
+
+    state = estimate(mc, x)
+    @test !any(isnan(state))
+    @test_approx_eq mcep(x, order, α) state
+
+    # details
+    mc1 = MelGeneralizedCepstrums._mcep(x, order, α)
+    mc2 = periodogram2mcep(abs2(rfft(x)), order, α)
+    @test_approx_eq mc1 mc2
+
+end
+
+function test_gcep_special_cases(order=20)
+    gc = GeneralizedCepstrum(order, 0.0)
+    gc_retyped = MelGeneralizedCepstrum(gc)
+    @test isa(gc_retyped, LinearCepstrum)
+
+    gc = GeneralizedCepstrum(order, -1.0)
+    gc_retyped = MelGeneralizedCepstrum(gc)
+    @test isa(gc_retyped, AllPoleCepstrum)
+end
+
+function test_gcep_basics(order=20, γ=-0.01)
+    srand(98765)
+    x = rand(512)
+
+    gc = GeneralizedCepstrum(order, γ)
+    @test isa(gc, GeneralizedCepstrum)
+    @test params(gc) == (order, γ)
+    @test allpass_alpha(gc) == 0.0
+    @test glog_gamma(gc) == γ
+    @test param_order(gc) == order
+
+    @test freq_form(typeof(gc)) == LinearFrequency
+    @test log_form(typeof(gc)) == GeneralizedLog
+
+    state = estimate(gc, x, norm=false)
+    @test !any(isnan(state))
+    @test_approx_eq gcep(x, order, γ, norm=false) state
+    @test !gain_normalized(state)
+
+    # gain-unnormalized
+    # should have different values for different scaled signals
+    @test rawdata(estimate(gc, 10x))[2:end] != rawdata(state)[2:end]
+
+    # gain normalized
+    state = estimate(gc, x, norm=true)
+    @test gain_normalized(state)
+    # should have same values for different scaled signals
+    @test_approx_eq rawdata(estimate(gc, 10x, norm=true))[2:end] rawdata(state)[2:end]
+end
+
+function test_mgcep_special_cases(order=20)
     # Linear frequency cepstrum
-    mgc_typed = mgcep(x, order, 0.0, 0.0)
-    @test isa(mgc_typed, LinearCepstrum)
+    mgc = MelGeneralizedCepstrum(order, 0.0, 0.0)
+    mgc_retyped = MelGeneralizedCepstrum(mgc)
+    # should turn out to be LinearCepstrum
+    @test isa(mgc_retyped, LinearCepstrum)
 
     # Mel-cepstrum
-    mgc_typed = mgcep(x, order, 0.41, 0.0)
-    @test isa(mgc_typed, MelCepstrum)
+    mgc = MelGeneralizedCepstrum(order, 0.41, 0.0)
+    mgc_retyped = MelGeneralizedCepstrum(mgc)
+    # should turn out to be MelCepstrum
+    @test isa(mgc_retyped, MelCepstrum)
 
     # Generalized cepstrum
-    mgc_typed = mgcep(x, order, 0.0, -0.1)
-    @test isa(mgc_typed, GeneralizedCepstrum)
+    mgc = MelGeneralizedCepstrum(order, 0.0, -0.1)
+    mgc_retyped = MelGeneralizedCepstrum(mgc)
+    @test isa(mgc_retyped, GeneralizedCepstrum)
 
-    # All-pole cepstrum (Linear prediction)
-    mgc_typed = mgcep(x, order, 0.0, -1.0)
-    @test isa(mgc_typed, AllPoleCepstrum)
+    # All-pole cepstrum
+    mgc = MelGeneralizedCepstrum(order, 0.0, -1.0)
+    mgc_retyped = MelGeneralizedCepstrum(mgc)
+    @test isa(mgc_retyped, AllPoleCepstrum)
 
-    # Mel all-pole cepstrum (Warped linear prediction)
-    mgc_typed = mgcep(x, order, 0.41, -1.0)
-    @test isa(mgc_typed, MelAllPoleCepstrum)
-
-    # Mel-Generalized Cesptrum
-    mgc_typed = mgcep(x, order, 0.41, -0.1)
-    @test isa(mgc_typed, MelGeneralizedCepstrum)
+    # Mel all-pole cepstrum
+    mgc = MelGeneralizedCepstrum(order, 0.41, -1.0)
+    mgc_retyped = MelGeneralizedCepstrum(mgc)
+    @test isa(mgc_retyped, MelAllPoleCepstrum)
 end
 
-function test_lpc_type()
+function test_mgcep_basics(order=20, α=0.41, γ=-0.01)
     srand(98765)
     x = rand(512)
-    order = 20
 
-    lpc_typed = lpc(x, order)
-    @test isa(lpc_typed, LinearPredictionCoef)
-end
+    mgc = MelGeneralizedCepstrum(order, α, γ)
+    @test isa(mgc, MelGeneralizedCepstrum)
+    @test params(mgc) == (order, α, γ)
+    @test allpass_alpha(mgc) == α
+    @test glog_gamma(mgc) == γ
+    @test param_order(mgc) == order
 
-function test_lpc_basics()
-    srand(98765)
-    x = rand(512)
-    order = 20
-    a = rand(order+1)
+    @test freq_form(typeof(mgc)) == MelFrequency
+    @test log_form(typeof(mgc)) == GeneralizedLog
 
-    l = LinearPredictionCoef(0.41, a, false)
-    @test isa(l, MelLinearPredictionCoef)
-    @test !isa(l, LinearPredictionCoef)
-    @test allpass_alpha(l) == 0.41
-    @test glog_gamma(l) == -1.0
-    @test order(l) == 20
-    @test powercoef(l) == a[1]
-    @test size(l) == size(a)
-    @test l.loggain == false
-    @test frequency_scale(typeof(l)) == Mel
+    state = estimate(mgc, x)
+    @test !any(isnan(state))
+    @test_approx_eq mgcep(x, order, α, γ) state
 
-    l = LinearPredictionCoef(0.0, a, true)
-    @test isa(l, LinearPredictionCoef)
-    @test frequency_scale(typeof(l)) == Linear
-    @test l.loggain == true
-    @test powercoef(l) == log(a[1])
+    # should only accept otype=0
+    for otype in [1,2,3,4,5]
+        @test_throws ArgumentError estimate(mgc, x, otype=otype)
+    end
 
-    xmat = repmat(x, 1, 2)
-    lpc_mat = lpc(xmat, order)
-    @test size(lpc_mat) == (order+1, 2)
-    @test isa(lpc_mat[:,1], LinearPredictionCoef)
-
-    @test_throws ArgumentError MelLinearPredictionCoef(1.0, a, false)
-end
-
-function test_mgcep_basics()
-    srand(98765)
-    c = rand(21)
-
-    mgc = MelGeneralizedCepstrum(0.41, -0.01, c)
-    @test isa(mgc, MelFrequencyCepstrum)
-    @test isa(mgc, GeneralizedLogCepstrum)
-    @test allpass_alpha(mgc) == 0.41
-    @test glog_gamma(mgc) == -0.01
-    @test order(mgc) == 20
-    @test powercoef(mgc) == mgc[1]
-    @test size(mgc) == size(c)
-
-    @test frequency_scale(typeof(mgc)) == Mel
-    @test log_func(typeof(mgc)) == GeneralizedLog
-
-    c = repmat(c, 1, 2)
-    mgc = MelGeneralizedCepstrum(0.41, -0.01, c)
-    @test size(mgc) == (21, 2)
-    @test isa(mgc[:,1], MelGeneralizedCepstrum)
-
-    @test_throws ArgumentError MelGeneralizedCepstrum(1.0, -0.01, c)
-    @test_throws ArgumentError MelGeneralizedCepstrum(0.41, 0.01, c)
+    @test_throws ArgumentError MelGeneralizedCepstrum(0, -.41, -0.01)
+    @test_throws ArgumentError MelGeneralizedCepstrum(order, 1.0, -0.01)
+    @test_throws ArgumentError MelGeneralizedCepstrum(order, 0.41, 0.01)
     @test_throws ArgumentError mgcepnorm!(rand(2), 0.41, -0.01, -1)
     @test_throws ArgumentError mgcepnorm!(rand(2), 0.41, -0.01, 6)
 end
 
-function test_mcep_basics()
-    srand(98765)
-    c = rand(21)
-
-    mc = MelGeneralizedCepstrum(0.41, 0.0, c)
-    @test isa(mc, MelCepstrum)
-    @test isa(mc, StandardLogCepstrum)
-    @test allpass_alpha(mc) == 0.41
-    @test glog_gamma(mc) == 0.0
-    @test order(mc) == 20
-    @test powercoef(mc) == mc[1]
-    @test size(mc) == size(c)
-
-    @test frequency_scale(typeof(mc)) == Mel
-    @test log_func(typeof(mc)) == StandardLog
-end
-
-function test_gcep_basics()
-    srand(98765)
-    c = rand(21)
-
-    gc = MelGeneralizedCepstrum(0.0, -0.01, c)
-    @test isa(gc, GeneralizedCepstrum)
-    @test isa(gc, LinearFrequencyCepstrum)
-    @test allpass_alpha(gc) == 0.0
-    @test glog_gamma(gc) == -0.01
-    @test order(gc) == 20
-    @test powercoef(gc) == gc[1]
-    @test size(gc) == size(c)
-
-    @test frequency_scale(typeof(gc)) == Linear
-    @test log_func(typeof(gc)) == GeneralizedLog
-
-    gc = MelGeneralizedCepstrum(0.0, -1.0, c)
-    @test log_func(typeof(gc)) == AllPoleLog
-end
-
 function test_lpc_basics()
     srand(98765)
-    c = rand(21)
+    x = rand(512)
+    order = 20
 
-    l = MelLinearPredictionCoef(0.0, c, false)
-    @test isa(l, LinearPredictionCoef)
-    l = MelLinearPredictionCoef(0.41, c, false)
-    @test !isa(l, LinearPredictionCoef)
-    @test isa(l, MelLinearPredictionCoef)
+    lpcdef = LinearPredictionCoef(order)
+    @test isa(lpcdef, LinearPredictionCoef)
+    state = estimate(lpcdef, x)
+    @test !any(isnan(state))
+    @test_approx_eq lpc(x, order) state
+    @test isa(paramdef(v), LinearPredictionCoef)
 
-    @test allpass_alpha(l) == 0.41
-    @test glog_gamma(l) == -1.0
-    @test order(l) == 20
-    @test powercoef(l) == l[1]
-    @test size(l) == size(c)
+    # LSP
+    lspstate = lpc2lsp(state)
+    @test isa(paramdef(lspstate), LineSpectralPair)
+    @test !has_loggain(lpsv)
+    @test !ready_to_filt(lspstate)
+    @test has_loggain(lpc2lsp(state, loggain=true))
 
-    @test frequency_scale(typeof(l)) == Mel
-    @test log_func(typeof(l)) == AllPoleLog
+    # PARCOR
+    parstate = lpc2par(state)
+    @test isa(paramdef(parstate), PartialAutoCorrelation)
+    @test !has_loggain(parstate)
+    @test !ready_to_filt(parstate)
 
-    c = repmat(c, 1, 2)
-    l = MelLinearPredictionCoef(0.0, c, false)
-    @test size(l) == (21, 2)
-    @test isa(l[:,1], MelLinearPredictionCoef)
+    # LPC cepstrum
+    mgcdef = AllPoleCepstrum(order)
+    @test isa(mgcdef, AllPoleCepstrum)
+    @test allpass_alpha(mgcdef) == 0.0
+    @test glog_gamma(mgcdef) == -1.0
+    @test param_order(mgcdef) == order
 
-    @test_throws ArgumentError MelLinearPredictionCoef(1.0, c, false)
+    @test freq_form(typeof(mgcdef)) == LinearFrequency
+    @test log_form(typeof(mgcdef)) == AllPoleLog
+
+    state = estimate(mgcdef, x)
+    @test !any(isnan(state))
+    @test has_loggain(state)
+    @test gain_normalized(state)
+    @test !ready_to_filt(state)
 end
 
 function test_mgcep_otypes(α::Float64, γ::Float64)
@@ -208,6 +202,182 @@ function test_mgcep_otypes(α::Float64, γ::Float64)
     @test_approx_eq_eps mgc_3[2:end] mgc_3̂[2:end] 1.0e-3
     @test_approx_eq_eps mgc_4[2:end] mgc_4̂[2:end] 1.0e-3
     @test_approx_eq_eps mgc_5[2:end] mgc_5̂[2:end] 1.0e-3
+end
+
+function test_lpc2c(order=20)
+    srand(98765)
+    x = rand(512)
+
+    state = estimate(LinearPredictionCoef(order), x)
+    @assert !has_loggain(state)
+    @test gain_normalized(state)
+    @test !ready_to_filt(state)
+
+    state2 = lpc2c(state)
+    @test_approx_eq rawdata(state2) lpc2c(rawdata(state))
+    @test has_loggain(state2)
+    @test gain_normalized(state2)
+    @test !ready_to_filt(state2)
+end
+
+function test_mc2b(order=20, α=0.41)
+    srand(98765)
+    x = rand(512)
+
+    mcdef = MelCepstrum(order, α)
+    state = estimate(mcdef, x)
+    @test has_loggain(state)
+    @test gain_normalized(state)
+    @test !ready_to_filt(state)
+
+    b = mc2b(state)
+    @test_approx_eq rawdata(b) mc2b(rawdata(state), α)
+    @test has_loggain(b)
+    @test gain_normalized(b)
+    @test ready_to_filt(b)
+
+    mc2b!(state)
+    @test_approx_eq rawdata(state) rawdata(b)
+end
+
+function test_mc2e(order=20, α=0.41, len=512)
+    srand(98765)
+    x = rand(512)
+
+    state = estimate(MelCepstrum(order, α), x)
+
+    e = mc2e(state, len)
+    @test !any(isnan(e))
+    @test_approx_eq e mc2e(rawdata(state), α, len)
+end
+
+function test_mgc2b(order=20, α=0.41, γ=-0.01)
+    srand(98765)
+    x = rand(512)
+
+    state_mgc = estimate(MelGeneralizedCepstrum(order, α, γ), x)
+    state_b = mgc2b(state_mgc)
+
+    @test has_loggain(state_b)
+    @test gain_normalized(state_b)
+    @test ready_to_filt(state_b)
+    @test_approx_eq rawdata(state_b) mgc2b(rawdata(state_mgc), α, γ)
+
+    # mgc2b should not accept filter coefficients
+    @test_throws ArgumentError mgc2b(state_b)
+    @test_throws ArgumentError mgc2b!(state_b)
+
+    state2 = copy(state_mgc)
+    mgc2b!(state2)
+    @test_approx_eq rawdata(state2) rawdata(state_b)
+end
+
+function test_mgc2sp(order=20, α=0.41, γ=-0.01, fftlen=512)
+    srand(98765)
+    x = rand(512)
+
+    state = estimate(MelGeneralizedCepstrum(order, α, γ), x)
+
+    logsp = mgc2sp(state, fftlen)
+    @test_approx_eq logsp mgc2sp(rawdata(state), α, γ, fftlen)
+    @test length(logsp) == fftlen>>1 + 1
+    @test !any(isnan(logsp))
+end
+
+function test_b2mc(order=20, α=0.41)
+    srand(98765)
+    x = rand(512)
+
+    state = estimate(MelCepstrum(order, α), x)
+
+    b = mc2b(state)
+    @test ready_to_filt(b)
+
+    mc = b2mc(b)
+    @test_approx_eq rawdata(mc) b2mc(rawdata(b), α)
+    @test has_loggain(mc)
+    @test gain_normalized(mc)
+    @test !ready_to_filt(mc)
+
+    # check invertibility
+    @test_approx_eq rawdata(state) rawdata(b2mc(mc2b(state)))
+
+    b2 = copy(b)
+    b2mc!(b2)
+    @test_approx_eq rawdata(b2) rawdata(mc)
+end
+
+function test_gnorm_and_ignorm(order=20, γ=-0.01)
+    srand(98765)
+    x = rand(512)
+
+    state1 = estimate( GeneralizedCepstrum(order, γ), x)
+    @test !gain_normalized(state1)
+    state2 = gnorm(state1)
+    @test gain_normalized(state2)
+    state3 = ignorm(state2)
+    @test !gain_normalized(state3)
+
+    # check invertibility
+    @test_approx_eq rawdata(state1) rawdata(state3)
+
+    # inplace version
+    state4 = copy(state1)
+    gnorm!(state4)
+    @test gain_normalized(state4)
+    @test_approx_eq rawdata(state4) rawdata(state2)
+
+    ignorm!(state4)
+    @test_approx_eq rawdata(state4) rawdata(state1)
+end
+
+function test_freqt(src_order, src_α, dst_order=20, dst_α=0.35)
+    srand(98765)
+    x = rand(512)
+
+    state1 = estimate(MelCepstrum(src_order, src_α), x)
+    state2 = freqt(state1, dst_order, dst_α)
+    @test allpass_alpha(paramdef(state2)) == dst_α
+    @test length(state2) == dst_order + 1
+    @test !any(isnan(state1))
+    @test !any(isnan(state2))
+
+    state4 = estimate(MelGeneralizedCepstrum(20, 0.41, -0.02), x)
+    state5 = freqt(state4, dst_order, dst_α)
+    @test allpass_alpha(paramdef(state5)) == dst_α
+    @test length(state5) == dst_order + 1
+    @test !any(isnan(state4))
+    @test !any(isnan(state5))
+end
+
+function test_gc2gc(src_order=20, src_α=0.35, src_γ=0.0,
+                    dst_order=20, dst_γ=-0.05)
+    srand(98765)
+    x = rand(512)
+
+    def = MelGeneralizedCepstrum(src_order, src_α, src_γ)
+
+    state1 = estimate(def, x)
+    state2 = gc2gc(state1, dst_order, dst_γ)
+    @test glog_gamma(paramdef(state2)) == dst_γ
+    if dst_γ != -1.0 && dst_γ != 0.0
+        @test !gain_normalized(state2)
+    end
+    @test !ready_to_filt(state2)
+end
+
+function test_mgc2mgc(src_order, src_α, src_γ, dst_order, dst_α, dst_γ)
+    srand(98765)
+    x = rand(512)
+
+    state = estimate(MelGeneralizedCepstrum(src_order, src_α, src_γ), x)
+    state2 = mgc2mgc(state, dst_order, dst_α, dst_γ)
+    if log_form(typeof(paramdef(state2))) == StandardLog
+        @test gain_normalized(state2)
+    else
+        @test !gain_normalized(state2)
+    end
+    @test !ready_to_filt(state2)
 end
 
 function test_extend()
@@ -256,66 +426,220 @@ function test_inplace_extend()
     @test mc == mc_submat[:,1]
 end
 
-function test_mgc2b(α::Float64, γ::Float64)
-    srand(98765)
-    mgc = rand(21)
+###  Perform tests ###
 
-    b = mgc2b(mgc, α, γ)
-    b̂ = copy(mgc)
-    mgc2b!(b̂, α, γ)
-    @test_approx_eq b b̂
-    mgc = MelGeneralizedCepstrum(α, γ, mgc)
-    b̂ = mgc2b(mgc)
-    @test_approx_eq b rawdata(b̂)
-    if α != 0.0 && γ != 0.0 && γ != -1.0
-        @test isa(b̂, MGLSADFCoef)
-    end
+let
+    println("testing: gcep")
+    test_gcep_special_cases()
+    test_gcep_basics()
 end
 
 let
-    srand(98765)
-    order = 20
-    x = rand(1024)
-    mc1 = MelGeneralizedCepstrums._mcep(x, order, 0.41)
-    mc2 = periodogram2mcep(abs2(rfft(x)), order, 0.41)
-    @test_approx_eq mc1 mc2
+    println("testing: gcep")
+    test_mcep_special_cases()
+    test_mcep_basics()
 end
 
-test_mcep_type()
-test_mgcep_type()
-test_lpc_type()
-test_lpc_basics()
-
-test_mgcep_basics()
-test_mcep_basics()
-test_gcep_basics()
-test_lpc_basics()
-
-test_extend()
-test_inplace_extend()
+let
+    println("testing: mgcep")
+    test_mgcep_special_cases()
+    test_mgcep_basics()
+end
 
 for α in [-0.35, 0.0, 0.35]
     for γ in [-1.0, -0.5, 0.0]
-        println("mgcep_otypes: testing with α=$α and γ=$γ")
+        println("mgcep: testing with α=$α and γ=$γ")
         test_mgcep_otypes(α, γ)
     end
 end
 
-# TODO(ryuichi): tests don't passed when α -0.544, -0.41, -0.35, γ = -1.0
-for α in [0.0, 0.35, 0.41, 0.544]
-    for γ in [-1.0, -0.75, -0.5, -0.25, 0.0]
-        println("mgc2b: testing with α=$α, γ=$γ")
-        test_mgc2b(α, γ)
+println("testing: mcepalpha")
+for elty in (UInt, Int, Float32, Float64)
+    @test_approx_eq  mcepalpha(convert(elty, 8000))  0.312
+    @test_approx_eq  mcepalpha(convert(elty, 11025)) 0.357
+    @test_approx_eq  mcepalpha(convert(elty, 16000)) 0.41
+    @test_approx_eq  mcepalpha(convert(elty, 22050)) 0.455
+    @test_approx_eq  mcepalpha(convert(elty, 44100)) 0.544
+    @test_approx_eq  mcepalpha(convert(elty, 48000)) 0.554
+end
+
+for order in 15:5:25
+    println("lpc2c: testing with order=$order")
+    test_lpc2c(order)
+end
+
+for order in 15:5:25
+    for α in [0.0, 0.35]
+        println("mc2b: testing with order=$order, α=$α")
+        test_mc2b(order, α)
     end
 end
 
-for f in (:uint, :int, :float)
-    @eval begin
-        @test_approx_eq  mcepalpha($f(8000))  0.312
-        @test_approx_eq  mcepalpha($f(11025)) 0.357
-        @test_approx_eq  mcepalpha($f(16000)) 0.41
-        @test_approx_eq  mcepalpha($f(22050)) 0.455
-        @test_approx_eq  mcepalpha($f(44100)) 0.544
-        @test_approx_eq  mcepalpha($f(48000)) 0.554
+let
+    println("testing: mc2b exceptions")
+    srand(98765)
+    x = rand(512)
+    b = mc2b(estimate(MelCepstrum(20, 0.41), x))
+    # mc2b assumes input is not filter coef.
+    @test_throws ArgumentError mc2b(b)
+    @test_throws ArgumentError mc2b!(b)
+    @test_throws ArgumentError mc2b(mgcep(x, 20, 0.41, -0.2))
+end
+
+for order in [20, 25, 30]
+    for α in [0.0, 0.35, 0.41, 0.544]
+        for fftlen in [256, 512]
+            println("mc2e: testing with order=$order, α=$α, fftlen=$fftlen")
+            test_mc2e(order, α, fftlen)
+        end
     end
+end
+
+for order in [20, 25, 30]
+    for α in [-0.554, -0.41, 0.0, 0.41, 0.544]
+        for γ in [-1.0, -0.5, 0.0]
+            println("mgc2b: testing with order=$order, α=$α, γ=$γ")
+            test_mgc2b(order, α, γ)
+        end
+    end
+end
+
+let
+    println("testing: mgc2b exceptions")
+    srand(98765)
+    x = rand(512)
+    b = mgc2b(estimate(MelGeneralizedCepstrum(20, 0.41, -0.3), x))
+    # mgc2b assumes input is not filter coef.
+    @test_throws ArgumentError mgc2b(b)
+end
+
+for order in [20, 25, 30]
+    for α in [-0.554, -0.41, 0.0, 0.41, 0.544]
+        for γ in [-1.0, -0.5, 0.0]
+            for fftlen in [256, 512]
+                println("mgc2sp: testing with order=$order, α=$α, γ=$γ, fftlen=$fftlen")
+                test_mgc2sp(order, α, γ, fftlen)
+            end
+        end
+    end
+end
+
+# mgc2sp exceptions
+let
+    println("testing: mgc2sp exceptions")
+    srand(98765)
+    x = rand(512)
+
+    state = mgc2b(estimate(MelGeneralizedCepstrum(20, 0.41, -0.1), x))
+    @test_throws ArgumentError mgc2sp(state, 1024)
+end
+
+for order in 15:5:25
+    for α in [0.0, 0.35]
+        println("b2mc: testing with order=$order, α=$α")
+        test_b2mc(order, α)
+    end
+end
+
+# b2mc exceptions
+let
+    println("testing: b2mc exceptions")
+    srand(98765)
+    x = rand(512)
+
+    state = estimate(MelCepstrum(20, 0.41), x)
+
+    # b2mc should not accept mel-cepstrum
+    @test_throws ArgumentError b2mc(state)
+    @test_throws ArgumentError b2mc!(state)
+end
+
+for order in [20, 25, 30]
+    for γ in [-1.0, -0.5, 0.0]
+        println("gnorm and ignorm: testing with order=$order, γ=$γ")
+        test_gnorm_and_ignorm(order, γ)
+    end
+end
+
+let
+    println("testing: gnorm and ignorm exceptions")
+    srand(98765)
+    x = rand(512)
+
+    state1 = estimate( GeneralizedCepstrum(20, -0.1), x)
+    state2 = gnorm(state1)
+    # double normalization should raise error
+    @test_throws ArgumentError gnorm(gnorm(state1))
+    @test_throws ArgumentError ignorm(ignorm(state2))
+
+    # should not accept filter coef.
+    @test_throws ArgumentError gnorm(mgc2b(state1))
+    @test_throws ArgumentError ignorm(mgc2b(state1))
+end
+
+for src_order in 15:5:25
+    for src_α in [0.0, 0.35]
+        for dst_order in 15:5:25
+            for dst_α in [0.0, 0.35]
+                println("freqt: testing with src_order=$src_order, src_α=$src_α, dst_order=$dst_order, dst_α=$dst_α")
+                test_freqt(src_order, src_α, dst_order,dst_α )
+            end
+        end
+    end
+end
+
+let
+    println("testing: freqt exceptions")
+    srand(98765)
+    x = rand(512)
+
+    # should not accept filter coefficients
+    state1 = mc2b(estimate(MelCepstrum(20, 0.41), x))
+    @test_throws ArgumentError freqt(state1, 20, 0.35)
+end
+
+for src_order in 15:5:25
+    for src_α in [0.0, 0.35]
+        for src_γ in [-1.0, -0.5, 0.0]
+            for dst_order in 15:5:25
+                for dst_γ in [-1.0, -0.5, 0.0]
+                    println("gc2gc: testing with src_order=$src_order, src_α=$src_α, src_γ=$src_γ, dst_order=$dst_order, dst_γ=$dst_γ")
+                    test_gc2gc(src_order,src_α, src_γ, dst_order, dst_γ)
+                end
+            end
+        end
+    end
+end
+
+for src_order in 15:5:25
+    for src_α in [0.0, 0.35]
+        for src_γ in [-1.0, -0.5, 0.0]
+            for dst_order in 15:5:25
+                for dst_α in [0.0, 0.35]
+                    for dst_γ in [-1.0, -0.5, 0.0]
+                        println("mgc2mgc: testing with src_order=$src_order, src_α, src_γ=$src_γ, dst_order=$dst_order, dst_α=$dst_α, dst_γ=$dst_γ")
+                        test_mgc2mgc(src_order, src_α, src_γ, dst_order, dst_α, dst_γ)
+                    end
+                end
+            end
+        end
+    end
+end
+
+let
+    println("testing: mgc2mgc exceptions")
+    srand(98765)
+    x = rand(512)
+
+    state = estimate(MelGeneralizedCepstrum(20, 0.41, -0.1), x)
+    mgc2b!(state)
+
+    # should not accept filter coefficients
+    @test_throws ArgumentError mgc2mgc(state, 0.35, -1.0)
+end
+
+let
+    println("testing: mat2mat functions")
+    test_extend()
+    test_inplace_extend()
 end

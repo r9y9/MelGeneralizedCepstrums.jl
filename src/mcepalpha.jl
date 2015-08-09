@@ -3,9 +3,9 @@
 
 # mcepalpha computes appropriate α for a given sampling frequency.
 function mcepalpha(fs::Real;
-                   start::FloatingPoint=0.0,
-                   stop::FloatingPoint=1.0,
-                   step::FloatingPoint=0.001,
+                   start::Float64=0.0,
+                   stop::Float64=1.0,
+                   step::Float64=0.001,
                    numpoints::Integer=1000)
     α_candidates = start:step:stop
     mel = melscale_vector(fs, numpoints)

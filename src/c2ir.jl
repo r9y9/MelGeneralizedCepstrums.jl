@@ -1,5 +1,5 @@
-function c2ir{T<:FloatingPoint}(c::AbstractVector{T}, len::Int)
-    h = Array(T, len)
+function c2ir(c::AbstractVector, len=256)
+    h = Array(eltype(c), len)
     m = length(c) - 1
 
     h[1] = exp(c[1])
@@ -14,5 +14,3 @@ function c2ir{T<:FloatingPoint}(c::AbstractVector{T}, len::Int)
 
     h
 end
-
-c2ir(c::MelGeneralizedCepstrum, len::Int) = c2ir(rawdata(c), len)

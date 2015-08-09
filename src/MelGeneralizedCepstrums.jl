@@ -1,35 +1,42 @@
 module MelGeneralizedCepstrums
 
 export
-    # Types
+    # Spectral parameter types
+    SpectralParam,
     MelGeneralizedCepstrum,
-    MelFrequencyCepstrum,
-    LinearFrequencyCepstrum,
-    GeneralizedLogCepstrum,
-    StandardLogCepstrum,
-    AllPoleCepstrum,
-    LinearCepstrum,
-    MelCepstrum,
     GeneralizedCepstrum,
+    MelCepstrum,
+    LinearCepstrum,
+    AllPoleCepstrum,
     MelAllPoleCepstrum,
-
-    MelLinearPredictionCoef,
+    LinearPredictionCoefVariants,
     LinearPredictionCoef,
+    LineSpectralPair,
+    PartialAutoCorrelation,
 
-    MelGeneralizedCepstrumFilterCoef,
-    LMADFCoef,
-    MLSADFCoef,
-    MGLSADFCoef,
+    # State, which keeps actual spectral parameter values
+    SpectralParamState,
 
-    # Basic property of Mel-generalized cepstrum
-    order,           # order of cepstrum (not including 0-th coef.)
-    allpass_alpha,   # all-pass constant (alpha)
-    glog_gamma,      # parameter of generalized log function
-    powercoef,       # power coef. (0-th order of mgcep)
+    # Generic interfaces
+    estimate,        # estimate spectral parameter values
+    params,          # returns parameters of a spectral parameter
+    param_order,     # returns order of a spectral parameter
 
-    # Feature extraction
-    mgcep,           # mel-generalized cepstrum analysis
+    # Mel-generalized cepstrum properties
+    allpass_alpha,   # all-pass constant (α)
+    glog_gamma,      # parameter of generalized log function (γ)
+
+    # Spectral state properties
+    paramdef,        # returns parameter definition from state
+    rawdata,         # returns rawdata in state
+    has_loggain,
+    gain_normalized,
+    ready_to_filt,
+
+    # Spectral parameter estimation
+    gcep,            # generalized cepstrum analysis
     mcep,            # mel-cepstrum analysis
+    mgcep,           # mel-generalized cepstrum analysis
     lpc,             # linear prediction (pipe to mgcep for now)
     periodogram2mcep,# periodogram to mel-cepstrum
 
@@ -37,36 +44,34 @@ export
 
     # Conversions
     lpc2c,           # LPC to cepstrum
-    lpc2c!,          #
+    lpc2lsp,         # LPC -> LSP
+    lpc2par,         # LPC -> PARCOR
     mc2b,            # mel-cepstrum -> mlsadf filter coef.
     mc2b!,           #
-    mc2e,            # mel-cesptrum to energy
+    mc2e,            # mel-cesptrum to energy (TODO: need more tests)
     mgc2b,           # mel-generalized cepstrum -> mglsadf coef.
     mgc2b!,          #
     mgc2sp,          # mel-generalized cepstrum -> spectrum envelope
     b2mc,            # mlsadf filter coef. -> mel-cepstrum
     b2mc!,           #
-    b2c,             # b2c in _mgcep.c
-    b2c!,            #
     gnorm,           # gain normalization for mel-generalized cepstrum
     gnorm!,          #
     ignorm,          # inverse gain normalization for mel-generalized cepstrum
     ignorm!,         #
     c2ir,            # cepstrum -> impulse response
     freqt,           # frequency transform
-    freqt!,          #
-    frqtr,           # frqtr in _mcep.c
-    frqtr!,          #
     gc2gc,           # generalized cepstrum -> genralized cepstrum
-    gc2gc!,          #
     mgc2mgc          # mel-generalized cepstrum -> mel-generalized cepstrum
 
 for fname in [
               "common",
-              "mgcep",
+              "gcep",
               "mcep",
+              "mgcep",
               "lpc",
               "lpc2c",
+              "lpc2lsp",
+              "lpc2par",
               "mcepalpha",
               "mc2b",
               "mc2e",

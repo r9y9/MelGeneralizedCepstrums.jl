@@ -1,5 +1,5 @@
-function ignorm!{T<:FloatingPoint}(c::AbstractVector{T},
-                                   γ::FloatingPoint)
+function ignorm!(c::AbstractVector, γ)
+    T = eltype(c)
     if γ == zero(T)
         c[1] = log(c[1])
         return c
@@ -14,14 +14,24 @@ function ignorm!{T<:FloatingPoint}(c::AbstractVector{T},
     c
 end
 
-function ignorm{T<:FloatingPoint}(normalizedc::AbstractVector{T},
-                                  γ::FloatingPoint)
-    c = copy(normalizedc)
-    ignorm!(c, γ)
+ignorm(normalizedc::AbstractVector, γ=0.0) = ignorm!(copy(normalizedc), γ)
+
+function ignorm!{T<:GeneralizedLogCepstrum}(state::SpectralParamState{T})
+    assert_not_ready_to_filt(state)
+    assert_gain_normalized(state)
+
+    γ = glog_gamma(paramdef(state))
+    state.data = ignorm!(rawdata(state), γ)
+    state.gain_normalized = false
+    state
 end
 
-function ignorm(c::MelGeneralizedCepstrum)
-    γ = glog_gamma(c)
-    raw = ignorm(rawdata(c), γ)
-    MelGeneralizedCepstrum(allpass_alpha(c), γ, raw)
+function ignorm!{T<:Union{AllPoleLogCepstrum,StandardLogCepstrum}}(state::SpectralParamState{T})
+    assert_not_ready_to_filt(state)
+    assert_gain_normalized(state)
+    state
+end
+
+function ignorm{T<:MelGeneralizedCepstrum}(state::SpectralParamState{T})
+    ignorm!(copy(state))
 end

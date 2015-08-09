@@ -86,7 +86,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     n::Int,               # the order of recursion
                     iter::Int,            # current iter #
                     y_fft::Array{Complex{T}}, # *length must be equal to length(x)*
-                    z_fft::Array{T},      # *length must be equal to length(x)*
+                    z_fft::Array{Complex{T}}, # *length must be equal to length(x)*
                     bplan::FFTW.Plan,     # FFTW.Plan used in backward fft
                     cr::Vector{T} = zeros(T, length(x)),
                     pr::Vector{T} = zeros(T, length(x)),
@@ -138,8 +138,11 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     end
 
     copy!(y_fft, pr)
-    FFTW.execute(bplan.plan, y_fft, pr)
-    scale!(pr, FFTW.normalization(pr))
+    A_mul_B!(z_fft, bplan, y_fft)
+    scale!(z_fft, 1 / length(y_fft))
+    pr = real(z_fft)
+    # FFTW.execute(bplan.plan, y_fft, pr)
+    # scale!(pr, FFTW.normalization(pr))
 
     if α != zero(T)
         b2c!(sub(pr, 1:2order+1), pr[1:n+1], α)
@@ -152,13 +155,20 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         for i=1:length(qr)
             @inbounds y_fft[i] = Complex(qr[i], qi[i])
         end
-        FFTW.execute(bplan.plan, y_fft, qr)
-        scale!(qr, FFTW.normalization(qr))
+
+        A_mul_B!(z_fft, bplan, y_fft)
+        scale!(z_fft, 1 / length(y_fft))
+        qr = real(z_fft)
+        # FFTW.execute(bplan.plan, y_fft, qr)
+        # scale!(qr, FFTW.normalization(qr))
         for i=1:length(rr)
             @inbounds y_fft[i] = Complex(rr[i], ri[i])
         end
-        FFTW.execute(bplan.plan, y_fft, rr)
-        scale!(rr, FFTW.normalization(rr))
+        A_mul_B!(z_fft, bplan, y_fft)
+        scale!(z_fft, 1 / length(y_fft))
+        rr = real(z_fft)
+        # FFTW.execute(bplan.plan, y_fft, rr)
+        # scale!(rr, FFTW.normalization(rr))
 
         if α != zero(T)
             b2c!(sub(qr, 1:n+1), qr[1:n+1], α)
@@ -259,18 +269,19 @@ function mgcepnorm!{T<:FloatingPoint}(bᵧ′::AbstractVector{T},
     mgc
 end
 
-function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* signal
-                                  order::Int=40,                 # order of mgcep
-                                  α::FloatingPoint=0.41,         # all-pass constant
-                                  γ::FloatingPoint=0.0;          # parameter of generalized log
-                                  n::Int=length(x)-1,            # order of recursion
-                                  miniter::Int=2,
-                                  maxiter::Int=30,
-                                  criteria::FloatingPoint=0.001, # stopping criteria
-                                  e::T=zero(T),                  # floor of
-                                  otype::Int=0,                  # output type
-                                  verbose::Bool=false
+function _mgcep(x::AbstractVector,          # a *windowed* signal
+                order=25,                 # order of mgcep
+                α=0.35,         # all-pass constant
+                γ=0.0;          # parameter of generalized log
+                n::Int=length(x)-1,            # order of recursion
+                miniter::Int=2,
+                maxiter::Int=30,
+                criteria::FloatingPoint=0.001, # stopping criteria
+                e::Real=zero(eltype(x)),       # floor of
+                otype::Int=0,                  # output type
+                verbose::Bool=false
     )
+    T = eltype(x)
     @assert n < length(x)
 
     # Periodogram
@@ -290,8 +301,9 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
 
     # FFT workspace
     y = Array(Complex{T}, length(x))
-    z = Array(T, length(x))
-    bplan = FFTW.Plan(y, z, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+    z = Array(Complex{T}, length(x))
+    # bplan = FFTW.Plan(y, z, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
+    bplan = plan_bfft(y)
 
     bᵧ′ = zeros(T, order+1)
     ϵ⁰ = newton!(bᵧ′, periodogram, order, α, -one(T), n, 1, y, z, bplan,
@@ -335,11 +347,23 @@ function _mgcep{T<:FloatingPoint}(x::AbstractVector{T},          # a *windowed* 
     mgcepnorm!(bᵧ′, α, γ, otype)
 end
 
-function mgcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
-                                   order::Int=40,
-                                   α::FloatingPoint=0.41,
-                                   γ::FloatingPoint=0.0;
-                                   kargs...)
-    raw = _mgcep(x, order, α, γ; kargs...)
-    MelGeneralizedCepstrum(α, γ, raw)
+function estimate(mgc::MelGeneralizedCepstrum, x::AbstractArray;
+                  otype::Int=0,
+                  use_sptk::Bool=false,
+                  kargs...)
+    if otype != 0
+        throw(ArgumentError("""otype = 0 is only allowed.
+                            Use `_mgcep` function if you need diffrent output types that are used in SPTK.mgcep."""))
+    end
+    order = param_order(mgc)
+    α = allpass_alpha(mgc)
+    γ = glog_gamma(mgc)
+    normalized = γ == zero(γ) ? true : false
+    mgcepfunc = use_sptk ? SPTK.mgcep : _mgcep
+    data = mgcepfunc(x, order, α, γ; otype=otype, kargs...)
+    SpectralParamState(mgc, data, true, normalized)
+end
+
+function mgcep(x::AbstractArray, order=25, α=0.35, γ=0.0; kargs...)
+    estimate(MelGeneralizedCepstrum(order, α, γ), x; kargs...)
 end
