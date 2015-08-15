@@ -12,7 +12,7 @@ MelGeneralizedCepstrums.jl provides a mel generalized cepstrum anlysis for spect
 - mel-cepstrum analysis
 - mel-generalized cepstrum analysis
 
-This package also provides mel-generalized cepstrum conversions, e.g mel-generalized cepstrum to mel-cepstrum, mel-cepstrum to (linear frequency) cepstrum, mel-cesptrum to filter coefficients of waveform synthesis filter (known as mel-log spectrum approximation digital filter), and vise versa. 
+This package also provides mel-generalized cepstrum conversions, e.g mel-generalized cepstrum to mel-cepstrum, mel-cepstrum to (linear frequency) cepstrum, mel-cesptrum to filter coefficients of waveform synthesis filter (known as mel-log spectrum approximation digital filter), and vise versa.
 
 Note that this package is built on top of [SPTK.jl](https://github.com/r9y9/SPTK.jl). A part of the core is re-writen in Julia language from [Speech Signal Processing Toolkit (SPTK)](http://sp-tk.sourceforge.net/).
 
@@ -48,7 +48,7 @@ logspec = 20.0/log(10)*logH
 ### LPC-Cepstrum
 
 ```julia
-lpc = estimate(AllPoleCepstrum(20)
+lpc = estimate(AllPoleCepstrum(20), x)
 
 logH = real(mgc2sp(mgc, 1024))
 logspec = 20.0/log(10)*logH
