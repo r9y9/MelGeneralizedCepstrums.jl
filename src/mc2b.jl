@@ -1,4 +1,4 @@
-function mc2b!{T<:FloatingPoint}(mc::AbstractVector{T}, α::FloatingPoint)
+function mc2b!(mc::AbstractVector, α)
     b = mc
 
     for i=length(mc)-1:-1:1
@@ -7,14 +7,25 @@ function mc2b!{T<:FloatingPoint}(mc::AbstractVector{T}, α::FloatingPoint)
     b
 end
 
-function mc2b{T<:FloatingPoint}(mc::AbstractVector{T}, α::FloatingPoint)
-    b = copy(mc)
-    mc2b!(b, α)
+mc2b(mc::AbstractVector, α) = mc2b!(copy(mc), α)
+
+function mc2b!{T<:MelCepstrum}(state::SpectralParamState{T})
+    assert_not_ready_to_filt(state)
+
+    α = allpass_alpha(paramdef(state))
+    state.ready_to_filt = true
+    α == zero(α) && return state
+
+    data = rawdata(state)
+    state.data = mc2b!(data, α)
+    state
 end
 
-function mc2b{F,L,T,N}(c::MelGeneralizedCepstrum{F,L,T,N})
-    α = allpass_alpha(c)
-    γ = glog_gamma(c)
-    raw = mc2b(rawdata(c), α)
-    MelGeneralizedCepstrumFilterCoef{F,L,T,N}(α, γ, raw)
+function mc2b!{T<:MelGeneralizedCepstrum}(state::SpectralParamState{T})
+    throw(ArgumentError("""
+                        use `mgc2b` instead of `mc2b` for mel-generalized cepstrums"""))
+end
+
+function mc2b{T<:MelGeneralizedCepstrum}(state::SpectralParamState{T})
+    mc2b!(copy(state))
 end

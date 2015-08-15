@@ -101,7 +101,7 @@ function mgcep{T<:FloatingPoint,N}(x::AbstractArray{T,N},
 end
 ```
 
-where `x` is a input windowed signal, `order` is the order of cepstrum (expect for 0-th), `α` is a frequency warping parameter and `γ` is a paramter of generalized log function. It returns a value typed `MelGeneralizedCepstrum{F,L,T,N}` which `F` and `L` are estimated by the value of `α` and `γ`. When `γ = 0`, mel-generalized cepstrum analysis corresponds to mel-cepstrum analysis. For more information about mel-generalized cepstrum, please see [the paper](http://www.sp.nitech.ac.jp/~tokuda/selected_pub/pdf/conference/tokuda_icslp1994.pdf).
+where `x` is a input windowed signal, `order` is the order of cepstrum (expect for 0-th), `α` is a frequency warping parameter and `γ` is a parameter of generalized log function. It returns a value typed `MelGeneralizedCepstrum{F,L,T,N}` which `F` and `L` are estimated by the value of `α` and `γ`. When `γ = 0`, mel-generalized cepstrum analysis corresponds to mel-cepstrum analysis. For more information about mel-generalized cepstrum, please see [the paper](http://www.sp.nitech.ac.jp/~tokuda/selected_pub/pdf/conference/tokuda_icslp1994.pdf).
 
 ## How spectrum envelope estimation works
 

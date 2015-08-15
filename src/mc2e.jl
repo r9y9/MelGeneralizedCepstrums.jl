@@ -1,6 +1,5 @@
 # mc2e computes energy from mel-cepstrum.
-function mc2e{T<:FloatingPoint}(mc::AbstractVector{T}, α::FloatingPoint,
-                                len::Int)
+function mc2e(mc::AbstractVector, α=0.35, len=256)
     # back to linear frequency domain
     c = freqt(mc, len-1, -α)
 
@@ -10,12 +9,19 @@ function mc2e{T<:FloatingPoint}(mc::AbstractVector{T}, α::FloatingPoint,
     sumabs2(ir)
 end
 
-function mc2e{T<:FloatingPoint}(mc::AbstractMatrix{T}, α::FloatingPoint,
-                                len::Int)
-    [mc2e(sub(mc, 1:size(mc, 1), i), α, len) for i=1:size(mc, 2)]
+function mc2e(mc::AbstractMatrix, α=0.35, len=256)
+    r = Array{T}(size(mc, 2))
+    for i in 1:size(r, 2)
+        r[i] = mc2e(sub(mc, :, i), α, len)
+    end
+    r
 end
 
-function mc2e(c::MelGeneralizedCepstrum, len::Int)
-    α = allpass_alpha(c)
-    mc2e(rawdata(c), α, len)
+function mc2e{T<:MelCepstrum}(state::SpectralParamState{T}, len)
+    assert_not_ready_to_filt(state)
+
+    def = paramdef(state)
+    α = allpass_alpha(def)
+    data = rawdata(state)
+    mc2e(data, α, len)
 end

@@ -1,13 +1,11 @@
 # mgc2b converts mel generalized cesptrum to MGLSADF filter coefficients.
-function mgc2b!{T<:FloatingPoint}(mgc::AbstractVector{T}, α::FloatingPoint,
-                                  γ::FloatingPoint)
+# TODO: consider `otype` optional argument?
+function mgc2b!(mgc::AbstractVector, α, γ)
     b = mgc
     mc2b!(b, α)
 
     # when gamma = 0, mel-generalized cespstrum corresponds to mel cepstrum
-    if γ == zero(T)
-        return b
-    end
+    γ == zero(γ) && return mgc
 
     gnorm!(b, γ)
 
@@ -20,21 +18,31 @@ function mgc2b!{T<:FloatingPoint}(mgc::AbstractVector{T}, α::FloatingPoint,
     b
 end
 
-function mgc2b{T<:FloatingPoint}(mgc::AbstractVector{T}, α::FloatingPoint,
-                                 γ::FloatingPoint)
-    b = copy(mgc)
-    mgc2b!(b, α, γ)
+mgc2b(mgc::AbstractVector, α=0.35, γ=0.0) = mgc2b!(copy(mgc), α, γ)
+
+function mgc2b!{T<:MelGeneralizedCepstrum}(state::SpectralParamState{T})
+    assert_not_ready_to_filt(state)
+
+    @assert has_loggain(state)
+    γ = glog_gamma(paramdef(state))
+    if γ == zero(γ)
+        @assert gain_normalized(state)
+    else
+        @assert !gain_normalized(state)
+    end
+
+    def = paramdef(state)
+    α = allpass_alpha(def)
+    γ = glog_gamma(def)
+    data = rawdata(state)
+    state.data = mgc2b!(data, α, γ)
+    state.has_loggain = true
+    state.gain_normalized = true
+    state.ready_to_filt = true
+    state
 end
 
-function mgc2b{F,L,T,N}(c::MelGeneralizedCepstrum{F,L,T,N})
-    α = allpass_alpha(c)
-    γ = glog_gamma(c)
-    raw = mgc2b(rawdata(c), α, γ)
-    MelGeneralizedCepstrumFilterCoef{F,L,T,N}(α, γ, raw)
-end
-
-function mgc2b{T,N}(c::MelGeneralizedCepstrum{Linear,StandardLog,T,N})
-    α = allpass_alpha(c)
-    γ = glog_gamma(c)
-    MelGeneralizedCepstrumFilterCoef{Linear,StandardLog,T,N}(α, γ, rawdata(c))
+# mgc is assumed not to be gamma scaled (TODO: handle this explicitly?)
+function mgc2b{T<:MelGeneralizedCepstrum}(state::SpectralParamState{T})
+    mgc2b!(copy(state))
 end

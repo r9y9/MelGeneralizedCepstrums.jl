@@ -1,6 +1,6 @@
-function b2mc!{T<:FloatingPoint}(mc::AbstractVector{T}, α::FloatingPoint)
+function b2mc!(mc::AbstractVector, α)
     m = length(mc)
-    o = zero(T)
+    o = zero(eltype(mc))
 
     mc[m] = mc[m]
     d = mc[m]
@@ -13,14 +13,25 @@ function b2mc!{T<:FloatingPoint}(mc::AbstractVector{T}, α::FloatingPoint)
     mc
 end
 
-function b2mc{T<:FloatingPoint}(b::AbstractVector{T}, α::FloatingPoint)
-    mc = copy(b)
-    b2mc!(mc, α)
+b2mc(b::AbstractVector, α=0.35) = b2mc!(copy(b), α)
+
+function b2mc!{T<:MelCepstrum}(state::SpectralParamState{T})
+    assert_ready_to_filt(state)
+
+    def = paramdef(state)
+    α = allpass_alpha(def)
+    data = rawdata(state)
+    state.data = b2mc!(data, α)
+    state.ready_to_filt = false
+    state
 end
 
-function b2mc{F,L,T,N}(c::MelGeneralizedCepstrumFilterCoef{F,L,T,N})
-    α = allpass_alpha(c)
-    γ = glog_gamma(c)
-    raw = b2mc(rawdata(c), α)
-    MelGeneralizedCepstrum{F,L,T,N}(α, γ, raw)
+function b2mc!{T<:MelGeneralizedCepstrum}(state::SpectralParamState{T})
+    throw(ArgumentError("""
+                        filter coefficients based on mel-generalized cesptrum cannot be converted to mel-cepstrum"""))
+
+end
+
+function b2mc{T<:MelGeneralizedCepstrum}(state::SpectralParamState{T})
+    b2mc!(copy(state))
 end

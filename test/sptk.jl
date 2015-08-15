@@ -1,6 +1,7 @@
 # Check consistency with SPTK
 
 import SPTK
+import MelGeneralizedCepstrums: lpc2c!, b2c, frqtr, frqtr!
 
 function test_mcep(order::Int, α::Float64)
     srand(98765)
@@ -13,7 +14,7 @@ end
 function test_mgcep(order::Int, α::Float64, γ::Float64)
     srand(98765)
     x = rand(512)
-    mgc = SPTK.mgcep(x, order, α, γ; dd=0.001)
+    mgc = SPTK.mgcep(x, order, α, γ; threshold=0.001)
     mgĉ = MelGeneralizedCepstrums._mgcep(x, order, α, γ; criteria=0.001)
     @test_approx_eq mgc mgĉ
 end
@@ -28,19 +29,6 @@ function test_lpc2c()
     ĉ = similar(a)
     lpc2c!(ĉ, a)
     @test_approx_eq c ĉ
-
-    a_typed = MelLinearPredictionCoef(0.0, a, false)
-    c = lpc2c(a_typed)
-    @test isa(c, LinearCepstrum)
-    @test c[1] == log(a_typed[1])
-
-    # assume a has loggain
-    a_typed = MelLinearPredictionCoef(0.0, a, true)
-    c = lpc2c(a_typed)
-    @test c[1] == a_typed[1]
-
-    a_typed = MelLinearPredictionCoef(0.41, a, false)
-    @test_throws ArgumentError lpc2c(a_typed)
 end
 
 function test_gnorm(γ::Float64)
@@ -53,10 +41,6 @@ function test_gnorm(γ::Float64)
     ĝ = copy(mc)
     gnorm!(ĝ, γ)
     @test_approx_eq g ĝ
-
-    mc = MelGeneralizedCepstrum(0.0, γ, mc)
-    ĝ = gnorm(mc)
-    @test_approx_eq g rawdata(ĝ)
 end
 
 function test_ignorm(γ::Float64)
@@ -69,10 +53,6 @@ function test_ignorm(γ::Float64)
     ĝ = copy(mc)
     ignorm!(ĝ, γ)
     @test_approx_eq g ĝ
-
-    mc = MelGeneralizedCepstrum(0.0, γ, mc)
-    ĝ = ignorm(mc)
-    @test_approx_eq g rawdata(ĝ)
 end
 
 function test_mc2b(α::Float64)
@@ -85,12 +65,6 @@ function test_mc2b(α::Float64)
     b̂ = copy(mc)
     mc2b!(b̂, α)
     @test_approx_eq b b̂
-
-    if α != 0.0
-        mc = MelGeneralizedCepstrum(α, 0.0, mc)
-        b̂ = mc2b(mc)
-        @test isa(b̂, MLSADFCoef)
-    end
 end
 
 
@@ -101,15 +75,6 @@ function test_b2mc(α::Float64)
     mc = SPTK.b2mc(b, α)
     mĉ = b2mc(b, α)
     @test_approx_eq mc mĉ
-
-    mc = MelGeneralizedCepstrum(α, 0.0, b)
-    b = mc2b(mc)
-    mĉ = b2mc(b)
-    if α != 0.0
-        @test isa(mĉ, MelCepstrum)
-        @test rawdata(mc) != rawdata(b)
-    end
-    @test_approx_eq rawdata(mc) rawdata(mĉ)
 end
 
 function test_c2ir(len::Int=512)
@@ -128,10 +93,6 @@ function test_freqt(order::Int, α::Float64)
     m = SPTK.freqt(mc, order, α)
     m̂ = freqt(mc, order, α)
     @test_approx_eq m m̂
-
-    mc = MelGeneralizedCepstrum(0.0, 0.0, mc)
-    m̂ = freqt(mc, order, α)
-    @test_approx_eq m rawdata(m̂)
 end
 
 function test_b2c(order::Int, α::Float64)
@@ -150,10 +111,6 @@ function test_frqtr(order::Int, α::Float64)
     m = SPTK.frqtr(mc, order, α)
     m̂ = frqtr(mc, order, α)
     @test_approx_eq m m̂
-
-    mc = MelGeneralizedCepstrum(0.0, 0.0, mc)
-    m̂ = frqtr(mc, order, α)
-    @test_approx_eq m rawdata(m̂)
 end
 
 function test_gc2gc(order::Int, γ::Float64)
@@ -163,10 +120,6 @@ function test_gc2gc(order::Int, γ::Float64)
     gc2 = SPTK.gc2gc(gc, 0.0, order, γ)
     gc2̂ = gc2gc(gc, 0.0, order, γ)
     @test_approx_eq gc2 gc2̂
-
-    gc = MelGeneralizedCepstrum(0.0, 0.0, gc)
-    gc2̂ = gc2gc(gc, order, γ)
-    @test_approx_eq gc2 rawdata(gc2̂)
 end
 
 function test_mgc2mgc(order::Int, α::Float64, γ::Float64)
@@ -176,12 +129,6 @@ function test_mgc2mgc(order::Int, α::Float64, γ::Float64)
     mgc2 = SPTK.mgc2mgc(mgc, 0.41, 0.0, order, α, γ)
     mgc2̂ = mgc2mgc(mgc, 0.41, 0.0, order, α, γ)
     @test_approx_eq mgc2 mgc2̂
-
-    mgc = MelGeneralizedCepstrum(0.41, 0.0, mgc)
-    mgc2̂ = mgc2mgc(mgc, order, α, γ)
-    @test_approx_eq mgc2 rawdata(mgc2̂)
-    @test allpass_alpha(mgc2̂) == α
-    @test glog_gamma(mgc2̂) == γ
 end
 
 function test_mgc2sp(α::Float64, γ::Float64)
@@ -194,10 +141,6 @@ function test_mgc2sp(α::Float64, γ::Float64)
     @test_approx_eq sp sp̂
     @test length(sp̂) == fftlen>>1 + 1
     @test eltype(sp̂) == Complex{eltype(mgc)}
-
-    mgc = MelGeneralizedCepstrum(α, γ, mgc)
-    sp̂ = mgc2sp(mgc, fftlen)
-    @test length(sp̂) == fftlen>>1 + 1
 end
 
 for order in 10:2:30

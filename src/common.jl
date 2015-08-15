@@ -1,140 +1,245 @@
-# Common types and functions
+import Base: eltype, size, length, getindex, setindex!, similar, copy
 
-import Base: eltype, length, size, getindex
+import SPTK
 
-# Mel-Generalized Cepstrum is parametrized by type of frequency scale (F) and
-# log function (L). It is designed to be a subtype of AbstractArray{T,N}.
-abstract AbstractMelGeneralizedCepstrumArray{F,L,T,N} <: AbstractArray{T,N}
+### Generic interface ###
 
-abstract Frequency
-type Mel <: Frequency
-end
-type Linear <: Frequency
+abstract SpectralParam
+
+function estimate(s::SpectralParam, x::AbstractArray)
+    error("should provide an estimator")
 end
 
-abstract Log
-type GeneralizedLog <: Log
-end
-type StandardLog <: Log
-end
-type AllPoleLog <: Log
+function params(s::SpectralParam)
+    error("should provide get access to parameters")
 end
 
-frequency_scale{F<:Frequency,L<:Log,T,N}(::Type{AbstractMelGeneralizedCepstrumArray{F,L,T,N}}) = F
-frequency_scale{T<:AbstractMelGeneralizedCepstrumArray}(::Type{T}) = frequency_scale(super(T))
+# subtypes of SpectralParam should have field `order`
+param_order(s::SpectralParam) = s.order
 
-log_func{F<:Frequency,L<:Log,T,N}(::Type{AbstractMelGeneralizedCepstrumArray{F,L,T,N}}) = L
-log_func{T<:AbstractMelGeneralizedCepstrumArray}(::Type{T}) = log_func(super(T))
+### Types that characterize spectral parameters ###
 
-immutable MelGeneralizedCepstrum{F<:Frequency,L<:Log,T<:FloatingPoint,N} <: AbstractMelGeneralizedCepstrumArray{F,L,T,N}
-    α::T
-    γ::T
-    data::Array{T,N}
+abstract FrequencyForm
+type MelFrequency <: FrequencyForm
+end
+type LinearFrequency <: FrequencyForm
+end
 
-    function MelGeneralizedCepstrum(α::FloatingPoint, γ::FloatingPoint,
-                                    data::Array{T,N})
+abstract LogForm
+type GeneralizedLog <: LogForm
+end
+type StandardLog <: LogForm
+end
+type AllPoleLog <: LogForm
+end
+
+### Definitions of spectral envelope parameters ###
+
+immutable MelGeneralizedCepstrum{F<:FrequencyForm,L<:LogForm} <: SpectralParam
+    order::Int
+    α::Real
+    γ::Real
+    function MelGeneralizedCepstrum(order::Int, α::Real, γ::Real)
+        order > 0 || throw(ArgumentError("order should be larger than 0"))
         abs(α) < 1 || throw(ArgumentError("|α| < 1 is supported"))
         (-1 <= γ <= 0) || throw(ArgumentError("-1 <= γ <= 0 is supported"))
-        @assert size(data, 1) > 1
-        new(α, γ, data)
+        new(order, α, γ)
     end
 end
 
-function MelGeneralizedCepstrum{T,N}(α::T, γ::T, data::Array{T,N})
-    F = (α == zero(T)) ? Linear : Mel
+typealias MelFrequencyCepstrum{L} MelGeneralizedCepstrum{MelFrequency,L}
+typealias LinearFrequencyCepstrum{L} MelGeneralizedCepstrum{LinearFrequency,L}
+typealias GeneralizedLogCepstrum{F} MelGeneralizedCepstrum{F,GeneralizedLog}
+typealias StandardLogCepstrum{F} MelGeneralizedCepstrum{F,StandardLog}
+typealias AllPoleLogCepstrum{F} MelGeneralizedCepstrum{F,AllPoleLog}
+
+typealias GeneralizedCepstrum MelGeneralizedCepstrum{LinearFrequency,GeneralizedLog}
+typealias MelCepstrum MelGeneralizedCepstrum{MelFrequency,StandardLog}
+typealias LinearCepstrum MelGeneralizedCepstrum{LinearFrequency,StandardLog}
+typealias AllPoleCepstrum MelGeneralizedCepstrum{LinearFrequency,AllPoleLog}
+typealias MelAllPoleCepstrum MelGeneralizedCepstrum{MelFrequency,AllPoleLog}
+
+freq_form{F<:FrequencyForm,L<:LogForm}(::Type{MelGeneralizedCepstrum{F,L}}) = F
+freq_form{T<:MelGeneralizedCepstrum}(::Type{T}) = freq_form(super(T))
+
+log_form{F<:FrequencyForm,L<:LogForm}(::Type{MelGeneralizedCepstrum{F,L}}) = L
+log_form{T<:MelGeneralizedCepstrum}(::Type{T}) = freq_form(super(T))
+
+# Generic fallback constructor, which determines type parmaters from α and γ
+function MelGeneralizedCepstrum(order::Int, α::Real, γ::Real)
+    F = (α == zero(α)) ? LinearFrequency : MelFrequency
 
     L = GeneralizedLog
-    if γ == zero(T)
+    if γ == zero(γ)
         L = StandardLog
-    elseif γ == -one(T)
+    elseif γ == -one(γ)
         L = AllPoleLog
     end
 
-    MelGeneralizedCepstrum{F,L,T,N}(α, γ, data)
+    MelGeneralizedCepstrum{F,L}(order, α, γ)
 end
 
 function MelGeneralizedCepstrum(mgc::MelGeneralizedCepstrum)
+    order = param_order(mgc)
     α = allpass_alpha(mgc)
     γ = glog_gamma(mgc)
-    MelGeneralizedCepstrum(α, γ, rawdata(mgc))
+    MelGeneralizedCepstrum(order, α, γ)
 end
 
-typealias MelFrequencyCepstrum{L,T,N} MelGeneralizedCepstrum{Mel,L,T,N}
-typealias LinearFrequencyCepstrum{L,T,N} MelGeneralizedCepstrum{Linear,L,T,N}
-typealias GeneralizedLogCepstrum{F,T,N} MelGeneralizedCepstrum{F,GeneralizedLog,T,N}
-typealias StandardLogCepstrum{F,T,N} MelGeneralizedCepstrum{F,StandardLog,T,N}
-typealias AllPoleLogCepstrum{F,T,N} MelGeneralizedCepstrum{F,AllPoleLog,T,N}
+function Base.call(::Type{GeneralizedCepstrum}, order::Int, γ::Real)
+    MelGeneralizedCepstrum{LinearFrequency,GeneralizedLog}(order, 0.0, γ)
+end
 
-typealias LinearCepstrum{T,N} MelGeneralizedCepstrum{Linear,StandardLog,T,N}
-typealias MelCepstrum{T,N} MelGeneralizedCepstrum{Mel,StandardLog,T,N}
-typealias GeneralizedCepstrum{T,N} MelGeneralizedCepstrum{Linear,GeneralizedLog,T,N}
-typealias AllPoleCepstrum{T,N} MelGeneralizedCepstrum{Linear,AllPoleLog,T,N}
-typealias MelAllPoleCepstrum{T,N} MelGeneralizedCepstrum{Mel,AllPoleLog,T,N}
+function Base.call(::Type{MelCepstrum}, order::Int, α::Real)
+    MelGeneralizedCepstrum{MelFrequency,StandardLog}(order, α, 0.0)
+end
 
+function Base.call(::Type{LinearCepstrum}, order::Int)
+    MelGeneralizedCepstrum{LinearFrequency,StandardLog}(order, 0.0, 0.0)
+end
 
-immutable MelGeneralizedCepstrumFilterCoef{F<:Frequency,L<:Log,T<:FloatingPoint,N} <: AbstractMelGeneralizedCepstrumArray{F,L,T,N}
-    α::T
-    γ::T
+function Base.call(::Type{AllPoleCepstrum}, order::Int)
+    MelGeneralizedCepstrum{LinearFrequency,AllPoleLog}(order, 0.0, -1.0)
+end
+
+function Base.call(::Type{MelAllPoleCepstrum}, order::Int, α::Real)
+    MelGeneralizedCepstrum{MelFrequency,AllPoleLog}(order, α, -1.0)
+end
+
+params(c::MelGeneralizedCepstrum) = (c.order, c.α, c.γ)
+params(c::GeneralizedCepstrum) = (c.order, c.γ)
+params(c::MelCepstrum) = (c.order, c.α)
+params(c::LinearCepstrum) = (c.order,)
+params(c::AllPoleCepstrum) = (c.order,)
+params(c::MelAllPoleCepstrum) = (c.order, c.α)
+allpass_alpha(c::MelGeneralizedCepstrum) = c.α
+glog_gamma(c::MelGeneralizedCepstrum) = c.γ
+
+### Definitions of LPC variants ###
+
+abstract LinearPredictionCoefVariants <: SpectralParam
+
+# LPC, LSP and PARCOR
+immutable LinearPredictionCoef <: LinearPredictionCoefVariants
+    order
+end
+
+immutable LineSpectralPair <: LinearPredictionCoefVariants
+    order
+end
+
+immutable PartialAutoCorrelation <: LinearPredictionCoefVariants
+    order
+end
+
+params(s::LinearPredictionCoefVariants) = (s.order,)
+
+### State, which keeps actual computation results in arrays ###
+
+abstract AbstractParamState{T,N} <: AbstractArray{T,N}
+
+function paramdef(s::AbstractParamState)
+    error("should provide get access for parameter definition")
+end
+
+function rawdata(s::AbstractParamState)
+    error("should provide get access for raw data")
+end
+
+type SpectralParamState{S<:SpectralParam,T,N} <: AbstractParamState{T,N}
+    def::S
     data::Array{T,N}
 
-    function MelGeneralizedCepstrumFilterCoef(α::FloatingPoint,
-                                              γ::FloatingPoint,
-                                              data::Array{T,N})
-        abs(α) < 1 || throw(ArgumentError("|α| < 1 is supported"))
-        (-1 <= γ <= 0) || throw(ArgumentError("-1 <= γ <= 0 is supported"))
-        @assert size(data, 1) > 1
-        new(α, γ, data)
+    has_loggain::Bool
+    gain_normalized::Bool
+    ready_to_filt::Bool  # state is explicitly converted to filter coef or not.
+
+    function SpectralParamState(s::S, data::Array{T,N},
+                                has_loggain::Bool,
+                                gain_normalized::Bool,
+                                ready_to_filt::Bool)
+        new(s, data, has_loggain, gain_normalized, ready_to_filt)
     end
 end
 
-function MelGeneralizedCepstrumFilterCoef{T,N}(α::T, γ::T, data::Array{T,N})
-    F = (α == zero(T)) ? Linear : Mel
-
-    L = GeneralizedLog
-    if γ == zero(T)
-        L = StandardLog
-    elseif γ == -one(T)
-        L = AllPoleLog
-    end
-
-    MelGeneralizedCepstrumFilterCoef{F,L,T,N}(α, γ, data)
+function SpectralParamState{S<:SpectralParam,T,N}(s::S, data::Array{T,N},
+                                                  has_loggain::Bool,
+                                                  gain_normalized::Bool;
+                                                  ready_to_filt::Bool=false)
+    SpectralParamState{S,T,N}(s, data, has_loggain, gain_normalized,
+                              ready_to_filt)
 end
 
-function MelGeneralizedCepstrumFilterCoef(mgc::MelGeneralizedCepstrumFilterCoef)
-    α = allpass_alpha(mgc)
-    γ = glog_gamma(mgc)
-    MelGeneralizedCepstrumFilterCoef(α, γ, rawdata(mgc))
+eltype(s::SpectralParamState) = eltype(s.data)
+size(s::SpectralParamState) = size(s.data)
+size(s::SpectralParamState) = size(s.data)
+length(s::SpectralParamState) = length(s.data)
+getindex(s::SpectralParamState, i::Real) = getindex(s.data, i)
+getindex(s::SpectralParamState, i::Real...) = getindex(s.data, i...)
+
+# colon indexing like s[:,1]
+function getindex(s::SpectralParamState, i::Colon, j...)
+    SpectralParamState(paramdef(s), getindex(s.data, i, j...),
+                       has_loggain(s), gain_normalized(s),
+                       ready_to_filt=ready_to_filt(s))
 end
 
-typealias LMADFCoef{T,N} MelGeneralizedCepstrumFilterCoef{Linear,StandardLog,T,N}
-typealias MLSADFCoef{T,N} MelGeneralizedCepstrumFilterCoef{Mel,StandardLog,T,N}
-typealias MGLSADFCoef{T,N} MelGeneralizedCepstrumFilterCoef{Mel,GeneralizedLog,T,N}
+setindex!(s::SpectralParamState, i::Real) = setindex!(s.data, i)
+setindex!(s::SpectralParamState, i::Real...) = setindex!(s.data, i...)
+setindex!(s::SpectralParamState, i::Colon, j...) = setindex!(s.data, i, j...)
 
-## AbstractArray implementation ##
+paramdef(s::SpectralParamState) = s.def
+rawdata(s::SpectralParamState) = s.data
+has_loggain(s::SpectralParamState) = s.has_loggain
+gain_normalized(s::SpectralParamState) = s.gain_normalized
+ready_to_filt(s::SpectralParamState) = s.ready_to_filt
 
-eltype(c::AbstractMelGeneralizedCepstrumArray) = eltype(c.data)
-length(c::AbstractMelGeneralizedCepstrumArray) = length(c.data)
-size(c::AbstractMelGeneralizedCepstrumArray) = size(c.data)
-getindex(c::AbstractMelGeneralizedCepstrumArray, i::Real) = getindex(c.data, i)
-getindex(c::AbstractMelGeneralizedCepstrumArray, i::Real...) = getindex(c.data, i...)
-function getindex(c::MelGeneralizedCepstrum, i::Range, j::Real)
-    α = allpass_alpha(c)
-    γ = glog_gamma(c)
-    MelGeneralizedCepstrum(α, γ, getindex(c.data, i, j))
+function similar(s::SpectralParamState)
+    def = paramdef(s)
+    data = rawdata(s)
+    SpectralParamState(def, similar(data), has_loggain(s), gain_normalized(s),
+                       ready_to_filt=ready_to_filt(s))
 end
-function getindex(c::MelGeneralizedCepstrumFilterCoef, i::Range, j::Real)
-    α = allpass_alpha(c)
-    γ = glog_gamma(c)
-    MelGeneralizedCepstrumFilterCoef(α, γ, getindex(c.data, i, j))
+
+function copy(s::SpectralParamState)
+    def = paramdef(s)
+    data = rawdata(s)
+    SpectralParamState(def, copy(data), has_loggain(s), gain_normalized(s),
+                       ready_to_filt=ready_to_filt(s))
 end
-getindex(c::AbstractMelGeneralizedCepstrumArray, i::Real, j::Range) = getindex(c.data, i, j)
-eltype(c::AbstractMelGeneralizedCepstrumArray) = Base.eltype(g.data)
 
-## Mel-generalized cepstrum related functions ##
+# Force re-type mel-generalized cepstrums by its parameter values
+# needed?
+function retype{T<:MelGeneralizedCepstrum}(s::SpectralParamState{T})
+    def = paramdef(s)
+    newdef = MelGeneralizedCepstrum(def)
+    SpectralParamState(newdef, rawdata(s), has_loggain(s), gain_normalized(s),
+                       ready_to_filt=ready_to_filt(s))
+end
 
-rawdata(c::AbstractMelGeneralizedCepstrumArray) = c.data
-order(c::AbstractMelGeneralizedCepstrumArray) = size(c.data, 1) - 1
-allpass_alpha(c::AbstractMelGeneralizedCepstrumArray) = c.α
-glog_gamma(c::AbstractMelGeneralizedCepstrumArray) = c.γ
-powercoef{F,L,T}(c::AbstractMelGeneralizedCepstrumArray{F,L,T,1}) = first(rawdata(c))
-powercoef{F,L,T}(c::AbstractMelGeneralizedCepstrumArray{F,L,T,2}) = rawdata(c)[1,:]
+
+### Asserts ###
+
+function assert_ready_to_filt(state::SpectralParamState)
+    ready_to_filt(state) && return nothing
+    throw(ArgumentError("""ready_to_filt = $(ready_to_filt(state))
+                        filter coefficient input is expected"""))
+end
+
+function assert_not_ready_to_filt(state::SpectralParamState)
+    !ready_to_filt(state) && return nothing
+    throw(ArgumentError("""ready_to_filt = $(ready_to_filt(state))
+                        filter coefficient input (can be obtain by `mgc2b` or `mc2b`) is not allowed"""))
+end
+
+function assert_gain_normalized(state::SpectralParamState)
+    gain_normalized(state) && return nothing
+    throw(ArgumentError("""gain_normalized: $(gain_normalized(state))
+                        gain is assumed to be normalized"""))
+end
+
+function assert_gain_unnormalized(state::SpectralParamState)
+    gain_normalized(state) || return nothing
+    throw(ArgumentError("""gain_normalized: $(gain_normalized(state))
+                        gain is assumed to be un-normalized"""))
+end
