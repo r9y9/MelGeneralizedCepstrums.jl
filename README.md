@@ -32,7 +32,7 @@ logH = real(mgc2sp(c, 1024))
 logspec = 20.0/log(10)*logH # 20log10(|H(ω)|)  = 20/log(10)*log(|H(ω)|)
 ```
 
-![](examples/c.png)
+![](examples/cepstrum.png)
 
 ### Mel-Cepstrum
 
@@ -43,7 +43,7 @@ logH = real(mgc2sp(mc, 1024))
 logspec = 20.0/log(10)*logH
 ```
 
-![](examples/mcep.png)
+![](examples/mel-cepstrum.png)
 
 ### LPC-Cepstrum
 
@@ -54,7 +54,7 @@ logH = real(mgc2sp(mgc, 1024))
 logspec = 20.0/log(10)*logH
 ```
 
-![](examples/lpc.png)
+![](examples/lpc-cepstrum.png)
 
 ### Warped LPC-Cepstrum
 
@@ -65,7 +65,7 @@ logH = real(mgc2sp(mgc, 1024))
 logspec = 20.0/log(10)*logH
 ```
 
-![](examples/wlpc.png)
+![](examples/warped-lpc-cepstrum.png)
 
 ### Generalized Cepstrum
 
@@ -76,7 +76,7 @@ logH = real(mgc2sp(mgc, 1024))
 logspec = 20.0/log(10)*logH
 ```
 
-![](examples/gcep.png)
+![](examples/generalized-cepstrum.png)
 
 ### Mel-Generalized Cepstrum
 
@@ -87,6 +87,6 @@ logH = real(mgc2sp(mgc, 1024))
 logspec = 20.0/log(10)*logH
 ```
 
-![](examples/mgcep.png)
+![](examples/mel-generalized-cepstrum.png)
 
 For the complete code of visualizations shown above, please check [the ijulia notebook](http://nbviewer.ipython.org/github/r9y9/MelGeneralizedCepstrums.jl/blob/master/examples/MelGeneralizedCepstrumsBasedEnvelope.ipynb).
