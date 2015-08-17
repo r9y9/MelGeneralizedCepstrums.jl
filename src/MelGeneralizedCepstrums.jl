@@ -15,7 +15,11 @@ export
     PartialAutoCorrelation,
 
     # State, which keeps actual spectral parameter values
-    SpectralParamState,
+    SpectralParamState, # subtype of AbstractArray
+
+    # typealiases for SpectralParamState
+    SpectralParamStateVector,
+    SpectralParamStateMatrix,
 
     # Generic interfaces
     estimate,        # estimate spectral parameter values
@@ -32,6 +36,9 @@ export
     has_loggain,
     gain_normalized,
     ready_to_filt,
+
+    loggain!,
+    unloggain!,
 
     # Spectral parameter estimation
     gcep,            # generalized cepstrum analysis

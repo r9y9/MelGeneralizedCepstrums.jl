@@ -8,6 +8,29 @@ import MelGeneralizedCepstrums: freq_form, log_form, rawdata, MelFrequency,
 
 ### Test functions ###
 
+function test_spectral_param_state()
+    srand(98765)
+
+    # state that doesn't have loggain
+    s = SpectralParamState(LinearPredictionCoef(20), rand(21, 2), false, true)
+    s_copy= copy(s)
+    loggain!(s_copy)
+    @test s_copy[1,1] == log(s[1,1])
+    @test s_copy[1,2] == log(s[1,2])
+
+    unloggain!(s_copy)
+    @test s_copy[1,1] == s[1,1]
+    @test s_copy[1,2] == s[1,2]
+
+    # state that has loggain
+    s = SpectralParamState(LinearCepstrum(20), rand(21, 2), true, true)
+    s_copy= copy(s)
+
+    loggain!(s_copy)
+    @test s_copy[1,1] == s[1,1]
+    @test s_copy[1,2] == s[1,2]
+end
+
 function test_mcep_special_cases(order=20)
     # Linear frequency cepstrum
     mc = MelCepstrum(order, 0.0)
@@ -427,6 +450,9 @@ function test_inplace_extend()
 end
 
 ###  Perform tests ###
+
+println("testing: spectral param state")
+test_spectral_param_state()
 
 let
     println("testing: gcep")

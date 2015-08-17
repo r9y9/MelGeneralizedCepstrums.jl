@@ -162,6 +162,9 @@ type SpectralParamState{S<:SpectralParam,T,N} <: AbstractParamState{T,N}
     end
 end
 
+typealias SpectralParamStateVector{S,T} SpectralParamState{S,T,1}
+typealias SpectralParamStateMatrix{S,T} SpectralParamState{S,T,2}
+
 function SpectralParamState{S<:SpectralParam,T,N}(s::S, data::Array{T,N},
                                                   has_loggain::Bool,
                                                   gain_normalized::Bool;
@@ -193,6 +196,42 @@ rawdata(s::SpectralParamState) = s.data
 has_loggain(s::SpectralParamState) = s.has_loggain
 gain_normalized(s::SpectralParamState) = s.gain_normalized
 ready_to_filt(s::SpectralParamState) = s.ready_to_filt
+
+function loggain!(s::SpectralParamStateVector)
+    has_loggain(s) && return s
+    data = rawdata(s)
+    data[1] = log(data[1])
+    s.has_loggain = true
+    s
+end
+
+function loggain!(s::SpectralParamStateMatrix)
+    has_loggain(s) && return s
+    data = rawdata(s)
+    for i in 1:size(s, 2)
+        data[1,i] = log(data[1,i])
+    end
+    s.has_loggain = true
+    s
+end
+
+function unloggain!(s::SpectralParamStateVector)
+    !has_loggain(s) && return s
+    data = rawdata(s)
+    data[1] = exp(data[1])
+    s.has_loggain = false
+    s
+end
+
+function unloggain!(s::SpectralParamStateMatrix)
+    !has_loggain(s) && return s
+    data = rawdata(s)
+    for i in 1:size(s, 2)
+        data[1,i] = exp(data[1,i])
+    end
+    s.has_loggain = false
+    s
+end
 
 function similar(s::SpectralParamState)
     def = paramdef(s)
