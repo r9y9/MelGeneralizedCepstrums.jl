@@ -55,7 +55,6 @@ export
     lpc2par,         # LPC -> PARCOR
     mc2b,            # mel-cepstrum -> mlsadf filter coef.
     mc2b!,           #
-    mc2e,            # mel-cesptrum to energy (TODO: need more tests)
     mgc2b,           # mel-generalized cepstrum -> mglsadf coef.
     mgc2b!,          #
     mgc2sp,          # mel-generalized cepstrum -> spectrum envelope

@@ -2,7 +2,8 @@ using MelGeneralizedCepstrums
 using Base.Test
 
 import MelGeneralizedCepstrums: freq_form, log_form, rawdata, MelFrequency,
-    LinearFrequency, StandardLog, GeneralizedLog, AllPoleLog, mgcepnorm!, retype
+    LinearFrequency, StandardLog, GeneralizedLog, AllPoleLog, mgcepnorm!, retype,
+    mc2e
 
 @unix_only include("sptk.jl")
 
@@ -519,6 +520,20 @@ for order in [20, 25, 30]
             test_mc2e(order, α, fftlen)
         end
     end
+end
+
+let
+    println("testing: mc2e exceptions")
+    srand(98765)
+    x = rand(512)
+    state = estimate(MelCepstrum(20, 0.35), x)
+    mc2e(state)
+    state = estimate(LinearCepstrum(20), x)
+    mc2e(state)
+    state = estimate(GeneralizedCepstrum(20, -0.01), x)
+    @test_throws Exception mc2e(state)
+    state = estimate(MelGeneralizedCepstrum(20, 0.35, -0.01), x)
+    @test_throws Exception mc2e(state)
 end
 
 for order in [20, 25, 30]
