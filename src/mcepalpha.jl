@@ -15,13 +15,13 @@ function mcepalpha(fs::Real;
 end
 
 function melscale_vector(fs::Real, len::Integer)
-    const step = (fs / 2.0) / len
+    step = (fs / 2.0) / len
     melscalev = 1000.0/log(2)*log(1 + step.*(1:len)./1000.0)
     return melscalev / melscalev[end]
 end
 
 function warping_vector(α::Float64, len::Integer)
-    const step = π / len
+    step = π / len
     ω = step .* (1:len)
     num = (1-α*α) * sin(ω)
     den = (1+α*α) * cos(ω) - 2*α
