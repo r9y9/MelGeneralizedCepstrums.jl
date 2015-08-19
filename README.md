@@ -5,6 +5,8 @@
 [![Coverage Status](https://coveralls.io/repos/r9y9/MelGeneralizedCepstrums.jl/badge.svg?branch=master)](https://coveralls.io/r/r9y9/MelGeneralizedCepstrums.jl?branch=master)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
 
+![](examples/mel-generalized-cepstrum.png)
+
 MelGeneralizedCepstrums.jl provides a mel generalized cepstrum anlysis for spectral envelope estimation that includes:
 
 - linear predicition analysis (LPC)
@@ -12,81 +14,22 @@ MelGeneralizedCepstrums.jl provides a mel generalized cepstrum anlysis for spect
 - mel-cepstrum analysis
 - mel-generalized cepstrum analysis
 
-This package also provides mel-generalized cepstrum conversions, e.g mel-generalized cepstrum to mel-cepstrum, mel-cepstrum to (linear frequency) cepstrum, mel-cesptrum to filter coefficients of waveform synthesis filter (known as mel-log spectrum approximation digital filter), and vise versa.
+The package also provides mel-generalized cepstrum conversions, e.g, mel-generalized cepstrum to mel-cepstrum, mel-cepstrum to (linear frequency) cepstrum, mel-cesptrum to filter coefficients, and vise versa.
 
-Note that this package is built on top of [SPTK.jl](https://github.com/r9y9/SPTK.jl). A part of the core is re-writen in Julia language from [Speech Signal Processing Toolkit (SPTK)](http://sp-tk.sourceforge.net/).
+Note that this package is built on top of [SPTK.jl](https://github.com/r9y9/SPTK.jl). The package is designed to provides a Julia-like interface with a focus on the mel-generalized cepstrum analysis in the SPTK. A part of the core is re-writen in Julia language from [Speech Signal Processing Toolkit (SPTK)](http://sp-tk.sourceforge.net/).
 
+## Demonstration notebook
 
-## How spectral envelope estimation works
+- [Introduction notebook](http://nbviewer.ipython.org/github/r9y9/MelGeneralizedCepstrums.jl/blob/master/examples/MelGeneralizedCepstrumsBasedEnvelope.ipynb): a brief introduction that shows how the mel-generalized cepstrum analysis works.
 
-We show how the spectral envelope estimation works. Suppose that we have a *windowed* speech signal `x` and we want to extact spectral enelope from that.
+## Supported Platforms
 
-![](examples/windowed.png)
+- Linux
+- Mac OS X
+- Windows
 
-### Linear frequency Cepstrum
-
-```julia
-c = estimate(LinearCepstrum(20), x)
-
-logH = real(mgc2sp(c, 1024))
-logspec = 20.0/log(10)*logH # 20log10(|H(ω)|)  = 20/log(10)*log(|H(ω)|)
-```
-
-![](examples/cepstrum.png)
-
-### Mel-Cepstrum
+## Installation
 
 ```julia
-mc = estimate(MelCepstrum(20, 0.41), x)
-
-logH = real(mgc2sp(mc, 1024))
-logspec = 20.0/log(10)*logH
+Pkg.clone("https://github.com/r9y9/MelGeneralizedCepstrums.jl")
 ```
-
-![](examples/mel-cepstrum.png)
-
-### LPC-Cepstrum
-
-```julia
-lpc = estimate(AllPoleCepstrum(20), x)
-
-logH = real(mgc2sp(mgc, 1024))
-logspec = 20.0/log(10)*logH
-```
-
-![](examples/lpc-cepstrum.png)
-
-### Warped LPC-Cepstrum
-
-```julia
-mgc = estimate(MelGeneralizedCepstrum(20, 0.41, -1.0), x)
-
-logH = real(mgc2sp(mgc, 1024))
-logspec = 20.0/log(10)*logH
-```
-
-![](examples/warped-lpc-cepstrum.png)
-
-### Generalized Cepstrum
-
-```julia
-mgc = estimate(GeneralizedCepstrum(20, -0.35), x)
-
-logH = real(mgc2sp(mgc, 1024))
-logspec = 20.0/log(10)*logH
-```
-
-![](examples/generalized-cepstrum.png)
-
-### Mel-Generalized Cepstrum
-
-```julia
-mgc = estimate(MelGeneralizedCepstrum(20, 0.41, -0.35), x)
-
-logH = real(mgc2sp(mgc, 1024))
-logspec = 20.0/log(10)*logH
-```
-
-![](examples/mel-generalized-cepstrum.png)
-
-For the complete code of visualizations shown above, please check [the ijulia notebook](http://nbviewer.ipython.org/github/r9y9/MelGeneralizedCepstrums.jl/blob/master/examples/MelGeneralizedCepstrumsBasedEnvelope.ipynb).
