@@ -1,85 +1,28 @@
-using MelGeneralizedCepstrums: _mcep, _mgcep, mc2b
+using MelGeneralizedCepstrums
+
+import MelGeneralizedCepstrums: _mcep, _mgcep
 import SPTK
 
-function perf_mc2b()
-    println("benchmark: mc2b")
+
+function perf(f1, f2, params...; name="foo", n=100, N=1024)
+    println("benchmark: $name")
 
     srand(98765)
-    mc = rand(21)
-    α = 0.41
-    n = 50000
+    x = rand(N)
 
-    mc2b(mc, α)
-    SPTK.mc2b(mc, α)
+    @show params
+    f1(x, params...)
+    f2(x, params...)
 
     @time begin
         elapsed = @elapsed for i=1:n
-            mc2b(mc, α)
+            f1(x, params...)
         end
     end
 
     @time begin
         elapsed_sptk = @elapsed for i=1:n
-            SPTK.mc2b(mc, α)
-        end
-    end
-
-    r = elapsed/elapsed_sptk
-    println("$r x slower than SPTK implementation")
-end
-
-function perf_mcep()
-    println("benchmark: mcep")
-
-    srand(98765)
-    x = rand(1024)
-
-    n = 2000
-    order = 25
-    α = 0.41
-
-    _mcep(x, order, α)
-    SPTK.mcep(x, order, α)
-
-    @time begin
-        elapsed = @elapsed for i=1:n
-            _mcep(x, order, α)
-        end
-    end
-
-    @time begin
-        elapsed_sptk = @elapsed for i=1:n
-            SPTK.mcep(x, order, α)
-        end
-    end
-
-    r = elapsed/elapsed_sptk
-    println("$r x slower than SPTK implementation")
-end
-
-function perf_mgcep()
-    println("benchmark: mgcep")
-
-    srand(98765)
-    x = rand(1024)
-
-    n = 200
-    order = 25
-    α = 0.41
-    γ = -0.1
-
-    _mgcep(x, order, α, γ)
-    SPTK.mgcep(x, order, α, γ)
-
-    @time begin
-        elapsed = @elapsed for i=1:n
-            _mgcep(x, order, α, γ)
-        end
-    end
-
-    @time begin
-        elapsed_sptk  = @elapsed for i=1:n
-            SPTK.mgcep(x, order, α, γ)
+            f2(x, params...)
         end
     end
 
@@ -90,10 +33,16 @@ end
 gc_enable(false)
 
 gc()
-perf_mcep()
+perf(_mgcep, SPTK.mgcep, 25, 0.41, -0.1; name="mgcep", n=200, N=1024)
 
 gc()
-perf_mgcep()
+perf(_mcep, SPTK.mcep, 25, 0.41; name="mcep", n=2000, N=1024)
 
 gc()
-perf_mc2b()
+perf(mc2b, SPTK.mc2b, 0.41; name="mb2b", n=20000, N=25)
+
+gc()
+perf(b2mc, SPTK.b2mc, 0.41; name="b2mc", n=20000, N=25)
+
+gc()
+perf(freqt, SPTK.freqt, 30, 0.41; name="freqt", n=20000, N=25)
