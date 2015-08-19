@@ -20,7 +20,7 @@ Note that this package is built on top of [SPTK.jl](https://github.com/r9y9/SPTK
 
 ## Demonstration notebook
 
-- [Introduction notebook](http://nbviewer.ipython.org/github/r9y9/MelGeneralizedCepstrums.jl/blob/master/examples/MelGeneralizedCepstrumsBasedEnvelope.ipynb): a brief introduction that shows how the mel-generalized cepstrum analysis works.
+- [Introduction notebook](https://github.com/r9y9/MelGeneralizedCepstrums.jl/blob/master/examples/Introduction%20to%20MelGeneralizedCeptrums.jl.ipynb): a brief introduction that shows how the mel-generalized cepstrum analysis works.
 
 ## Supported Platforms
 
