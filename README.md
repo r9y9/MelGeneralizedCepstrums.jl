@@ -31,5 +31,5 @@ Note that this package is built on top of [SPTK.jl](https://github.com/r9y9/SPTK
 ## Installation
 
 ```julia
-Pkg.clone("https://github.com/r9y9/MelGeneralizedCepstrums.jl")
+Pkg.add("MelGeneralizedCepstrums")
 ```
