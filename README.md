@@ -33,3 +33,8 @@ Note that this package is built on top of [SPTK.jl](https://github.com/r9y9/SPTK
 ```julia
 Pkg.add("MelGeneralizedCepstrums")
 ```
+
+## Related packages
+
+- [SynthesisFilters.jl](https://github.com/r9y9/SynthesisFilters.jl): speech waveform synthesis filters, especially from mel-generalized cepstrums
+- [WORLD.jl](https://github.com/r9y9/WORLD.jl): a lightweight julia wrapper for WORLD - a high-quality speech analysis, modification and synthesis system
