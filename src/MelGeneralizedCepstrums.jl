@@ -55,6 +55,7 @@ export
     lpc2c,           # LPC to cepstrum
     lpc2lsp,         # LPC -> LSP
     lpc2par,         # LPC -> PARCOR
+    par2lpc,         # PARCOR -> LPC
     mc2b,            # mel-cepstrum -> mlsadf filter coef.
     mc2b!,           #
     mgc2b,           # mel-generalized cepstrum -> mglsadf coef.
@@ -80,6 +81,7 @@ for fname in [
               "lpc2c",
               "lpc2lsp",
               "lpc2par",
+              "par2lpc",
               "mcepalpha",
               "mc2b",
               "mc2e",

@@ -244,6 +244,19 @@ function test_lpc2c(order=20)
     @test !ready_to_filt(state2)
 end
 
+function test_lpc_and_par_conversion(order=20)
+    srand(98765)
+    x = rand(512)
+
+    lpc_state1 = estimate(LinearPredictionCoef(order), x)
+    @test all(isfinite(rawdata(lpc_state1)))
+    par_state = lpc2par(lpc_state1)
+    @test all(isfinite(rawdata(par_state)))
+    lpc_state2 = par2lpc(par_state)
+
+    @test_approx_eq rawdata(lpc_state1) rawdata(lpc_state2)
+end
+
 function test_mc2b(order=20, α=0.41)
     srand(98765)
     x = rand(512)
@@ -493,6 +506,11 @@ end
 for order in 15:5:25
     println("lpc2c: testing with order=$order")
     test_lpc2c(order)
+end
+
+for order in 15:5:25
+    println("par2lpc and lpc2par: testing with order=$order")
+    test_lpc_and_par_conversion(order)
 end
 
 for order in 15:5:25
