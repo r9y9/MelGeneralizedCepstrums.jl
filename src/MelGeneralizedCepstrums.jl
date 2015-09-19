@@ -51,26 +51,28 @@ export
 
     mcepalpha,       # determine appropriate all pass constant in mel-cesptum
 
-    # Conversions
+    # LPC, LSP and PARCOR conversions
     lpc2c,           # LPC to cepstrum
     lpc2lsp,         # LPC -> LSP
     lpc2par,         # LPC -> PARCOR
     par2lpc,         # PARCOR -> LPC
-    mc2b,            # mel-cepstrum -> mlsadf filter coef.
-    mc2b!,           #
-    mgc2b,           # mel-generalized cepstrum -> mglsadf coef.
+
+    # Mel-generalized cepstrum conversions
+    mgc2b,           # mel-generalized cepstrum -> MGLSADF coef.
     mgc2b!,          #
-    mgc2sp,          # mel-generalized cepstrum -> spectrum envelope
-    b2mc,            # mlsadf filter coef. -> mel-cepstrum
+    mc2b,            # mel-cepstrum -> MLSADF coef.
+    mc2b!,           #
+    b2mc,            # MLSADF coef. -> mel-cepstrum
     b2mc!,           #
-    gnorm,           # gain normalization for mel-generalized cepstrum
-    gnorm!,          #
-    ignorm,          # inverse gain normalization for mel-generalized cepstrum
-    ignorm!,         #
     c2ir,            # cepstrum -> impulse response
+    gc2gc,           # generalized cepstrum -> generalized cepstrum
+    gnorm,           # gain normalization
+    gnorm!,          #
+    ignorm,          # inverse gain normalization
+    ignorm!,         #
     freqt,           # frequency transform
-    gc2gc,           # generalized cepstrum -> genralized cepstrum
-    mgc2mgc          # mel-generalized cepstrum -> mel-generalized cepstrum
+    mgc2mgc,         # mel-generalized cepstrum -> mel-generalized cepstrum
+    mgc2sp           # mel-generalized cepstrum -> spectrum envelope
 
 for fname in [
               "common",
@@ -83,19 +85,19 @@ for fname in [
               "lpc2par",
               "par2lpc",
               "mcepalpha",
-              "mc2b",
-              "mc2e",
               "mgc2b",
-              "mgc2sp",
-              "b2mc",
               "b2c",
+              "mc2e",
+              "frqtr",
+              "mc2b",
+              "b2mc",
+              "c2ir",
+              "gc2gc",
               "gnorm",
               "ignorm",
-              "c2ir",
               "freqt",
-              "frqtr",
-              "gc2gc",
               "mgc2mgc",
+              "mgc2sp",
               "extend"
     ]
     include(string(fname, ".jl"))
