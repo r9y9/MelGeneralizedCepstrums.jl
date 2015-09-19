@@ -1,7 +1,7 @@
 # Mel-cepstrum analysis
 # re-coded from SPTK
 
-function fill_al!{T<:FloatingPoint}(al::Vector{T}, α::FloatingPoint)
+function fill_al!{T<:AbstractFloat}(al::Vector{T}, α::AbstractFloat)
     al[1] = one(T)
     for i=2:length(al)
         @inbounds al[i] = -α*al[i-1]
@@ -51,12 +51,12 @@ function update_toeplitz_elements!(te::AbstractVector, c::AbstractVector)
     te
 end
 
-function periodogram2mcep{T<:FloatingPoint}(periodogram::AbstractVector{T}, # modified periodogram
+function periodogram2mcep{T<:AbstractFloat}(periodogram::AbstractVector{T}, # modified periodogram
                                             order::Int=40,                  # order of mel-cepstrum
-                                            α::FloatingPoint=0.41;          # all-pass constant
+                                            α::AbstractFloat=0.41;          # all-pass constant
                                             miniter::Int=2,
                                             maxiter::Int=30,
-                                            criteria::FloatingPoint=0.001,  # stopping criteria
+                                            criteria::AbstractFloat=0.001,  # stopping criteria
                                             e::T=zero(T),                   # floor of periodogram
                                             verbose::Bool=false)
     logperiodogram = log(periodogram + e)

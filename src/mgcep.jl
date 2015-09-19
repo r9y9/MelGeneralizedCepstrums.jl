@@ -38,7 +38,7 @@
 # Gain normalization (e.g. b -> b'):
 # bₐ,ᵧ'(m) = bₐ,ᵧ(m) / (1 + γbₐ,ᵧ(0))
 
-function ptrans!{T}(p::AbstractVector{T},  m::Int, α::FloatingPoint)
+function ptrans!{T}(p::AbstractVector{T},  m::Int, α::AbstractFloat)
     d, o = zero(T), zero(T)
 
     d = p[m+1]
@@ -54,7 +54,7 @@ function ptrans!{T}(p::AbstractVector{T},  m::Int, α::FloatingPoint)
     p
 end
 
-function qtrans!{T}(q::AbstractVector{T},  m::Int, α::FloatingPoint)
+function qtrans!{T}(q::AbstractVector{T},  m::Int, α::AbstractFloat)
     d = q[2]
     @inbounds for i=2:2m
         o = q[i+1] + α*d
@@ -66,7 +66,7 @@ function qtrans!{T}(q::AbstractVector{T},  m::Int, α::FloatingPoint)
 end
 
 function gain{T}(er::AbstractVector{T}, c::AbstractVector{T}, m::Int,
-                 g::FloatingPoint)
+                 g::AbstractFloat)
     t = zero(T)
     if g != zero(T)
         for i=2:m+1
@@ -81,8 +81,8 @@ end
 function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     x::AbstractVector{T}, # modified periodogram
                     order::Int,           # order of cepstrum
-                    α::FloatingPoint,     # allpass constant
-                    γ::FloatingPoint,     # parameter of generalized log function
+                    α::AbstractFloat,     # allpass constant
+                    γ::AbstractFloat,     # parameter of generalized log function
                     n::Int,               # the order of recursion
                     iter::Int,            # current iter #
                     y_fft::Array{Complex{T}}, # *length must be equal to length(x)*
@@ -236,9 +236,9 @@ end
 # 5: K, γbₐ,ᵧ'(1), ..., γbₐ,ᵧ'(m)
 #
 # For simplicity, we represent bₐ,ᵧ as bᵧ.
-function mgcepnorm!{T<:FloatingPoint}(bᵧ′::AbstractVector{T},
-                                      α::FloatingPoint,
-                                      γ::FloatingPoint,
+function mgcepnorm!{T<:AbstractFloat}(bᵧ′::AbstractVector{T},
+                                      α::AbstractFloat,
+                                      γ::AbstractFloat,
                                       otype::Int)
     0<=otype<=5 || throw(ArgumentError("0 ≤ otype ≤ 5 are supported"))
 
@@ -276,7 +276,7 @@ function _mgcep(x::AbstractVector,          # a *windowed* signal
                 n::Int=length(x)-1,            # order of recursion
                 miniter::Int=2,
                 maxiter::Int=30,
-                criteria::FloatingPoint=0.001, # stopping criteria
+                criteria::AbstractFloat=0.001, # stopping criteria
                 e::Real=zero(eltype(x)),       # floor of
                 otype::Int=0,                  # output type
                 verbose::Bool=false
