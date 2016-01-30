@@ -1,5 +1,10 @@
 # Check consistency with SPTK
 
+module SPTKTest
+
+using MelGeneralizedCepstrums
+using Base.Test
+
 import SPTK
 import MelGeneralizedCepstrums: lpc2c!, b2c, frqtr, frqtr!
 
@@ -230,3 +235,5 @@ end
 
 println("lpc2c: testing")
 test_lpc2c()
+
+end # module SPTKTestModule

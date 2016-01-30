@@ -175,7 +175,6 @@ end
 
 eltype(s::SpectralParamState) = eltype(s.data)
 size(s::SpectralParamState) = size(s.data)
-size(s::SpectralParamState) = size(s.data)
 length(s::SpectralParamState) = length(s.data)
 getindex(s::SpectralParamState, i::Real) = getindex(s.data, i)
 getindex(s::SpectralParamState, i::Real...) = getindex(s.data, i...)
