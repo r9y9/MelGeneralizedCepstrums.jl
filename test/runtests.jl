@@ -549,9 +549,9 @@ let
     state = estimate(LinearCepstrum(20), x)
     mc2e(state)
     state = estimate(GeneralizedCepstrum(20, -0.01), x)
-    @test_throws Exception mc2e(state)
+    @test_throws ErrorException mc2e(state)
     state = estimate(MelGeneralizedCepstrum(20, 0.35, -0.01), x)
-    @test_throws Exception mc2e(state)
+    @test_throws ErrorException mc2e(state)
 end
 
 for order in [20, 25, 30]
