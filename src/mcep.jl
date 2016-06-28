@@ -83,7 +83,7 @@ function periodogram2mcep{T<:AbstractFloat}(periodogram::AbstractVector{T}, # mo
     c[xh+1] /= 2.0
 
     # Initial value of mel-cesptrum
-    mc = freqt(sub(c, 1:xh+1), order, α)
+    mc = freqt(view(c, 1:xh+1), order, α)
     czero = c[1]
 
     # Allocate memory for solving linear equation (Tm + Hm)d = b
@@ -98,9 +98,9 @@ function periodogram2mcep{T<:AbstractFloat}(periodogram::AbstractVector{T}, # mo
     fill_al!(al, α)
 
     # Newton raphson roop
-    ch = sub(c, 1:xh+1)
+    ch = view(c, 1:xh+1)
     ch_copy = Array(T, xh+1)
-    c_frqtr = sub(c, 1:2order+1)
+    c_frqtr = view(c, 1:2order+1)
     for i=1:maxiter
         fill!(c, zero(T))
         freqt!(ch, mc, -α)

@@ -13,7 +13,7 @@ end
 function mc2e(mc::AbstractMatrix, α=0.35, len=256)
     r = Array(eltype(mc), size(mc, 2))
     for i in 1:length(r)
-        r[i] = mc2e(sub(mc, :, i), α, len)
+        r[i] = mc2e(view(mc, :, i), α, len)
     end
     r
 end

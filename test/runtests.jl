@@ -5,7 +5,7 @@ import MelGeneralizedCepstrums: freq_form, log_form, rawdata, MelFrequency,
     LinearFrequency, StandardLog, GeneralizedLog, AllPoleLog, mgcepnorm!, retype,
     mc2e
 
-@unix_only include("sptk.jl")
+@static is_linux() ? include("sptk.jl") : nothing
 
 ### Test functions ###
 
@@ -422,7 +422,7 @@ function test_extend()
     mc = rand(21)
     mc_mat = repmat(mc, 1, 2)
     mc_mat2 = copy(mc_mat)
-    mc_submat = sub(mc_mat2, 1:size(mc_mat2, 1), 1:size(mc_mat2, 2))
+    mc_submat = view(mc_mat2, 1:size(mc_mat2, 1), 1:size(mc_mat2, 2))
 
     # case 1: Vector input
     r1 = mc2b(mc, 0.41)
@@ -445,7 +445,7 @@ function test_inplace_extend()
     mc = rand(21)
     mc_mat = repmat(mc, 1, 2)
     mc_mat2 = copy(mc_mat)
-    mc_submat = sub(mc_mat2, 1:size(mc_mat2, 1), 1:size(mc_mat2, 2))
+    mc_submat = view(mc_mat2, 1:size(mc_mat2, 1), 1:size(mc_mat2, 2))
 
     mc_org = copy(mc)
 

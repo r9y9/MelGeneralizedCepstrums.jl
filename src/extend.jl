@@ -18,7 +18,7 @@ for f in vec2vec_inplace
     @eval begin
         function ($f)(x::AbstractMatrix, args...; kargs...)
             for i = 1:size(x, 2)
-                @inbounds $f(sub(x, :, i), args...; kargs...)
+                @inbounds $f(view(x, :, i), args...; kargs...)
             end
             x
         end
@@ -50,7 +50,7 @@ for f in vec2vec
                 @inbounds ret[i, 1] = r[i]
             end
             for i = 2:size(x, 2)
-                @inbounds ret[:, i] = $f(sub(x, :, i), args...; kargs...)
+                @inbounds ret[:, i] = $f(view(x, :, i), args...; kargs...)
             end
             ret
         end
