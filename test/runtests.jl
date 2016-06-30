@@ -1,4 +1,6 @@
 using MelGeneralizedCepstrums
+using Compat
+import Compat: view
 using Base.Test
 
 import MelGeneralizedCepstrums: freq_form, log_form, rawdata, MelFrequency,
