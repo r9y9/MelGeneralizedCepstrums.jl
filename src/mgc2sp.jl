@@ -13,7 +13,7 @@ end
 function mgc2sp{T<:AbstractFloat}(mgc::AbstractMatrix{T}, α=0.0, γ=0.0, fftlen=256)
     sp = Array{Complex{T}}(fftlen>>1 + 1, size(mgc, 2))
     for i in 1:size(mgc, 2)
-        @inbounds sp[:,i] = mgc2sp(sub(mgc, :, i), α, γ, fftlen)
+        @inbounds sp[:,i] = mgc2sp(view(mgc, :, i), α, γ, fftlen)
     end
     sp
 end

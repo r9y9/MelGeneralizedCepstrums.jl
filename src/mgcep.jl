@@ -107,7 +107,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     copy!(cr, 2, c, 2, order)
 
     if α != zero(T)
-        b2c!(sub(cr, 1:n+1), cr[1:order+1], -α)
+        b2c!(view(cr, 1:n+1), cr[1:order+1], -α)
     end
 
     y = fft(cr)
@@ -145,7 +145,7 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
     # scale!(pr, FFTW.normalization(pr))
 
     if α != zero(T)
-        b2c!(sub(pr, 1:2order+1), pr[1:n+1], α)
+        b2c!(view(pr, 1:2order+1), pr[1:n+1], α)
     end
 
     if γ == zero(T) || γ == -one(T)
@@ -171,8 +171,8 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         # scale!(rr, FFTW.normalization(rr))
 
         if α != zero(T)
-            b2c!(sub(qr, 1:n+1), qr[1:n+1], α)
-            b2c!(sub(rr, 1:order+1), rr[1:n+1], α)
+            b2c!(view(qr, 1:n+1), qr[1:n+1], α)
+            b2c!(view(rr, 1:order+1), rr[1:n+1], α)
         end
     end
 
@@ -195,9 +195,9 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
         end
     end
 
-    te = sub(pr, 1:order)
+    te = view(pr, 1:order)
     fill_toeplitz!(Tm, te)
-    he = sub(qr, 3:2order+1)
+    he = view(qr, 3:2order+1)
     fill_hankel!(Hm, he)
 
     for i=1:length(Hm)

@@ -86,23 +86,23 @@ function MelGeneralizedCepstrum(mgc::MelGeneralizedCepstrum)
     MelGeneralizedCepstrum(order, α, γ)
 end
 
-function Base.call(::Type{GeneralizedCepstrum}, order::Int, γ::Real)
+@compat function (::Type{GeneralizedCepstrum})(order::Int, γ::Real)
     MelGeneralizedCepstrum{LinearFrequency,GeneralizedLog}(order, 0.0, γ)
 end
 
-function Base.call(::Type{MelCepstrum}, order::Int, α::Real)
+@compat function (::Type{MelCepstrum})(order::Int, α::Real)
     MelGeneralizedCepstrum{MelFrequency,StandardLog}(order, α, 0.0)
 end
 
-function Base.call(::Type{LinearCepstrum}, order::Int)
+@compat function (::Type{LinearCepstrum})(order::Int)
     MelGeneralizedCepstrum{LinearFrequency,StandardLog}(order, 0.0, 0.0)
 end
 
-function Base.call(::Type{AllPoleCepstrum}, order::Int)
+@compat function (::Type{AllPoleCepstrum})(order::Int)
     MelGeneralizedCepstrum{LinearFrequency,AllPoleLog}(order, 0.0, -1.0)
 end
 
-function Base.call(::Type{MelAllPoleCepstrum}, order::Int, α::Real)
+@compat function (::Type{MelAllPoleCepstrum})(order::Int, α::Real)
     MelGeneralizedCepstrum{MelFrequency,AllPoleLog}(order, α, -1.0)
 end
 
