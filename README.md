@@ -1,9 +1,11 @@
 # MelGeneralizedCepstrums
 
+[![MelGeneralizedCepstrums](http://pkg.julialang.org/badges/MelGeneralizedCepstrums_0.4.svg)](http://pkg.julialang.org/?pkg=MelGeneralizedCepstrums&ver=0.4)
+[![MelGeneralizedCepstrums](http://pkg.julialang.org/badges/MelGeneralizedCepstrums_0.5.svg)](http://pkg.julialang.org/?pkg=MelGeneralizedCepstrums&ver=0.5)
+
 [![Build Status](https://travis-ci.org/r9y9/MelGeneralizedCepstrums.jl.svg?branch=master)](https://travis-ci.org/r9y9/MelGeneralizedCepstrums.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/gr17ty0m7fagqsh5/branch/master?svg=true)](https://ci.appveyor.com/project/r9y9/melgeneralizedcepstrums-jl/branch/master)
 [![Coverage Status](https://coveralls.io/repos/r9y9/MelGeneralizedCepstrums.jl/badge.svg?branch=master)](https://coveralls.io/r/r9y9/MelGeneralizedCepstrums.jl?branch=master)
-[![MelGeneralizedCepstrums](http://pkg.julialang.org/badges/MelGeneralizedCepstrums_0.4.svg)](http://pkg.julialang.org/?pkg=MelGeneralizedCepstrums&ver=0.4)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
 
 ![](examples/mel-generalized-cepstrum.png)
