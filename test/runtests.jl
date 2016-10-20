@@ -62,7 +62,7 @@ function test_mcep_basics(order=20, α=0.41)
 
     # details
     mc1 = MelGeneralizedCepstrums._mcep(x, order, α)
-    mc2 = periodogram2mcep(abs2.(rfft(x)), order, α)
+    mc2 = periodogram2mcep(@compat(abs2.(rfft(x))), order, α)
     @test_approx_eq mc1 mc2
 
 end
@@ -92,7 +92,7 @@ function test_gcep_basics(order=20, γ=-0.01)
     @test log_form(typeof(gc)) == GeneralizedLog
 
     state = estimate(gc, x, norm=false)
-    @test @compat all(isfinite.(state))
+    @test all(@compat(isfinite.(state)))
     @test_approx_eq gcep(x, order, γ, norm=false) state
     @test !gain_normalized(state)
 
