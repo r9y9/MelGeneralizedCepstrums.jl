@@ -30,4 +30,4 @@ function warping_vector(α::Float64, len::Integer)
     return warpfreq / warpfreq[end]
 end
 
-rms_distance(v1, v2) = sumabs2(v1 - v2) / length(v1)
+rms_distance(v1, v2) = sum(abs2, v1 - v2) / length(v1)

@@ -1,5 +1,5 @@
 function b2c!(wc::AbstractVector, c::AbstractVector, α,
-              prev=Array(eltype(wc),length(wc)))
+              prev=Array{eltype(wc),1}(length(wc)))
     T = eltype(wc)
 
     fill!(wc, zero(T))
@@ -21,4 +21,4 @@ function b2c!(wc::AbstractVector, c::AbstractVector, α,
     wc
 end
 
-b2c(c::AbstractVector, order, α) = b2c!(Array(eltype(c), order+1), c, α)
+b2c(c::AbstractVector, order, α) = b2c!(Array{eltype(c),1}(order+1), c, α)

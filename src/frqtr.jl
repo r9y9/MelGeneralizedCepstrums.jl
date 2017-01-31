@@ -1,5 +1,5 @@
 function frqtr!(wc::AbstractVector, c::AbstractVector, α,
-                prev::Vector=Array(eltype(wc), length(wc)))
+                prev::Vector=Array{eltype(wc),1}(length(wc)))
     fill!(wc, zero(eltype(wc)))
     dst_order = length(wc) - 1
 
@@ -18,5 +18,5 @@ function frqtr!(wc::AbstractVector, c::AbstractVector, α,
 end
 
 function frqtr(c::AbstractVector, order=25, α=0.35)
-    frqtr!(Array(eltype(c), order+1), c, α)
+    frqtr!(Array{eltype(c),1}(order+1), c, α)
 end

@@ -65,8 +65,8 @@ function periodogram2mcep{T<:AbstractFloat}(periodogram::AbstractVector{T}, # mo
     const xh = fftlen>>1
 
     # create FFT workspace and plan
-    y = Array(Complex{T}, xh+1)
-    c = Array(T, fftlen)
+    y = Array{Complex{T},1}(xh+1)
+    c = Array{T,1}(fftlen)
     # fplan = FFTW.Plan(c, y, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
     # bplan = FFTW.Plan(y, c, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
     fplan = plan_rfft(c)
@@ -87,19 +87,19 @@ function periodogram2mcep{T<:AbstractFloat}(periodogram::AbstractVector{T}, # mo
     czero = c[1]
 
     # Allocate memory for solving linear equation (Tm + Hm)d = b
-    Tm = Array(T, order+1, order+1)
-    Hm = Array(T, order+1, order+1)
-    Tm_plus_Hm = Array(T, order+1, order+1)
-    he = Array(T, 2order+1) # elements of hankel matrix
-    te = Array(T, order+1)  # elements of toeplitz matrix
-    b = Array(T, order+1)   # right side of linear equation
+    Tm = Array{T,2}(order+1, order+1)
+    Hm = Array{T,2}(order+1, order+1)
+    Tm_plus_Hm = Array{T,2}(order+1, order+1)
+    he = Array{T,1}(2order+1) # elements of hankel matrix
+    te = Array{T,1}(order+1)  # elements of toeplitz matrix
+    b = Array{T,1}(order+1)   # right side of linear equation
 
-    al = Array(T, order+1)
+    al = Array{T,1}(order+1)
     fill_al!(al, α)
 
     # Newton raphson roop
     ch = view(c, 1:xh+1)
-    ch_copy = Array(T, xh+1)
+    ch_copy = Array{T,1}(xh+1)
     c_frqtr = view(c, 1:2order+1)
     for i=1:maxiter
         fill!(c, zero(T))

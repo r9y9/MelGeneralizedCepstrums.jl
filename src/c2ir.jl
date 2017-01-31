@@ -1,5 +1,5 @@
 function c2ir(c::AbstractVector, len=256)
-    h = Array(eltype(c), len)
+    h = Array{eltype(c),1}(len)
     m = length(c) - 1
 
     h[1] = exp(c[1])

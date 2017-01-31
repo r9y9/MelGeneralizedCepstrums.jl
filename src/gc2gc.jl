@@ -27,7 +27,7 @@ end
 
 function gc2gc(src_ceps::AbstractVector, src_γ=0.0,
                dst_order=length(src_ceps)-1, dst_γ=0.0)
-    gc2gc!(Array(eltype(src_ceps), dst_order+1), dst_γ, src_ceps, src_γ)
+    gc2gc!(Array{eltype(src_ceps)}(dst_order+1), dst_γ, src_ceps, src_γ)
 end
 
 function gc2gc{T<:MelGeneralizedCepstrum}(state::SpectralParamState{T},

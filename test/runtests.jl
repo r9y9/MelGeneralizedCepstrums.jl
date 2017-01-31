@@ -58,13 +58,12 @@ function test_mcep_basics(order=20, α=0.41)
 
     state = estimate(mc, x)
     @test @compat all(isfinite.(state))
-    @test_approx_eq mcep(x, order, α) state
+    @test mcep(x, order, α) ≈ state
 
     # details
     mc1 = MelGeneralizedCepstrums._mcep(x, order, α)
     mc2 = periodogram2mcep(@compat(abs2.(rfft(x))), order, α)
-    @test_approx_eq mc1 mc2
-
+    @test mc1 ≈ mc2
 end
 
 function test_gcep_special_cases(order=20)
@@ -93,7 +92,7 @@ function test_gcep_basics(order=20, γ=-0.01)
 
     state = estimate(gc, x, norm=false)
     @test all(@compat(isfinite.(state)))
-    @test_approx_eq gcep(x, order, γ, norm=false) state
+    @test gcep(x, order, γ, norm=false) ≈ state
     @test !gain_normalized(state)
 
     # gain-unnormalized
@@ -104,7 +103,7 @@ function test_gcep_basics(order=20, γ=-0.01)
     state = estimate(gc, x, norm=true)
     @test gain_normalized(state)
     # should have same values for different scaled signals
-    @test_approx_eq rawdata(estimate(gc, 10x, norm=true))[2:end] rawdata(state)[2:end]
+    @test rawdata(estimate(gc, 10x, norm=true))[2:end] ≈ rawdata(state)[2:end]
 end
 
 function test_mgcep_special_cases(order=20)
@@ -152,7 +151,7 @@ function test_mgcep_basics(order=20, α=0.41, γ=-0.01)
 
     state = estimate(mgc, x)
     @test @compat all(isfinite.(state))
-    @test_approx_eq mgcep(x, order, α, γ) state
+    @test mgcep(x, order, α, γ) ≈ state
 
     # should only accept otype=0
     for otype in [1,2,3,4,5]
@@ -175,7 +174,7 @@ function test_lpc_basics()
     @test isa(lpcdef, LinearPredictionCoef)
     state = estimate(lpcdef, x)
     @test @compat all(isfinite.(state))
-    @test_approx_eq lpc(x, order) state
+    @test lpc(x, order) ≈ state
     @test isa(paramdef(v), LinearPredictionCoef)
 
     # LSP
@@ -224,10 +223,10 @@ function test_mgcep_otypes(α::Float64, γ::Float64)
     mgc_5̂ = MelGeneralizedCepstrums._mgcep(10x, order, α, γ; otype=5)
 
     # check if gain normalized
-    @test_approx_eq_eps mgc_2[2:end] mgc_2̂[2:end] 1.0e-3
-    @test_approx_eq_eps mgc_3[2:end] mgc_3̂[2:end] 1.0e-3
-    @test_approx_eq_eps mgc_4[2:end] mgc_4̂[2:end] 1.0e-3
-    @test_approx_eq_eps mgc_5[2:end] mgc_5̂[2:end] 1.0e-3
+    @test mgc_2[2:end] ≈ mgc_2̂[2:end] atol=1.0e-3
+    @test mgc_3[2:end] ≈ mgc_3̂[2:end] atol=1.0e-3
+    @test mgc_4[2:end] ≈ mgc_4̂[2:end] atol=1.0e-3
+    @test mgc_5[2:end] ≈ mgc_5̂[2:end] atol=1.0e-3
 end
 
 function test_lpc2c(order=20)
@@ -240,7 +239,7 @@ function test_lpc2c(order=20)
     @test !ready_to_filt(state)
 
     state2 = lpc2c(state)
-    @test_approx_eq rawdata(state2) lpc2c(rawdata(state))
+    @test rawdata(state2) ≈ lpc2c(rawdata(state))
     @test has_loggain(state2)
     @test gain_normalized(state2)
     @test !ready_to_filt(state2)
@@ -256,7 +255,7 @@ function test_lpc_and_par_conversion(order=20)
     @test @compat all(isfinite.(rawdata(par_state)))
     lpc_state2 = par2lpc(par_state)
 
-    @test_approx_eq rawdata(lpc_state1) rawdata(lpc_state2)
+    @test rawdata(lpc_state1) ≈ rawdata(lpc_state2)
 end
 
 function test_mc2b(order=20, α=0.41)
@@ -270,13 +269,13 @@ function test_mc2b(order=20, α=0.41)
     @test !ready_to_filt(state)
 
     b = mc2b(state)
-    @test_approx_eq rawdata(b) mc2b(rawdata(state), α)
+    @test rawdata(b) ≈ mc2b(rawdata(state), α)
     @test has_loggain(b)
     @test gain_normalized(b)
     @test ready_to_filt(b)
 
     mc2b!(state)
-    @test_approx_eq rawdata(state) rawdata(b)
+    @test rawdata(state) ≈ rawdata(b)
 end
 
 function test_mc2e(order=20, α=0.41, len=512)
@@ -287,7 +286,7 @@ function test_mc2e(order=20, α=0.41, len=512)
 
     e = mc2e(state, len)
     @test @compat all(isfinite.(e))
-    @test_approx_eq e mc2e(rawdata(state), α, len)
+    @test e ≈ mc2e(rawdata(state), α, len)
 end
 
 function test_mgc2b(order=20, α=0.41, γ=-0.01)
@@ -300,7 +299,7 @@ function test_mgc2b(order=20, α=0.41, γ=-0.01)
     @test has_loggain(state_b)
     @test gain_normalized(state_b)
     @test ready_to_filt(state_b)
-    @test_approx_eq rawdata(state_b) mgc2b(rawdata(state_mgc), α, γ)
+    @test rawdata(state_b) ≈ mgc2b(rawdata(state_mgc), α, γ)
 
     # mgc2b should not accept filter coefficients
     @test_throws ArgumentError mgc2b(state_b)
@@ -308,7 +307,7 @@ function test_mgc2b(order=20, α=0.41, γ=-0.01)
 
     state2 = copy(state_mgc)
     mgc2b!(state2)
-    @test_approx_eq rawdata(state2) rawdata(state_b)
+    @test rawdata(state2) ≈ rawdata(state_b)
 end
 
 function test_mgc2sp(order=20, α=0.41, γ=-0.01, fftlen=512)
@@ -318,7 +317,7 @@ function test_mgc2sp(order=20, α=0.41, γ=-0.01, fftlen=512)
     state = estimate(MelGeneralizedCepstrum(order, α, γ), x)
 
     logsp = mgc2sp(state, fftlen)
-    @test_approx_eq logsp mgc2sp(rawdata(state), α, γ, fftlen)
+    @test logsp ≈ mgc2sp(rawdata(state), α, γ, fftlen)
     @test length(logsp) == fftlen>>1 + 1
     @test @compat all(isfinite.(logsp))
 end
@@ -333,17 +332,17 @@ function test_b2mc(order=20, α=0.41)
     @test ready_to_filt(b)
 
     mc = b2mc(b)
-    @test_approx_eq rawdata(mc) b2mc(rawdata(b), α)
+    @test rawdata(mc) ≈ b2mc(rawdata(b), α)
     @test has_loggain(mc)
     @test gain_normalized(mc)
     @test !ready_to_filt(mc)
 
     # check invertibility
-    @test_approx_eq rawdata(state) rawdata(b2mc(mc2b(state)))
+    @test rawdata(state) ≈ rawdata(b2mc(mc2b(state)))
 
     b2 = copy(b)
     b2mc!(b2)
-    @test_approx_eq rawdata(b2) rawdata(mc)
+    @test rawdata(b2) ≈ rawdata(mc)
 end
 
 function test_gnorm_and_ignorm(order=20, γ=-0.01)
@@ -358,16 +357,16 @@ function test_gnorm_and_ignorm(order=20, γ=-0.01)
     @test !gain_normalized(state3)
 
     # check invertibility
-    @test_approx_eq rawdata(state1) rawdata(state3)
+    @test rawdata(state1) ≈ rawdata(state3)
 
     # inplace version
     state4 = copy(state1)
     gnorm!(state4)
     @test gain_normalized(state4)
-    @test_approx_eq rawdata(state4) rawdata(state2)
+    @test rawdata(state4) ≈ rawdata(state2)
 
     ignorm!(state4)
-    @test_approx_eq rawdata(state4) rawdata(state1)
+    @test rawdata(state4) ≈ rawdata(state1)
 end
 
 function test_freqt(src_order, src_α, dst_order=20, dst_α=0.35)
@@ -497,12 +496,12 @@ end
 
 println("testing: mcepalpha")
 for elty in (UInt, Int, Float32, Float64)
-    @test_approx_eq  mcepalpha(convert(elty, 8000))  0.312
-    @test_approx_eq  mcepalpha(convert(elty, 11025)) 0.357
-    @test_approx_eq  mcepalpha(convert(elty, 16000)) 0.41
-    @test_approx_eq  mcepalpha(convert(elty, 22050)) 0.455
-    @test_approx_eq  mcepalpha(convert(elty, 44100)) 0.544
-    @test_approx_eq  mcepalpha(convert(elty, 48000)) 0.554
+    @test mcepalpha(convert(elty, 8000)) ≈ 0.312
+    @test mcepalpha(convert(elty, 11025)) ≈ 0.357
+    @test mcepalpha(convert(elty, 16000)) ≈ 0.41
+    @test mcepalpha(convert(elty, 22050)) ≈ 0.455
+    @test mcepalpha(convert(elty, 44100)) ≈ 0.544
+    @test mcepalpha(convert(elty, 48000)) ≈ 0.554
 end
 
 for order in 15:5:25

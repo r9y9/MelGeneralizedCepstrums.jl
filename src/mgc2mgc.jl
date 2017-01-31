@@ -23,7 +23,7 @@ function mgc2mgc(src_ceps::AbstractVector,
                  dst_order=length(src_ceps) - 1,
                  dst_α=0.0,
                  dst_γ=0.0)
-    mgc2mgc!(Array(eltype(src_ceps), dst_order+1), dst_α, dst_γ,src_ceps, src_α, src_γ)
+    mgc2mgc!(Array{eltype(src_ceps),1}(dst_order+1), dst_α, dst_γ,src_ceps, src_α, src_γ)
 end
 
 function mgc2mgc{T<:MelGeneralizedCepstrum}(state::SpectralParamState{T},

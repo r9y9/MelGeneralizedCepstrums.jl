@@ -94,10 +94,10 @@ function newton!{T}(c::AbstractVector{T}, # mel-generalized cepstrum stored
                     ri::Vector{T} = zeros(T, length(x)),
                     qr::Vector{T} = zeros(T, length(x)),
                     qi::Vector{T} = zeros(T, length(x)),
-                    Tm::Matrix{T} = Array(T, order, order),
-                    Hm::Matrix{T} = Array(T, order, order),
-                    Tm_plus_Hm::Matrix{T} = Array(T, order, order),
-                    b::Vector{T} = Array(T, order), # right side of equation Ax = b
+                    Tm::Matrix{T} = Array{T,2}(order, order),
+                    Hm::Matrix{T} = Array{T,2}(order, order),
+                    Tm_plus_Hm::Matrix{T} = Array{T,2}(order, order),
+                    b::Vector{T} = Array{T,1}(order), # right side of equation Ax = b
     )
     @assert length(x) > length(c)
     @assert n < length(x)
@@ -294,14 +294,14 @@ function _mgcep(x::AbstractVector,          # a *windowed* signal
     ri = zeros(T, length(x))
     qr = zeros(T, length(x))
     qi = zeros(T, length(x))
-    Tm = Array(T, order, order)
-    Hm = Array(T, order, order)
-    Tm_plus_Hm = Array(T, order, order)
-    b = Array(T, order)
+    Tm = Array{T,2}(order, order)
+    Hm = Array{T,2}(order, order)
+    Tm_plus_Hm = Array{T,2}(order, order)
+    b = Array{T,1}(order)
 
     # FFT workspace
-    y = Array(Complex{T}, length(x))
-    z = Array(Complex{T}, length(x))
+    y = Array{Complex{T},1}(length(x))
+    z = Array{Complex{T},1}(length(x))
     # bplan = FFTW.Plan(y, z, 1, FFTW.ESTIMATE, FFTW.NO_TIMELIMIT)
     bplan = plan_bfft(y)
 
@@ -310,7 +310,7 @@ function _mgcep(x::AbstractVector,          # a *windowed* signal
                  cr, pr, rr, ri, qr, qi, Tm, Hm, Tm_plus_Hm, b)
 
     if γ != -one(T)
-        d = Array(T, order+1)
+        d = Array{T,1}(order+1)
         if α != zero(T)
             ignorm!(bᵧ′, -1.0)
             b2mc!(bᵧ′, α)

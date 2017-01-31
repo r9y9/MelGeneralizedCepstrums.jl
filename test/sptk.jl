@@ -13,7 +13,7 @@ function test_mcep(order::Int, α::Float64)
     x = rand(512)
     mc = SPTK.mcep(x, order, α)
     mĉ = MelGeneralizedCepstrums._mcep(x, order, α)
-    @test_approx_eq mc mĉ
+    @test mc ≈ mĉ
 end
 
 function test_mgcep(order::Int, α::Float64, γ::Float64)
@@ -21,7 +21,7 @@ function test_mgcep(order::Int, α::Float64, γ::Float64)
     x = rand(512)
     mgc = SPTK.mgcep(x, order, α, γ; threshold=0.001)
     mgĉ = MelGeneralizedCepstrums._mgcep(x, order, α, γ; criteria=0.001)
-    @test_approx_eq mgc mgĉ
+    @test mgc ≈ mgĉ
 end
 
 function test_lpc2c()
@@ -30,10 +30,10 @@ function test_lpc2c()
 
     c = SPTK.lpc2c(a)
     ĉ = lpc2c(a)
-    @test_approx_eq c ĉ
+    @test c ≈ ĉ
     ĉ = similar(a)
     lpc2c!(ĉ, a)
-    @test_approx_eq c ĉ
+    @test c ≈ ĉ
 end
 
 function test_gnorm(γ::Float64)
@@ -42,10 +42,10 @@ function test_gnorm(γ::Float64)
 
     g = SPTK.gnorm(mc, γ)
     ĝ = gnorm(mc, γ)
-    @test_approx_eq g ĝ
+    @test g ≈ ĝ
     ĝ = copy(mc)
     gnorm!(ĝ, γ)
-    @test_approx_eq g ĝ
+    @test g ≈ ĝ
 end
 
 function test_ignorm(γ::Float64)
@@ -54,10 +54,10 @@ function test_ignorm(γ::Float64)
 
     g = SPTK.ignorm(mc, γ)
     ĝ = ignorm(mc, γ)
-    @test_approx_eq g ĝ
+    @test g ≈ ĝ
     ĝ = copy(mc)
     ignorm!(ĝ, γ)
-    @test_approx_eq g ĝ
+    @test g ≈ ĝ
 end
 
 function test_mc2b(α::Float64)
@@ -66,10 +66,10 @@ function test_mc2b(α::Float64)
 
     b = SPTK.mc2b(mc, α)
     b̂ = mc2b(mc, α)
-    @test_approx_eq b b̂
+    @test b ≈ b̂
     b̂ = copy(mc)
     mc2b!(b̂, α)
-    @test_approx_eq b b̂
+    @test b ≈ b̂
 end
 
 
@@ -79,7 +79,7 @@ function test_b2mc(α::Float64)
 
     mc = SPTK.b2mc(b, α)
     mĉ = b2mc(b, α)
-    @test_approx_eq mc mĉ
+    @test mc ≈ mĉ
 end
 
 function test_c2ir(len::Int=512)
@@ -88,7 +88,7 @@ function test_c2ir(len::Int=512)
 
     ir = SPTK.c2ir(c, len)
     ir̂ = c2ir(c, len)
-    @test_approx_eq ir ir̂
+    @test ir ≈ ir̂
 end
 
 function test_freqt(order::Int, α::Float64)
@@ -97,7 +97,7 @@ function test_freqt(order::Int, α::Float64)
 
     m = SPTK.freqt(mc, order, α)
     m̂ = freqt(mc, order, α)
-    @test_approx_eq m m̂
+    @test m ≈ m̂
 end
 
 function test_b2c(order::Int, α::Float64)
@@ -106,7 +106,7 @@ function test_b2c(order::Int, α::Float64)
 
     m = SPTK.b2c(mc, order, α)
     m̂2 = b2c(mc, order, α)
-    @test_approx_eq m m̂2
+    @test m ≈ m̂2
 end
 
 function test_frqtr(order::Int, α::Float64)
@@ -115,7 +115,7 @@ function test_frqtr(order::Int, α::Float64)
 
     m = SPTK.frqtr(mc, order, α)
     m̂ = frqtr(mc, order, α)
-    @test_approx_eq m m̂
+    @test m ≈ m̂
 end
 
 function test_gc2gc(order::Int, γ::Float64)
@@ -124,7 +124,7 @@ function test_gc2gc(order::Int, γ::Float64)
 
     gc2 = SPTK.gc2gc(gc, 0.0, order, γ)
     gc2̂ = gc2gc(gc, 0.0, order, γ)
-    @test_approx_eq gc2 gc2̂
+    @test gc2 ≈ gc2̂
 end
 
 function test_mgc2mgc(order::Int, α::Float64, γ::Float64)
@@ -133,7 +133,7 @@ function test_mgc2mgc(order::Int, α::Float64, γ::Float64)
 
     mgc2 = SPTK.mgc2mgc(mgc, 0.41, 0.0, order, α, γ)
     mgc2̂ = mgc2mgc(mgc, 0.41, 0.0, order, α, γ)
-    @test_approx_eq mgc2 mgc2̂
+    @test mgc2 ≈ mgc2̂
 end
 
 function test_mgc2sp(α::Float64, γ::Float64)
@@ -143,7 +143,7 @@ function test_mgc2sp(α::Float64, γ::Float64)
     fftlen = 512
     sp = SPTK.mgc2sp(mgc, α, γ, fftlen)
     sp̂ = mgc2sp(mgc, α, γ, fftlen)
-    @test_approx_eq sp sp̂
+    @test sp ≈ sp̂
     @test length(sp̂) == fftlen>>1 + 1
     @test eltype(sp̂) == Complex{eltype(mgc)}
 end

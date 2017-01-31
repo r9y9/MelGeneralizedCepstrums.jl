@@ -1,5 +1,5 @@
 function freqt!(wc::AbstractVector, c::AbstractVector, α;
-                prev=Array(eltype(wc), length(wc)))
+                prev=Array{eltype(wc),1}(length(wc)))
     fill!(wc, zero(eltype(wc)))
     dst_order = length(wc) - 1
 
@@ -21,7 +21,7 @@ function freqt!(wc::AbstractVector, c::AbstractVector, α;
 end
 
 function freqt(c::AbstractVector, order=25, α=0.35)
-    wc = Array(eltype(c), order+1)
+    wc = Array{eltype(c),1}(order+1)
     freqt!(wc, c, α)
 end
 

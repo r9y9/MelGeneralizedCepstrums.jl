@@ -45,7 +45,7 @@ for f in vec2vec
     @eval begin
         function ($f)(x::AbstractMatrix, args...; kargs...)
             r = $f(x[:, 1], args...; kargs...)
-            ret = Array(eltype(x), size(r, 1), size(x, 2))
+            ret = Array{eltype(x),2}(size(r, 1), size(x, 2))
             for i = 1:length(r)
                 @inbounds ret[i, 1] = r[i]
             end
