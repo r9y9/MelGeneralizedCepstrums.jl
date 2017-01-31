@@ -223,10 +223,10 @@ function test_mgcep_otypes(α::Float64, γ::Float64)
     mgc_5̂ = MelGeneralizedCepstrums._mgcep(10x, order, α, γ; otype=5)
 
     # check if gain normalized
-    @test mgc_2[2:end] ≈ mgc_2̂[2:end] atol=1.0e-3
-    @test mgc_3[2:end] ≈ mgc_3̂[2:end] atol=1.0e-3
-    @test mgc_4[2:end] ≈ mgc_4̂[2:end] atol=1.0e-3
-    @test mgc_5[2:end] ≈ mgc_5̂[2:end] atol=1.0e-3
+    @test isapprox(mgc_2[2:end], mgc_2̂[2:end], atol=1.0e-3)
+    @test isapprox(mgc_3[2:end], mgc_3̂[2:end], atol=1.0e-3)
+    @test isapprox(mgc_4[2:end], mgc_4̂[2:end], atol=1.0e-3)
+    @test isapprox(mgc_5[2:end], mgc_5̂[2:end], atol=1.0e-3)
 end
 
 function test_lpc2c(order=20)
