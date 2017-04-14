@@ -4,7 +4,7 @@ import SPTK
 
 ### Generic interface ###
 
-abstract SpectralParam
+@compat abstract type SpectralParam end
 
 function estimate(s::SpectralParam, x::AbstractArray)
     error("should provide an estimator")
@@ -19,13 +19,13 @@ param_order(s::SpectralParam) = s.order
 
 ### Types that characterize spectral parameters ###
 
-abstract FrequencyForm
+@compat abstract type FrequencyForm end
 type MelFrequency <: FrequencyForm
 end
 type LinearFrequency <: FrequencyForm
 end
 
-abstract LogForm
+@compat abstract type LogForm end
 type GeneralizedLog <: LogForm
 end
 type StandardLog <: LogForm
@@ -39,25 +39,26 @@ immutable MelGeneralizedCepstrum{F<:FrequencyForm,L<:LogForm} <: SpectralParam
     order::Int
     α::Real
     γ::Real
-    function MelGeneralizedCepstrum(order::Int, α::Real, γ::Real)
+    function (::Type{MelGeneralizedCepstrum{F,L}}){F<:FrequencyForm,L<:LogForm}(
+            order::Int, α::Real, γ::Real)
         order > 0 || throw(ArgumentError("order should be larger than 0"))
         abs(α) < 1 || throw(ArgumentError("|α| < 1 is supported"))
         (-1 <= γ <= 0) || throw(ArgumentError("-1 <= γ <= 0 is supported"))
-        new(order, α, γ)
+        new{F,L}(order, α, γ)
     end
 end
 
-typealias MelFrequencyCepstrum{L} MelGeneralizedCepstrum{MelFrequency,L}
-typealias LinearFrequencyCepstrum{L} MelGeneralizedCepstrum{LinearFrequency,L}
-typealias GeneralizedLogCepstrum{F} MelGeneralizedCepstrum{F,GeneralizedLog}
-typealias StandardLogCepstrum{F} MelGeneralizedCepstrum{F,StandardLog}
-typealias AllPoleLogCepstrum{F} MelGeneralizedCepstrum{F,AllPoleLog}
+@compat const MelFrequencyCepstrum{L} = MelGeneralizedCepstrum{MelFrequency,L}
+@compat const LinearFrequencyCepstrum{L} = MelGeneralizedCepstrum{LinearFrequency,L}
+@compat const GeneralizedLogCepstrum{F} = MelGeneralizedCepstrum{F,GeneralizedLog}
+@compat const StandardLogCepstrum{F} = MelGeneralizedCepstrum{F,StandardLog}
+@compat const AllPoleLogCepstrum{F} = MelGeneralizedCepstrum{F,AllPoleLog}
 
-typealias GeneralizedCepstrum MelGeneralizedCepstrum{LinearFrequency,GeneralizedLog}
-typealias MelCepstrum MelGeneralizedCepstrum{MelFrequency,StandardLog}
-typealias LinearCepstrum MelGeneralizedCepstrum{LinearFrequency,StandardLog}
-typealias AllPoleCepstrum MelGeneralizedCepstrum{LinearFrequency,AllPoleLog}
-typealias MelAllPoleCepstrum MelGeneralizedCepstrum{MelFrequency,AllPoleLog}
+@compat const GeneralizedCepstrum = MelGeneralizedCepstrum{LinearFrequency,GeneralizedLog}
+@compat const MelCepstrum = MelGeneralizedCepstrum{MelFrequency,StandardLog}
+@compat const LinearCepstrum = MelGeneralizedCepstrum{LinearFrequency,StandardLog}
+@compat const AllPoleCepstrum = MelGeneralizedCepstrum{LinearFrequency,AllPoleLog}
+@compat const MelAllPoleCepstrum = MelGeneralizedCepstrum{MelFrequency,AllPoleLog}
 
 freq_form{F<:FrequencyForm,L<:LogForm}(::Type{MelGeneralizedCepstrum{F,L}}) = F
 freq_form{T<:MelGeneralizedCepstrum}(::Type{T}) = freq_form(super(T))
@@ -117,7 +118,7 @@ glog_gamma(c::MelGeneralizedCepstrum) = c.γ
 
 ### Definitions of LPC variants ###
 
-abstract LinearPredictionCoefVariants <: SpectralParam
+@compat abstract type LinearPredictionCoefVariants <: SpectralParam end
 
 # LPC, LSP and PARCOR
 immutable LinearPredictionCoef <: LinearPredictionCoefVariants
@@ -136,7 +137,7 @@ params(s::LinearPredictionCoefVariants) = (s.order,)
 
 ### State, which keeps actual computation results in arrays ###
 
-abstract AbstractParamState{T,N} <: AbstractArray{T,N}
+@compat abstract type AbstractParamState{T,N} <: AbstractArray{T,N} end
 
 function paramdef(s::AbstractParamState)
     error("should provide get access for parameter definition")
@@ -154,16 +155,16 @@ type SpectralParamState{S<:SpectralParam,T,N} <: AbstractParamState{T,N}
     gain_normalized::Bool
     ready_to_filt::Bool  # state is explicitly converted to filter coef or not.
 
-    function SpectralParamState(s::S, data::Array{T,N},
+    function (::Type{SpectralParamState{S,T,N}}){S,T,N}(s::S, data::Array{T,N},
                                 has_loggain::Bool,
                                 gain_normalized::Bool,
                                 ready_to_filt::Bool)
-        new(s, data, has_loggain, gain_normalized, ready_to_filt)
+        new{S,T,N}(s, data, has_loggain, gain_normalized, ready_to_filt)
     end
 end
 
-typealias SpectralParamStateVector{S,T} SpectralParamState{S,T,1}
-typealias SpectralParamStateMatrix{S,T} SpectralParamState{S,T,2}
+@compat const SpectralParamStateVector{S,T} = SpectralParamState{S,T,1}
+@compat const SpectralParamStateMatrix{S,T} = SpectralParamState{S,T,2}
 
 function SpectralParamState{S<:SpectralParam,T,N}(s::S, data::Array{T,N},
                                                   has_loggain::Bool,

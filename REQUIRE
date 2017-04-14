@@ -1,3 +1,3 @@
-julia 0.4
+julia 0.5
 SPTK
-Compat 0.8.4
+Compat 0.17.0
