@@ -2,6 +2,7 @@
 
 [![MelGeneralizedCepstrums](http://pkg.julialang.org/badges/MelGeneralizedCepstrums_0.4.svg)](http://pkg.julialang.org/?pkg=MelGeneralizedCepstrums&ver=0.4)
 [![MelGeneralizedCepstrums](http://pkg.julialang.org/badges/MelGeneralizedCepstrums_0.5.svg)](http://pkg.julialang.org/?pkg=MelGeneralizedCepstrums&ver=0.5)
+[![MelGeneralizedCepstrums](http://pkg.julialang.org/badges/MelGeneralizedCepstrums_0.6.svg)](http://pkg.julialang.org/?pkg=MelGeneralizedCepstrums&ver=0.6)
 
 [![Build Status](https://travis-ci.org/r9y9/MelGeneralizedCepstrums.jl.svg?branch=master)](https://travis-ci.org/r9y9/MelGeneralizedCepstrums.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/gr17ty0m7fagqsh5/branch/master?svg=true)](https://ci.appveyor.com/project/r9y9/melgeneralizedcepstrums-jl/branch/master)
