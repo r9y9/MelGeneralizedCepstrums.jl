@@ -1,6 +1,4 @@
 using MelGeneralizedCepstrums
-using Compat
-import Compat: view
 using Base.Test
 
 import MelGeneralizedCepstrums: freq_form, log_form, rawdata, MelFrequency,
@@ -57,12 +55,12 @@ function test_mcep_basics(order=20, α=0.41)
     @test log_form(typeof(mc)) == StandardLog
 
     state = estimate(mc, x)
-    @test @compat all(isfinite.(state))
+    @test all(isfinite.(state))
     @test mcep(x, order, α) ≈ state
 
     # details
     mc1 = MelGeneralizedCepstrums._mcep(x, order, α)
-    mc2 = periodogram2mcep(@compat(abs2.(rfft(x))), order, α)
+    mc2 = periodogram2mcep(abs2.(rfft(x)), order, α)
     @test mc1 ≈ mc2
 end
 
@@ -91,7 +89,7 @@ function test_gcep_basics(order=20, γ=-0.01)
     @test log_form(typeof(gc)) == GeneralizedLog
 
     state = estimate(gc, x, norm=false)
-    @test all(@compat(isfinite.(state)))
+    @test all(isfinite.(state))
     @test gcep(x, order, γ, norm=false) ≈ state
     @test !gain_normalized(state)
 
@@ -150,7 +148,7 @@ function test_mgcep_basics(order=20, α=0.41, γ=-0.01)
     @test log_form(typeof(mgc)) == GeneralizedLog
 
     state = estimate(mgc, x)
-    @test @compat all(isfinite.(state))
+    @test all(isfinite.(state))
     @test mgcep(x, order, α, γ) ≈ state
 
     # should only accept otype=0
@@ -173,7 +171,7 @@ function test_lpc_basics()
     lpcdef = LinearPredictionCoef(order)
     @test isa(lpcdef, LinearPredictionCoef)
     state = estimate(lpcdef, x)
-    @test @compat all(isfinite.(state))
+    @test all(isfinite.(state))
     @test lpc(x, order) ≈ state
     @test isa(paramdef(v), LinearPredictionCoef)
 
@@ -201,7 +199,7 @@ function test_lpc_basics()
     @test log_form(typeof(mgcdef)) == AllPoleLog
 
     state = estimate(mgcdef, x)
-    @test @compat all(isfinite.(state))
+    @test all(isfinite.(state))
     @test has_loggain(state)
     @test gain_normalized(state)
     @test !ready_to_filt(state)
@@ -250,9 +248,9 @@ function test_lpc_and_par_conversion(order=20)
     x = rand(512)
 
     lpc_state1 = estimate(LinearPredictionCoef(order), x)
-    @test @compat all(isfinite.(rawdata(lpc_state1)))
+    @test all(isfinite.(rawdata(lpc_state1)))
     par_state = lpc2par(lpc_state1)
-    @test @compat all(isfinite.(rawdata(par_state)))
+    @test all(isfinite.(rawdata(par_state)))
     lpc_state2 = par2lpc(par_state)
 
     @test rawdata(lpc_state1) ≈ rawdata(lpc_state2)
@@ -285,7 +283,7 @@ function test_mc2e(order=20, α=0.41, len=512)
     state = estimate(MelCepstrum(order, α), x)
 
     e = mc2e(state, len)
-    @test @compat all(isfinite.(e))
+    @test all(isfinite.(e))
     @test e ≈ mc2e(rawdata(state), α, len)
 end
 
@@ -319,7 +317,7 @@ function test_mgc2sp(order=20, α=0.41, γ=-0.01, fftlen=512)
     logsp = mgc2sp(state, fftlen)
     @test logsp ≈ mgc2sp(rawdata(state), α, γ, fftlen)
     @test length(logsp) == fftlen>>1 + 1
-    @test @compat all(isfinite.(logsp))
+    @test all(isfinite.(logsp))
 end
 
 function test_b2mc(order=20, α=0.41)
@@ -377,15 +375,15 @@ function test_freqt(src_order, src_α, dst_order=20, dst_α=0.35)
     state2 = freqt(state1, dst_order, dst_α)
     @test allpass_alpha(paramdef(state2)) == dst_α
     @test length(state2) == dst_order + 1
-    @test @compat all(isfinite.(state1))
-    @test @compat all(isfinite.(state2))
+    @test all(isfinite.(state1))
+    @test all(isfinite.(state2))
 
     state4 = estimate(MelGeneralizedCepstrum(20, 0.41, -0.02), x)
     state5 = freqt(state4, dst_order, dst_α)
     @test allpass_alpha(paramdef(state5)) == dst_α
     @test length(state5) == dst_order + 1
-    @test @compat all(isfinite.(state4))
-    @test @compat all(isfinite.(state5))
+    @test all(isfinite.(state4))
+    @test all(isfinite.(state5))
 end
 
 function test_gc2gc(src_order=20, src_α=0.35, src_γ=0.0,

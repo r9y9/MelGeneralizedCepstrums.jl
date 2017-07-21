@@ -59,7 +59,7 @@ function periodogram2mcep{T<:AbstractFloat}(periodogram::AbstractVector{T}, # mo
                                             criteria::AbstractFloat=0.001,  # stopping criteria
                                             e::T=zero(T),                   # floor of periodogram
                                             verbose::Bool=false)
-    logperiodogram = @compat log.(periodogram + e)
+    logperiodogram = log.(periodogram + e)
 
     fftlen = (size(logperiodogram, 1)-1)*2
     const xh = fftlen>>1
@@ -161,7 +161,7 @@ function _mcep(x::AbstractVector,  # a *windowed* signal
                order=25,           # order of mel-cepstrum
                α=0.35;             # all-pass constant
                kargs...)
-    periodgram = @compat abs2.(rfft(x))
+    periodgram = abs2.(rfft(x))
     periodogram2mcep(periodgram, order, α; kargs...)
 end
 

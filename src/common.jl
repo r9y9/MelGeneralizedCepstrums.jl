@@ -4,7 +4,7 @@ import SPTK
 
 ### Generic interface ###
 
-@compat abstract type SpectralParam end
+abstract type SpectralParam end
 
 function estimate(s::SpectralParam, x::AbstractArray)
     error("should provide an estimator")
@@ -19,23 +19,23 @@ param_order(s::SpectralParam) = s.order
 
 ### Types that characterize spectral parameters ###
 
-@compat abstract type FrequencyForm end
-type MelFrequency <: FrequencyForm
+abstract type FrequencyForm end
+struct MelFrequency <: FrequencyForm
 end
-type LinearFrequency <: FrequencyForm
+struct LinearFrequency <: FrequencyForm
 end
 
-@compat abstract type LogForm end
-type GeneralizedLog <: LogForm
+abstract type LogForm end
+struct GeneralizedLog <: LogForm
 end
-type StandardLog <: LogForm
+struct StandardLog <: LogForm
 end
-type AllPoleLog <: LogForm
+struct AllPoleLog <: LogForm
 end
 
 ### Definitions of spectral envelope parameters ###
 
-immutable MelGeneralizedCepstrum{F<:FrequencyForm,L<:LogForm} <: SpectralParam
+struct MelGeneralizedCepstrum{F<:FrequencyForm,L<:LogForm} <: SpectralParam
     order::Int
     α::Real
     γ::Real
@@ -48,17 +48,17 @@ immutable MelGeneralizedCepstrum{F<:FrequencyForm,L<:LogForm} <: SpectralParam
     end
 end
 
-@compat const MelFrequencyCepstrum{L} = MelGeneralizedCepstrum{MelFrequency,L}
-@compat const LinearFrequencyCepstrum{L} = MelGeneralizedCepstrum{LinearFrequency,L}
-@compat const GeneralizedLogCepstrum{F} = MelGeneralizedCepstrum{F,GeneralizedLog}
-@compat const StandardLogCepstrum{F} = MelGeneralizedCepstrum{F,StandardLog}
-@compat const AllPoleLogCepstrum{F} = MelGeneralizedCepstrum{F,AllPoleLog}
+const MelFrequencyCepstrum{L} = MelGeneralizedCepstrum{MelFrequency,L}
+const LinearFrequencyCepstrum{L} = MelGeneralizedCepstrum{LinearFrequency,L}
+const GeneralizedLogCepstrum{F} = MelGeneralizedCepstrum{F,GeneralizedLog}
+const StandardLogCepstrum{F} = MelGeneralizedCepstrum{F,StandardLog}
+const AllPoleLogCepstrum{F} = MelGeneralizedCepstrum{F,AllPoleLog}
 
-@compat const GeneralizedCepstrum = MelGeneralizedCepstrum{LinearFrequency,GeneralizedLog}
-@compat const MelCepstrum = MelGeneralizedCepstrum{MelFrequency,StandardLog}
-@compat const LinearCepstrum = MelGeneralizedCepstrum{LinearFrequency,StandardLog}
-@compat const AllPoleCepstrum = MelGeneralizedCepstrum{LinearFrequency,AllPoleLog}
-@compat const MelAllPoleCepstrum = MelGeneralizedCepstrum{MelFrequency,AllPoleLog}
+const GeneralizedCepstrum = MelGeneralizedCepstrum{LinearFrequency,GeneralizedLog}
+const MelCepstrum = MelGeneralizedCepstrum{MelFrequency,StandardLog}
+const LinearCepstrum = MelGeneralizedCepstrum{LinearFrequency,StandardLog}
+const AllPoleCepstrum = MelGeneralizedCepstrum{LinearFrequency,AllPoleLog}
+const MelAllPoleCepstrum = MelGeneralizedCepstrum{MelFrequency,AllPoleLog}
 
 freq_form{F<:FrequencyForm,L<:LogForm}(::Type{MelGeneralizedCepstrum{F,L}}) = F
 freq_form{T<:MelGeneralizedCepstrum}(::Type{T}) = freq_form(super(T))
@@ -87,23 +87,23 @@ function MelGeneralizedCepstrum(mgc::MelGeneralizedCepstrum)
     MelGeneralizedCepstrum(order, α, γ)
 end
 
-@compat function (::Type{GeneralizedCepstrum})(order::Int, γ::Real)
+function (::Type{GeneralizedCepstrum})(order::Int, γ::Real)
     MelGeneralizedCepstrum{LinearFrequency,GeneralizedLog}(order, 0.0, γ)
 end
 
-@compat function (::Type{MelCepstrum})(order::Int, α::Real)
+function (::Type{MelCepstrum})(order::Int, α::Real)
     MelGeneralizedCepstrum{MelFrequency,StandardLog}(order, α, 0.0)
 end
 
-@compat function (::Type{LinearCepstrum})(order::Int)
+function (::Type{LinearCepstrum})(order::Int)
     MelGeneralizedCepstrum{LinearFrequency,StandardLog}(order, 0.0, 0.0)
 end
 
-@compat function (::Type{AllPoleCepstrum})(order::Int)
+function (::Type{AllPoleCepstrum})(order::Int)
     MelGeneralizedCepstrum{LinearFrequency,AllPoleLog}(order, 0.0, -1.0)
 end
 
-@compat function (::Type{MelAllPoleCepstrum})(order::Int, α::Real)
+function (::Type{MelAllPoleCepstrum})(order::Int, α::Real)
     MelGeneralizedCepstrum{MelFrequency,AllPoleLog}(order, α, -1.0)
 end
 
@@ -118,18 +118,18 @@ glog_gamma(c::MelGeneralizedCepstrum) = c.γ
 
 ### Definitions of LPC variants ###
 
-@compat abstract type LinearPredictionCoefVariants <: SpectralParam end
+abstract type LinearPredictionCoefVariants <: SpectralParam end
 
 # LPC, LSP and PARCOR
-immutable LinearPredictionCoef <: LinearPredictionCoefVariants
+struct LinearPredictionCoef <: LinearPredictionCoefVariants
     order
 end
 
-immutable LineSpectralPair <: LinearPredictionCoefVariants
+struct LineSpectralPair <: LinearPredictionCoefVariants
     order
 end
 
-immutable PartialAutoCorrelation <: LinearPredictionCoefVariants
+struct PartialAutoCorrelation <: LinearPredictionCoefVariants
     order
 end
 
@@ -137,7 +137,7 @@ params(s::LinearPredictionCoefVariants) = (s.order,)
 
 ### State, which keeps actual computation results in arrays ###
 
-@compat abstract type AbstractParamState{T,N} <: AbstractArray{T,N} end
+abstract type AbstractParamState{T,N} <: AbstractArray{T,N} end
 
 function paramdef(s::AbstractParamState)
     error("should provide get access for parameter definition")
@@ -147,7 +147,7 @@ function rawdata(s::AbstractParamState)
     error("should provide get access for raw data")
 end
 
-type SpectralParamState{S<:SpectralParam,T,N} <: AbstractParamState{T,N}
+mutable struct SpectralParamState{S<:SpectralParam,T,N} <: AbstractParamState{T,N}
     def::S
     data::Array{T,N}
 
@@ -163,8 +163,8 @@ type SpectralParamState{S<:SpectralParam,T,N} <: AbstractParamState{T,N}
     end
 end
 
-@compat const SpectralParamStateVector{S,T} = SpectralParamState{S,T,1}
-@compat const SpectralParamStateMatrix{S,T} = SpectralParamState{S,T,2}
+const SpectralParamStateVector{S,T} = SpectralParamState{S,T,1}
+const SpectralParamStateMatrix{S,T} = SpectralParamState{S,T,2}
 
 function SpectralParamState{S<:SpectralParam,T,N}(s::S, data::Array{T,N},
                                                   has_loggain::Bool,

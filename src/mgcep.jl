@@ -285,7 +285,7 @@ function _mgcep(x::AbstractVector,          # a *windowed* signal
     @assert n < length(x)
 
     # Periodogram
-    periodogram = @compat abs2.(fft(x)) + e
+    periodogram = abs2.(fft(x)) + e
 
     # Allocate memory
     cr = zeros(T, length(x))

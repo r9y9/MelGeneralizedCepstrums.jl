@@ -16,16 +16,16 @@ end
 
 function melscale_vector(fs::Real, len::Integer)
     step = (fs / 2.0) / len
-    melscalev = @compat 1000.0/log(2)*log.(1 + step.*(1:len)./1000.0)
+    melscalev = 1000.0/log(2)*log.(1 + step.*(1:len)./1000.0)
     return melscalev / melscalev[end]
 end
 
 function warping_vector(α::Float64, len::Integer)
     step = π / len
     ω = step .* (1:len)
-    num = @compat (1-α*α) * sin.(ω)
-    den = @compat (1+α*α) * cos.(ω) - 2*α
-    warpfreq = @compat atan.(num./den)
+    num = (1-α*α) * sin.(ω)
+    den = (1+α*α) * cos.(ω) - 2*α
+    warpfreq = atan.(num./den)
     warpfreq[warpfreq .< 0] += π
     return warpfreq / warpfreq[end]
 end
