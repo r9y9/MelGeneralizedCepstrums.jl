@@ -38,6 +38,8 @@
 # Gain normalization (e.g. b -> b'):
 # bₐ,ᵧ'(m) = bₐ,ᵧ(m) / (1 + γbₐ,ᵧ(0))
 
+!isdefined(Base, :FFTW) && using FFTW
+
 function ptrans!{T}(p::AbstractVector{T},  m::Int, α::AbstractFloat)
     d, o = zero(T), zero(T)
 

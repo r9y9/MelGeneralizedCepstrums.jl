@@ -1,6 +1,8 @@
 # Mel-cepstrum analysis
 # re-coded from SPTK
 
+!isdefined(Base, :FFTW) && using FFTW
+
 function fill_al!{T<:AbstractFloat}(al::Vector{T}, α::AbstractFloat)
     al[1] = one(T)
     for i=2:length(al)
